@@ -28,7 +28,12 @@ function bookletTopics(items) {
       break
     }
   }
-  const head = segment(items.slice(0, headEnd))
+  // block position decides, unless the question's own evidence clearly points elsewhere
+  const head = segment(items.slice(0, headEnd)).map((t, k) => {
+    const s = scores(items[k])
+    const own = argmax(s)
+    return s[own] - s[t] >= 5 ? own : t
+  })
   const tail = items.slice(headEnd).map((it, k) => {
     const s = scores(it)
     const best = argmax(s)
