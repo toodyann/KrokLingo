@@ -59,7 +59,16 @@ function readCollapsed(): boolean {
 function Sidebar({ route }: { route: Route }) {
   const wide = useMediaQuery(WIDE_QUERY)
   const [collapsed, setCollapsed] = useState(readCollapsed)
+  // Right after "collapse" the pointer (and focus) is still on the sidebar; without this the
+  // peek-on-hover would reopen it at once. Peeking resumes once the pointer or focus leaves.
+  const [peekSuppressed, setPeekSuppressed] = useState(false)
   const rail = !wide || collapsed
+
+  const toggle = () => {
+    const next = !collapsed
+    setCollapsed(next)
+    setPeekSuppressed(next)
+  }
 
   useEffect(() => {
     document.documentElement.classList.toggle('sidebar-collapsed', collapsed)
@@ -71,7 +80,14 @@ function Sidebar({ route }: { route: Route }) {
   }, [collapsed])
 
   return (
-    <aside className={`sidebar${rail ? ' rail' : ''}`} aria-label="Розділи">
+    <aside
+      className={`sidebar${rail ? ' rail' : ''}${peekSuppressed ? ' no-peek' : ''}`}
+      aria-label="Розділи"
+      onPointerLeave={() => setPeekSuppressed(false)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setPeekSuppressed(false)
+      }}
+    >
       <a className="brand" href="#/" aria-label="KrokLingo — на головну">
         <BrandMark size={38} />
         <span className="brand-text fade">
@@ -99,7 +115,7 @@ function Sidebar({ route }: { route: Route }) {
           <button
             type="button"
             className="icon-btn sidebar-toggle"
-            onClick={() => setCollapsed((v) => !v)}
+            onClick={toggle}
             aria-label={collapsed ? 'Закріпити бічну панель розгорнутою' : 'Згорнути бічну панель'}
             title={collapsed ? 'Закріпити розгорнутою' : 'Згорнути (розкриватиметься при наведенні)'}
             aria-expanded={!collapsed}
