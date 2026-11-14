@@ -1,5 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="8" fill="#1d1d1f"/>
-  <rect x="5" y="20" width="22" height="6" rx="2" fill="#ffd84d"/>
-  <text x="16" y="21.5" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="14" font-weight="800" fill="#ffffff" letter-spacing="-0.5">K1</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="150 170 954 954">
+  <defs>
+    <linearGradient id="enamel-stroke" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0473D6"/>
+      <stop offset="1" stop-color="#0058B6"/>
+    </linearGradient>
+  </defs>
+  <path fill="#FDFDFC" stroke="url(#enamel-stroke)" stroke-width="60" stroke-linejoin="round"
+    d="M627,288 C580,288 500,224 405,224 C290,224 192,320 192,450 C192,560 265,660 295,750 C318,840 340,990 390,1045 C420,1078 480,1075 500,1000 C520,920 560,780 627,780 C690,780 720,920 738,1000 C758,1075 818,1078 848,1045 C898,990 922,840 947,750 C977,660 1055,560 1055,450 C1055,320 964,224 849,224 C754,224 674,288 627,288 Z"/>
+  <path fill="#68C1FC"
+    d="M276,524 C269,465 284,392 330,353 C360,330 405,314 450,314 C500,314 585,352 640,351 C605,362 540,358 480,356 C430,358 385,377 345,404 C310,430 283,475 276,524 Z"/>
 </svg>
