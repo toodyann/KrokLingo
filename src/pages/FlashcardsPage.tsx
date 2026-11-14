@@ -1,9 +1,21 @@
 import { useMemo, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
+import { EmptyState } from '../components/EmptyState'
+import { IconBook } from '../components/Icons'
 import { PageHeader } from '../components/PageHeader'
+import { Segmented } from '../components/Segmented'
 import { shuffle } from '../lib/util'
 import { useApp } from '../store/context'
 
 type Direction = 'en-uk' | 'uk-en'
+
+const DIRECTIONS: [Direction, string][] = [
+  ['en-uk', 'Англійська → українська'],
+  ['uk-en', 'Українська → англійська'],
+]
 
 /** Box at which a word is considered learned. */
 const LEARNED_BOX = 3
@@ -50,84 +62,79 @@ export function FlashcardsPage() {
   const back = entry ? (direction === 'en-uk' ? entry.translation : entry.word) : ''
 
   return (
-    <div className="page page-narrow">
-      <PageHeader
-        back={{ href: '#/dictionary', label: 'Словник' }}
-        title="Картки"
-      />
+    <div className="page flashcards-page">
+      <PageHeader back={{ href: '#/dictionary', label: 'Словник' }} title="Картки" />
 
       <div className="toolbar">
-        <div className="segmented" role="radiogroup" aria-label="Напрям">
-          <button type="button" role="radio" aria-checked={direction === 'en-uk'} onClick={() => setDirection('en-uk')}>
-            Англійська → українська
-          </button>
-          <button type="button" role="radio" aria-checked={direction === 'uk-en'} onClick={() => setDirection('uk-en')}>
-            Українська → англійська
-          </button>
-        </div>
+        <Segmented value={direction} onChange={setDirection} options={DIRECTIONS} label="Напрям" />
         <span className="spacer" />
         {deck.length > 0 && !done && (
-          <span className="secondary tnum">
+          <span className="text-sm text-muted-foreground tnum">
             {index + 1} / {deck.length}
           </span>
         )}
       </div>
 
       {deck.length === 0 ? (
-        <div className="card empty">
-          <h2 className="t-title3">Немає слів для повторення</h2>
-        </div>
+        <EmptyState
+          icon={<IconBook />}
+          title="Немає слів для повторення"
+          actions={
+            <Button asChild variant="outline">
+              <a href="#/dictionary">До словника</a>
+            </Button>
+          }
+        />
       ) : done ? (
-        <div className="card flashcard">
-          <h2 className="t-title2">Раунд завершено</h2>
-          <p className="secondary">
+        <Card className="flashcard">
+          <h2 className="t-section">Раунд завершено</h2>
+          <p className="text-muted-foreground">
             Знаю: {score.known} · Ще повторити: {score.again}
           </p>
-          <button type="button" className="btn btn-primary" onClick={restart}>
+          <Button size="lg" onClick={restart}>
             Новий раунд
-          </button>
-        </div>
+          </Button>
+        </Card>
       ) : (
         entry && (
-          <div className="card flashcard" aria-live="polite">
+          <Card className="flashcard" aria-live="polite">
             <div className="fc-front">{front}</div>
             {revealed ? (
               <>
                 <div className="fc-back">{back}</div>
                 {entry.note && <div className="fc-note">{entry.note}</div>}
-                <div className="row" style={{ justifyContent: 'center', marginTop: 16 }}>
-                  <button type="button" className="btn btn-gray" onClick={() => answer(false)}>
+                <div className="mt-4 flex justify-center gap-2">
+                  <Button size="lg" variant="outline" onClick={() => answer(false)}>
                     Ще повторю
-                  </button>
-                  <button type="button" className="btn btn-primary" onClick={() => answer(true)}>
+                  </Button>
+                  <Button size="lg" onClick={() => answer(true)}>
                     Знаю
-                  </button>
+                  </Button>
                 </div>
               </>
             ) : (
-              <button type="button" className="btn btn-tinted" onClick={() => setRevealed(true)} style={{ marginTop: 16 }}>
+              <Button size="lg" variant="secondary" className="mt-4" onClick={() => setRevealed(true)}>
                 Показати переклад
-              </button>
+              </Button>
             )}
-          </div>
+          </Card>
         )
       )}
 
-      <div className="list" style={{ marginTop: 20 }}>
-        <label className="list-row" style={{ cursor: 'pointer' }}>
-          <div className="list-row-main">Включати вивчені слова</div>
-          <input
-            type="checkbox"
-            className="switch"
+      <Card className="mt-5">
+        <CardContent className="flex items-center justify-between gap-4">
+          <Label htmlFor="include-learned">Включати вивчені слова</Label>
+          <Switch
+            id="include-learned"
             checked={includeLearned}
-            onChange={(e) => {
-              setIncludeLearned(e.target.checked)
+            onCheckedChange={(v) => {
+              setIncludeLearned(v)
               setIndex(0)
               setRevealed(false)
             }}
           />
-        </label>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

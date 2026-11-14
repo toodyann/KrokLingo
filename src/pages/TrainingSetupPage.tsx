@@ -1,5 +1,13 @@
 import { useMemo, useState } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
+import { Switch } from '@/components/ui/switch'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { PageHeader } from '../components/PageHeader'
+import { Segmented } from '../components/Segmented'
 import { navigate } from '../lib/router'
 import { createSession, mistakeIds } from '../lib/session'
 import { pluralUk, shuffle } from '../lib/util'
@@ -11,7 +19,7 @@ export function TrainingSetupPage() {
   const { bank, settings, history, session, setSession } = useApp()
   const [collections, setCollections] = useState<string[]>(() => bank.collections.map((c) => c.id))
   const [topics, setTopics] = useState<string[]>(() => bank.topics.map((t) => t.id))
-  const [count, setCount] = useState<number>(20)
+  const [count, setCount] = useState<(typeof COUNTS)[number]>(20)
   const [onlyMistakes, setOnlyMistakes] = useState(false)
   const [instantFeedback, setInstantFeedback] = useState(true)
 
@@ -29,8 +37,6 @@ export function TrainingSetupPage() {
 
   const pool = inCollections.filter((q) => topics.includes(q.topic) && (!onlyMistakes || mistakes.has(q.id)))
   const finalCount = count === 0 ? pool.length : Math.min(count, pool.length)
-
-  const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id])
 
   const start = () => {
     if (session && !confirm('Незавершений тест буде скасовано, а його відповіді втрачено. Почати тренування?')) return
@@ -56,95 +62,131 @@ export function TrainingSetupPage() {
   }
 
   return (
-    <div className="page page-narrow">
+    <div className="page">
       <PageHeader back={{ href: '#/tests', label: 'Тести' }} title="Тренування" />
 
-      <section className="section">
-        <h2 className="section-title">Збірники</h2>
-        <div className="row">
-          {bank.collections.map((c) => {
-            const n = bank.questions.filter((q) => q.collection === c.id).length
-            const on = collections.includes(c.id)
-            return (
-              <label key={c.id} className={`chip${on ? ' on' : ''}`} title={c.description}>
-                <input type="checkbox" checked={on} onChange={() => setCollections((l) => toggle(l, c.id))} />
-                {c.name} <span className="count">{n}</span>
-              </label>
-            )
-          })}
-        </div>
-      </section>
+      <div className="split">
+        <Card>
+          <CardContent className="grid gap-6">
+            <div className="grid gap-3">
+              <h2 className="text-base font-semibold">Збірники</h2>
+              <ToggleGroup
+                type="multiple"
+                variant="outline"
+                spacing={2}
+                value={collections}
+                onValueChange={setCollections}
+                className="flex-wrap justify-start"
+                aria-label="Збірники"
+              >
+                {bank.collections.map((c) => (
+                  <ToggleGroupItem key={c.id} value={c.id} title={c.description} className="data-[state=on]:bg-brand/12 data-[state=on]:text-brand">
+                    {c.name}
+                    <span className="text-xs text-muted-foreground">{bank.questions.filter((q) => q.collection === c.id).length}</span>
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            </div>
 
-      <section className="section">
-        <div className="row" style={{ marginBottom: 8 }}>
-          <h2 className="section-title" style={{ margin: '0 0 0 16px' }}>
-            Теми
-          </h2>
-          <span className="spacer" />
-          <button type="button" className="btn btn-plain btn-sm" onClick={() => setTopics(bank.topics.map((t) => t.id))}>
-            Усі
-          </button>
-          <button type="button" className="btn btn-plain btn-sm" onClick={() => setTopics([])}>
-            Жодної
-          </button>
-        </div>
-        <div className="row">
-          {bank.topics
-            .filter((t) => topicCounts.has(t.id))
-            .map((t) => {
-              const on = topics.includes(t.id)
-              return (
-                <label key={t.id} className={`chip${on ? ' on' : ''}`}>
-                  <input type="checkbox" checked={on} onChange={() => setTopics((l) => toggle(l, t.id))} />
-                  {t.name} <span className="count">{topicCounts.get(t.id)}</span>
-                </label>
-              )
-            })}
-        </div>
-      </section>
+            <Separator />
 
-      <section className="section">
-        <h2 className="section-title">Кількість питань</h2>
-        <div className="segmented" role="radiogroup" aria-label="Кількість питань">
-          {COUNTS.map((n) => (
-            <button
-              key={n}
-              type="button"
-              role="radio"
-              aria-checked={count === n}
-              onClick={() => setCount(n)}
-              style={{ minWidth: 52 }}
-            >
-              {n === 0 ? 'Усі' : n}
-            </button>
-          ))}
-        </div>
-      </section>
+            <div className="grid gap-3">
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="text-base font-semibold">Теми</h2>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="sm" onClick={() => setTopics(bank.topics.map((t) => t.id))}>
+                    Усі
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setTopics([])}>
+                    Жодної
+                  </Button>
+                </div>
+              </div>
+              <ToggleGroup
+                type="multiple"
+                variant="outline"
+                spacing={2}
+                value={topics}
+                onValueChange={setTopics}
+                className="flex-wrap justify-start"
+                aria-label="Теми"
+              >
+                {bank.topics
+                  .filter((t) => topicCounts.has(t.id))
+                  .map((t) => (
+                    <ToggleGroupItem key={t.id} value={t.id} className="data-[state=on]:bg-brand/12 data-[state=on]:text-brand">
+                      {t.name}
+                      <span className="text-xs text-muted-foreground">{topicCounts.get(t.id)}</span>
+                    </ToggleGroupItem>
+                  ))}
+              </ToggleGroup>
+            </div>
 
-      <section className="section">
-        <div className="list">
-          <label className="list-row" style={{ cursor: 'pointer' }}>
-            <div className="list-row-main">Лише питання з помилками</div>
-            <span className="list-row-value">{mistakes.size}</span>
-            <input type="checkbox" className="switch" checked={onlyMistakes} onChange={(e) => setOnlyMistakes(e.target.checked)} />
-          </label>
-          <label className="list-row" style={{ cursor: 'pointer' }}>
-            <div className="list-row-main">Показувати відповідь і пояснення одразу</div>
-            <input
-              type="checkbox"
-              className="switch"
-              checked={instantFeedback}
-              onChange={(e) => setInstantFeedback(e.target.checked)}
-            />
-          </label>
-        </div>
-      </section>
+            <Separator />
 
-      <button type="button" className="btn btn-primary btn-lg btn-block" onClick={start} disabled={finalCount === 0}>
-        {finalCount > 0
-          ? `Почати · ${finalCount} ${pluralUk(finalCount, 'питання', 'питання', 'питань')}`
-          : 'Немає питань для цих умов'}
-      </button>
+            <div className="grid gap-3">
+              <h2 className="text-base font-semibold">Кількість питань</h2>
+              <Segmented
+                value={count}
+                onChange={setCount}
+                options={COUNTS.map((n) => [n, n === 0 ? 'Усі' : String(n)] as const)}
+                label="Кількість питань"
+              />
+            </div>
+
+            <Separator />
+
+            <div className="grid gap-4">
+              <h2 className="text-base font-semibold">Параметри</h2>
+              <div className="flex items-center justify-between gap-4">
+                <Label htmlFor="only-mistakes" className="flex-1">
+                  Лише питання з помилками
+                  <Badge variant="secondary">{mistakes.size}</Badge>
+                </Label>
+                <Switch id="only-mistakes" checked={onlyMistakes} onCheckedChange={setOnlyMistakes} />
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <Label htmlFor="instant" className="flex-1">
+                  Показувати відповідь і пояснення одразу
+                </Label>
+                <Switch id="instant" checked={instantFeedback} onCheckedChange={setInstantFeedback} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <aside className="split-aside">
+          <Card>
+            <CardContent className="summary-card">
+              <div>
+                <div className="text-sm text-muted-foreground">Буде питань</div>
+                <div className="summary-figure">{finalCount}</div>
+              </div>
+              <div className="summary-rows">
+                <div>
+                  <span>Доступно за фільтрами</span>
+                  <b>{pool.length}</b>
+                </div>
+                <div>
+                  <span>Обрано тем</span>
+                  <b>
+                    {topics.filter((t) => topicCounts.has(t)).length} з {topicCounts.size}
+                  </b>
+                </div>
+                <div>
+                  <span>Відповідь</span>
+                  <b>{instantFeedback ? 'одразу' : 'наприкінці'}</b>
+                </div>
+              </div>
+              <Button size="lg" className="w-full" onClick={start} disabled={finalCount === 0}>
+                {finalCount > 0
+                  ? `Почати · ${finalCount} ${pluralUk(finalCount, 'питання', 'питання', 'питань')}`
+                  : 'Немає питань для цих умов'}
+              </Button>
+            </CardContent>
+          </Card>
+        </aside>
+      </div>
     </div>
   )
 }

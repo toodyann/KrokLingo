@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { IconChevronLeft, IconChevronRight, IconClose, IconGrid } from '../components/Icons'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { EmptyState } from '../components/EmptyState'
+import { IconChevronLeft, IconChevronRight, IconClose, IconGrid, IconTests } from '../components/Icons'
 import { QuestionView } from '../components/QuestionView'
 import { useDraggableSheet } from '../components/useDraggableSheet'
 import { useNow } from '../lib/hooks'
@@ -87,19 +90,23 @@ export function TestPage() {
 
   if (!session) {
     return (
-      <div className="page page-narrow">
-        <div className="card empty">
-          <h2 className="t-title3">Немає активного тесту</h2>
-          <p style={{ marginBottom: 16 }}>Почніть симуляцію іспиту або тренування.</p>
-          <div className="row" style={{ justifyContent: 'center' }}>
-            <a className="btn btn-primary" href="#/exam">
-              Іспит
-            </a>
-            <a className="btn btn-tinted" href="#/training">
-              Тренування
-            </a>
-          </div>
-        </div>
+      <div className="page">
+        <EmptyState
+          icon={<IconTests />}
+          title="Немає активного тесту"
+          actions={
+            <>
+              <Button asChild>
+                <a href="#/exam">Почати іспит</a>
+              </Button>
+              <Button asChild variant="outline">
+                <a href="#/training">Тренування</a>
+              </Button>
+            </>
+          }
+        >
+          Почніть симуляцію іспиту або тренування за темами.
+        </EmptyState>
       </div>
     )
   }
@@ -137,9 +144,9 @@ export function TestPage() {
       <div className="test-bar material">
         <div className="test-bar-inner">
           <div className="left">
-            <button type="button" className="icon-btn" onClick={abandon} aria-label="Вийти з тесту без збереження">
+            <Button variant="ghost" size="icon" onClick={abandon} aria-label="Вийти з тесту без збереження">
               <IconClose />
-            </button>
+            </Button>
             <span className="secondary t-subhead regular-only">{session.title}</span>
           </div>
           {remaining !== null ? (
@@ -154,9 +161,7 @@ export function TestPage() {
             </div>
           )}
           <div className="right">
-            <button type="button" className="btn btn-primary btn-sm" onClick={askFinish}>
-              Завершити
-            </button>
+            <Button onClick={askFinish}>Завершити</Button>
           </div>
         </div>
         <div className="test-stats" aria-live="polite">
@@ -182,8 +187,8 @@ export function TestPage() {
         <div className="runner">
           <div>
             <div className="question-meta">
-              <span className="pill pill-accent">{session.mode === 'exam' ? 'Іспит' : 'Тренування'}</span>
-              {question && <span className="pill">{bank.topicName(question.topic)}</span>}
+              <Badge variant="brand">{session.mode === 'exam' ? 'Іспит' : 'Тренування'}</Badge>
+              {question && <Badge variant="secondary">{bank.topicName(question.topic)}</Badge>}
             </div>
 
             {question ? (
@@ -200,25 +205,25 @@ export function TestPage() {
             )}
 
             <div className="runner-nav">
-              <button type="button" className="btn btn-gray" onClick={() => go(session.current - 1)} disabled={isFirst}>
+              <Button variant="outline" size="lg" onClick={() => go(session.current - 1)} disabled={isFirst}>
                 <IconChevronLeft />
                 Назад
-              </button>
+              </Button>
               {isLast ? (
-                <button type="button" className="btn btn-primary" onClick={askFinish}>
+                <Button size="lg" onClick={askFinish}>
                   Завершити тест
-                </button>
+                </Button>
               ) : (
-                <button type="button" className="btn btn-primary" onClick={() => go(session.current + 1)}>
+                <Button size="lg" onClick={() => go(session.current + 1)}>
                   Далі
                   <IconChevronRight />
-                </button>
+                </Button>
               )}
             </div>
           </div>
 
-          <aside className="card">
-            <h2 className="t-headline" style={{ marginBottom: 12 }}>
+          <aside className="card p-5">
+            <h2 className="card-title" style={{ marginBottom: 12 }}>
               Питання
             </h2>
             <Palette session={session} bank={bank} onGo={go} />
@@ -227,30 +232,24 @@ export function TestPage() {
       </div>
 
       <div className="bottom-toolbar material">
-        <button
-          type="button"
-          className="icon-btn"
-          onClick={() => go(session.current - 1)}
-          disabled={isFirst}
-          aria-label="Попереднє питання"
-        >
+        <Button variant="ghost" size="icon" onClick={() => go(session.current - 1)} disabled={isFirst} aria-label="Попереднє питання">
           <IconChevronLeft />
-        </button>
-        <button type="button" className="btn btn-gray" onClick={() => setPaletteOpen(true)} aria-label="Усі питання">
+        </Button>
+        <Button variant="outline" className="flex-1" onClick={() => setPaletteOpen(true)} aria-label="Усі питання">
           <IconGrid />
           <span className="tnum">
             {session.current + 1} / {stats.total}
           </span>
-        </button>
+        </Button>
         {isLast ? (
-          <button type="button" className="btn btn-primary" onClick={askFinish}>
+          <Button className="flex-1" onClick={askFinish}>
             Завершити
-          </button>
+          </Button>
         ) : (
-          <button type="button" className="btn btn-primary" onClick={() => go(session.current + 1)}>
+          <Button className="flex-1" onClick={() => go(session.current + 1)}>
             Далі
             <IconChevronRight />
-          </button>
+          </Button>
         )}
       </div>
 
@@ -310,17 +309,17 @@ function Palette({ session, bank, onGo }: { session: ActiveSession; bank: Bank; 
         {session.instantFeedback ? (
           <>
             <span>
-              <i style={{ background: 'var(--success-tint)' }} />
+              <i style={{ background: 'var(--success-soft)' }} />
               правильно
             </span>
             <span>
-              <i style={{ background: 'var(--danger-tint)' }} />
+              <i style={{ background: 'var(--danger-soft)' }} />
               <s>неправильно</s>
             </span>
           </>
         ) : (
           <span>
-            <i style={{ background: 'var(--accent-tint)' }} />є відповідь
+            <i style={{ background: 'var(--brand-soft)' }} />є відповідь
           </span>
         )}
         <span>
@@ -349,9 +348,9 @@ function PaletteSheet({ onClose, children }: { onClose: () => void; children: (d
         <div className="grabber" aria-hidden="true" />
         <div className="sheet-head">
           <h2 className="t-headline">Усі питання</h2>
-          <button type="button" className="icon-btn filled" onClick={() => dismiss()} aria-label="Закрити">
+          <Button variant="ghost" size="icon-sm" onClick={() => dismiss()} aria-label="Закрити">
             <IconClose size={16} />
-          </button>
+          </Button>
         </div>
         {children(() => dismiss())}
       </div>

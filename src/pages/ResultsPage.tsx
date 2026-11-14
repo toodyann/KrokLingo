@@ -1,5 +1,10 @@
 import { useMemo, useState } from 'react'
 import { TopicBars } from '../components/Charts'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { EmptyState } from '../components/EmptyState'
+import { Segmented } from '../components/Segmented'
 import { PageHeader } from '../components/PageHeader'
 import { QuestionView } from '../components/QuestionView'
 import { useToast } from '../components/toastContext'
@@ -19,11 +24,13 @@ export function ResultsPage({ id }: { id: string }) {
 
   if (!record) {
     return (
-      <div className="page page-narrow">
+      <div className="page">
         <PageHeader back={{ href: '#/history', label: 'Історія' }} title="Результати" />
-        <div className="card empty">
-          <h2 className="t-title3">Результат не знайдено</h2>
-        </div>
+        <EmptyState title="Результат не знайдено" actions={
+            <Button asChild variant="outline">
+              <a href="#/history">До історії</a>
+            </Button>
+          } />
       </div>
     )
   }
@@ -60,12 +67,12 @@ export function ResultsPage({ id }: { id: string }) {
         subtitle={`${record.title} · ${formatDate(record.finishedAt)}`}
         actions={
           <>
-            <a className="btn btn-tinted btn-sm" href={record.mode === 'exam' ? '#/exam' : '#/training'}>
-              Пройти ще раз
-            </a>
-            <button type="button" className="btn btn-destructive btn-sm" onClick={remove}>
+            <Button asChild variant="outline">
+              <a href={record.mode === 'exam' ? '#/exam' : '#/training'}>Пройти ще раз</a>
+            </Button>
+            <Button variant="destructive" onClick={remove}>
               Видалити
-            </button>
+            </Button>
           </>
         }
       />
@@ -117,23 +124,65 @@ export function ResultsPage({ id }: { id: string }) {
         </div>
       </div>
 
-      <div className="grid grid-2 section">
-        <section className="card">
-          <h2 className="t-title3" style={{ marginBottom: 16 }}>
-            За темами
-          </h2>
-          <TopicBars stats={stats} threshold={record.threshold} />
-        </section>
-        <section className="card">
-          <div className="row" style={{ marginBottom: 14 }}>
-            <h2 className="t-title3">Нові слова цієї сесії</h2>
-            <span className="spacer" />
-            <span className="pill">
-              {record.newWords.length} {pluralUk(record.newWords.length, 'слово', 'слова', 'слів')}
-            </span>
-          </div>
+      <div className="split">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Детальний розбір</CardTitle>
+          <CardAction>
+            <Segmented value={filter} onChange={setFilter} options={filters} label="Фільтр питань" />
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+
+        {items.length === 0 && <EmptyState bare title="Немає питань у цій категорії" />}
+
+        {items.map(({ item, index, question }) => {
+          const ok = question && item.chosen === question.correct
+          return (
+            <article className="review-item" key={item.qid + index}>
+              <div className="review-head">
+                <b className="tnum">Питання {index + 1}</b>
+                {question && <Badge variant="secondary">{bank.topicName(question.topic)}</Badge>}
+                {item.chosen == null ? (
+                  <Badge variant="warning">без відповіді</Badge>
+                ) : ok ? (
+                  <Badge variant="success">✓ правильно</Badge>
+                ) : (
+                  <Badge variant="destructive">✗ неправильно</Badge>
+                )}
+              </div>
+              {question ? (
+                <QuestionView question={question} order={item.order} chosen={item.chosen} reveal passageOpen={false} />
+              ) : (
+                <p className="secondary">Питання видалене з бази.</p>
+              )}
+            </article>
+          )
+        })}
+        </CardContent>
+      </Card>
+
+        <aside className="split-aside">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">За темами</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TopicBars stats={stats} threshold={record.threshold} />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Нові слова цієї сесії</CardTitle>
+              <CardAction>
+                <Badge variant="secondary">
+                  {record.newWords.length} {pluralUk(record.newWords.length, 'слово', 'слова', 'слів')}
+                </Badge>
+              </CardAction>
+            </CardHeader>
+            <CardContent>
           {record.newWords.length === 0 ? (
-            <p className="secondary">Нових слів немає</p>
+            <p className="text-muted-foreground">Нових слів немає</p>
           ) : (
             <>
               <div className="word-list">
@@ -145,57 +194,19 @@ export function ResultsPage({ id }: { id: string }) {
                 ))}
               </div>
               <div className="row" style={{ marginTop: 16 }}>
-                <a className="btn btn-tinted btn-sm" href="#/flashcards">
-                  Повторити картками
-                </a>
-                <a className="btn btn-plain btn-sm" href="#/dictionary">
-                  Відкрити словник
-                </a>
+                <Button asChild size="sm" variant="secondary">
+                  <a href="#/flashcards">Повторити картками</a>
+                </Button>
+                <Button asChild size="sm" variant="ghost">
+                  <a href="#/dictionary">Відкрити словник</a>
+                </Button>
               </div>
             </>
           )}
-        </section>
+            </CardContent>
+          </Card>
+        </aside>
       </div>
-
-      <section className="card">
-        <div className="row" style={{ marginBottom: 12 }}>
-          <h2 className="t-title3">Детальний розбір</h2>
-          <span className="spacer" />
-          <div className="segmented" role="radiogroup" aria-label="Фільтр питань">
-            {filters.map(([key, label]) => (
-              <button key={key} type="button" role="radio" aria-checked={filter === key} onClick={() => setFilter(key)}>
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {items.length === 0 && <div className="empty">Немає питань у цій категорії.</div>}
-
-        {items.map(({ item, index, question }) => {
-          const ok = question && item.chosen === question.correct
-          return (
-            <article className="review-item" key={item.qid + index}>
-              <div className="review-head">
-                <b className="tnum">Питання {index + 1}</b>
-                {question && <span className="pill">{bank.topicName(question.topic)}</span>}
-                {item.chosen == null ? (
-                  <span className="pill pill-warning">без відповіді</span>
-                ) : ok ? (
-                  <span className="pill pill-success">✓ правильно</span>
-                ) : (
-                  <span className="pill pill-danger">✗ неправильно</span>
-                )}
-              </div>
-              {question ? (
-                <QuestionView question={question} order={item.order} chosen={item.chosen} reveal passageOpen={false} />
-              ) : (
-                <p className="secondary">Питання видалене з бази.</p>
-              )}
-            </article>
-          )
-        })}
-      </section>
     </div>
   )
 }

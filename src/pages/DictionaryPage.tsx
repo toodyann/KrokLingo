@@ -1,5 +1,23 @@
-import { useMemo, useState, type FormEvent } from 'react'
-import { IconCheck, IconPencil, IconTrash } from '../components/Icons'
+import { useId, useMemo, useState, type FormEvent, type ReactNode } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Segmented } from '../components/Segmented'
+import { EmptyState } from '../components/EmptyState'
+import { IconBook, IconCheck, IconDownload, IconPencil, IconPlus, IconTrash } from '../components/Icons'
 import { PageHeader } from '../components/PageHeader'
 import { useToast } from '../components/toastContext'
 import { exportDocx, exportTxt } from '../lib/exportDictionary'
@@ -53,44 +71,34 @@ export function DictionaryPage() {
       <PageHeader
         title="Словник"
         subtitle={
-          <>
-            {dictionary.length} {pluralUk(dictionary.length, 'слово', 'слова', 'слів')} · вивчено {learned.length}
-            {untranslated > 0 && ` · без перекладу ${untranslated}`}
-          </>
+          dictionary.length > 0 ? (
+            <>
+              {dictionary.length} {pluralUk(dictionary.length, 'слово', 'слова', 'слів')} · вивчено {learned.length}
+              {untranslated > 0 && ` · без перекладу ${untranslated}`}
+            </>
+          ) : undefined
         }
         actions={
-          dictionary.length > 0 && (
-            <a className="btn btn-primary btn-sm" href="#/flashcards">
-              Повторити картками
-            </a>
-          )
+          <>
+            <Button variant="outline" onClick={() => setAdding((v) => !v)} aria-expanded={adding}>
+              <IconPlus />
+              Додати слово
+            </Button>
+            {dictionary.length > 0 && (
+              <Button asChild>
+                <a href="#/flashcards">Повторити картками</a>
+              </Button>
+            )}
+          </>
         }
       />
 
-      <div className="toolbar">
-        <input
-          type="search"
-          placeholder="Пошук слова, перекладу чи примітки"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          aria-label="Пошук у словнику"
-        />
-        <div className="segmented" role="radiogroup" aria-label="Фільтр">
-          {FILTERS.map(([key, label]) => (
-            <button key={key} type="button" role="radio" aria-checked={filter === key} onClick={() => setFilter(key)}>
-              {label}
-            </button>
-          ))}
-        </div>
-        <select value={sort} onChange={(e) => setSort(e.target.value as Sort)} aria-label="Сортування">
-          <option value="new">Спочатку нові</option>
-          <option value="az">За алфавітом</option>
-          <option value="lookups">Найчастіше шукані</option>
-        </select>
-      </div>
-
       {adding && (
-        <div className="card section">
+        <Card className="section">
+          <CardHeader>
+            <CardTitle className="text-base">Нове слово</CardTitle>
+          </CardHeader>
+          <CardContent>
           <EntryForm
             submitLabel="Додати слово"
             onCancel={() => setAdding(false)}
@@ -99,76 +107,128 @@ export function DictionaryPage() {
               setAdding(false)
             }}
           />
-        </div>
+          </CardContent>
+        </Card>
       )}
 
-      {visible.length === 0 ? (
-        <div className="card empty">
-          {dictionary.length === 0 ? (
-            <>
-              <h2 className="t-title3">Словник порожній</h2>
-            </>
-          ) : (
-            'Нічого не знайдено.'
-          )}
-        </div>
+      {dictionary.length === 0 ? (
+        <EmptyState
+          icon={<IconBook />}
+          title="Словник порожній"
+          actions={
+            <Button asChild>
+              <a href="#/tests">До тестів</a>
+            </Button>
+          }
+        >
+          Натисніть на незнайоме слово в будь-якому питанні — воно збережеться тут разом із перекладом.
+        </EmptyState>
       ) : (
-        <div className="list section">
-          {visible.map((e) =>
-            editingId === e.id ? (
-              <div className="dict-entry" key={e.id}>
-                <EntryForm
-                  initial={e}
-                  submitLabel="Зберегти"
-                  onCancel={() => setEditingId(null)}
-                  onSubmit={(v) => {
-                    const translation = v.translation.trim()
-                    updateEntry(e.id, {
-                      word: v.word.trim().toLowerCase(),
-                      translation,
-                      note: v.note.trim(),
-                      source: translation !== e.translation ? 'manual' : e.source,
-                    })
-                    setEditingId(null)
-                  }}
-                />
-              </div>
-            ) : (
-              <EntryRow
-                key={e.id}
-                entry={e}
-                onEdit={() => setEditingId(e.id)}
-                onToggleLearned={() => updateEntry(e.id, { learned: !e.learned, box: e.learned ? 0 : e.box })}
-                onDelete={() => remove([e], `«${e.word}» видалено`)}
-              />
-            ),
-          )}
-        </div>
-      )}
+        <>
+          <div className="toolbar">
+            <Input
+              type="search"
+              className="h-9 min-w-[240px] flex-1"
+              placeholder="Пошук слова, перекладу чи примітки"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              aria-label="Пошук у словнику"
+            />
+            <Segmented value={filter} onChange={setFilter} options={FILTERS} label="Фільтр" />
+            <Select value={sort} onValueChange={(v) => setSort(v as Sort)}>
+              <SelectTrigger className="w-[200px]" aria-label="Сортування">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="new">Спочатку нові</SelectItem>
+                <SelectItem value="az">За алфавітом</SelectItem>
+                <SelectItem value="lookups">Найчастіше шукані</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-      <div className="row">
-        <button type="button" className="btn btn-tinted btn-sm" onClick={() => setAdding((v) => !v)}>
-          Додати слово
-        </button>
-        <button type="button" className="btn btn-plain btn-sm" onClick={() => exportTxt(visible)} disabled={!visible.length}>
-          Експорт .txt
-        </button>
-        <button type="button" className="btn btn-plain btn-sm" onClick={() => exportDocx(visible)} disabled={!visible.length}>
-          Експорт .docx
-        </button>
-        <span className="spacer" />
-        {learned.length > 0 && (
-          <button
-            type="button"
-            className="btn btn-destructive btn-sm"
-            onClick={() =>
-              remove(learned, `Видалено ${learned.length} ${pluralUk(learned.length, 'вивчене слово', 'вивчені слова', 'вивчених слів')}`)
-            }
-          >
-            Видалити вивчені
-          </button>
-        )}
-      </div>
+          {visible.length === 0 ? (
+            <EmptyState title="Нічого не знайдено">Змініть пошуковий запит або фільтр.</EmptyState>
+          ) : (
+            <div className="dict-table" role="table" aria-label="Слова">
+              <div className="dict-head" role="row">
+                <span role="columnheader">Слово</span>
+                <span role="columnheader">Переклад</span>
+                <span role="columnheader" className="col-note">
+                  Примітка
+                </span>
+                <span role="columnheader">Додано</span>
+                <span role="columnheader" className="sr-only">
+                  Дії
+                </span>
+              </div>
+              {visible.map((e) =>
+                editingId === e.id ? (
+                  <div className="dict-entry editing" key={e.id} role="row">
+                    <EntryForm
+                      initial={e}
+                      submitLabel="Зберегти"
+                      onCancel={() => setEditingId(null)}
+                      onSubmit={(v) => {
+                        const translation = v.translation.trim()
+                        updateEntry(e.id, {
+                          word: v.word.trim().toLowerCase(),
+                          translation,
+                          note: v.note.trim(),
+                          source: translation !== e.translation ? 'manual' : e.source,
+                        })
+                        setEditingId(null)
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <EntryRow
+                    key={e.id}
+                    entry={e}
+                    onEdit={() => setEditingId(e.id)}
+                    onToggleLearned={() => updateEntry(e.id, { learned: !e.learned, box: e.learned ? 0 : e.box })}
+                    onDelete={() => remove([e], `«${e.word}» видалено`)}
+                  />
+                ),
+              )}
+            </div>
+          )}
+
+          <div className="dict-footer">
+            <span className="secondary t-footnote">
+              Показано {visible.length} з {dictionary.length}
+            </span>
+            <div className="row">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" disabled={!visible.length}>
+                    <IconDownload />
+                    Експорт
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>
+                    {visible.length} {pluralUk(visible.length, 'слово', 'слова', 'слів')}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onSelect={() => exportTxt(visible)}>Текстовий файл (.txt)</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => exportDocx(visible)}>Документ Word (.docx)</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {learned.length > 0 && (
+                <Button
+                  variant="destructive"
+                  onClick={() =>
+                    remove(learned, `Видалено ${learned.length} ${pluralUk(learned.length, 'вивчене слово', 'вивчені слова', 'вивчених слів')}`)
+                  }
+                >
+                  Видалити вивчені
+                </Button>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
@@ -185,36 +245,40 @@ function EntryRow({
   onDelete: () => void
 }) {
   return (
-    <div className={`dict-entry${entry.learned ? ' learned' : ''}`}>
-      <div>
+    <div className={`dict-entry${entry.learned ? ' learned' : ''}`} role="row">
+      <div role="cell">
         <div className="dict-word">
           <mark>{entry.word}</mark>
         </div>
-        <div className="secondary t-footnote" title={formatDate(entry.addedAt)}>
-          {entry.learned ? 'вивчено' : entry.lookups > 1 ? `шукали ${entry.lookups} рази` : formatDate(entry.addedAt).split(',')[0]}
-        </div>
+        {(entry.learned || entry.lookups > 1) && (
+          <div className="muted t-footnote">{entry.learned ? 'вивчено' : `шукали ${entry.lookups} рази`}</div>
+        )}
       </div>
-      <div className="dict-tr">
-        {entry.translation ? <div>{entry.translation}</div> : <span className="pill pill-warning">без перекладу</span>}
-        {entry.note && <div className="dict-note">{entry.note}</div>}
+      <div className="dict-tr" role="cell">
+        {entry.translation ? entry.translation : <Badge variant="warning">без перекладу</Badge>}
       </div>
-      <div className="dict-actions">
-        <button
-          type="button"
-          className={`icon-btn${entry.learned ? ' on' : ''}`}
+      <div className="dict-note-col" role="cell">
+        {entry.note}
+      </div>
+      <div className="dict-date" role="cell" title={formatDate(entry.addedAt)}>
+        {formatDate(entry.addedAt).split(',')[0]}
+      </div>
+      <div className="dict-actions" role="cell">
+        <IconAction
+          label={entry.learned ? 'Повернути до вивчення' : 'Позначити як вивчене'}
+          ariaLabel={entry.learned ? `Повернути «${entry.word}» до вивчення` : `Позначити «${entry.word}» як вивчене`}
+          pressed={entry.learned}
           onClick={onToggleLearned}
-          aria-pressed={entry.learned}
-          aria-label={entry.learned ? `Повернути «${entry.word}» до вивчення` : `Позначити «${entry.word}» як вивчене`}
-          title={entry.learned ? 'Повернути до вивчення' : 'Позначити як вивчене'}
+          className={entry.learned ? 'text-success' : undefined}
         >
           <IconCheck />
-        </button>
-        <button type="button" className="icon-btn" onClick={onEdit} aria-label={`Редагувати «${entry.word}»`} title="Редагувати">
+        </IconAction>
+        <IconAction label="Редагувати" ariaLabel={`Редагувати «${entry.word}»`} onClick={onEdit}>
           <IconPencil />
-        </button>
-        <button type="button" className="icon-btn" onClick={onDelete} aria-label={`Видалити «${entry.word}»`} title="Видалити">
+        </IconAction>
+        <IconAction label="Видалити" ariaLabel={`Видалити «${entry.word}»`} onClick={onDelete}>
           <IconTrash />
-        </button>
+        </IconAction>
       </div>
     </div>
   )
@@ -242,16 +306,17 @@ function EntryForm({
     translation: initial?.translation ?? '',
     note: initial?.note ?? '',
   })
+  const id = useId()
   const submit = (e: FormEvent) => {
     e.preventDefault()
     if (values.word.trim()) onSubmit(values)
   }
   return (
     <form className="dict-edit" onSubmit={submit}>
-      <label className="field">
-        <span>Слово англійською</span>
-        <input
-          type="text"
+      <div className="grid gap-1.5">
+        <Label htmlFor={`${id}-word`}>Слово англійською</Label>
+        <Input
+          id={`${id}-word`}
           autoFocus
           autoCapitalize="none"
           spellCheck={false}
@@ -259,28 +324,59 @@ function EntryForm({
           onChange={(e) => setValues((v) => ({ ...v, word: e.target.value }))}
           required
         />
-      </label>
-      <label className="field">
-        <span>Переклад</span>
-        <input type="text" value={values.translation} onChange={(e) => setValues((v) => ({ ...v, translation: e.target.value }))} />
-      </label>
-      <label className="field full">
-        <span>Примітка</span>
-        <textarea
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor={`${id}-tr`}>Переклад</Label>
+        <Input
+          id={`${id}-tr`}
+          value={values.translation}
+          onChange={(e) => setValues((v) => ({ ...v, translation: e.target.value }))}
+        />
+      </div>
+      <div className="grid gap-1.5 full">
+        <Label htmlFor={`${id}-note`}>Примітка</Label>
+        <Textarea
+          id={`${id}-note`}
           rows={2}
           placeholder="Медичне значення терміна, приклад, асоціація"
           value={values.note}
           onChange={(e) => setValues((v) => ({ ...v, note: e.target.value }))}
         />
-      </label>
+      </div>
       <div className="row full">
-        <button type="submit" className="btn btn-primary btn-sm">
-          {submitLabel}
-        </button>
-        <button type="button" className="btn btn-plain btn-sm" onClick={onCancel}>
+        <Button type="submit">{submitLabel}</Button>
+        <Button type="button" variant="ghost" onClick={onCancel}>
           Скасувати
-        </button>
+        </Button>
       </div>
     </form>
+  )
+}
+
+/** Icon-only row action with a tooltip and an accessible name. */
+function IconAction({
+  label,
+  ariaLabel,
+  onClick,
+  pressed,
+  className,
+  children,
+}: {
+  label: string
+  ariaLabel: string
+  onClick: () => void
+  pressed?: boolean
+  className?: string
+  children: ReactNode
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button variant="ghost" size="icon" onClick={onClick} aria-label={ariaLabel} aria-pressed={pressed} className={className}>
+          {children}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
   )
 }

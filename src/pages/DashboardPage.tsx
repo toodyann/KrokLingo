@@ -13,6 +13,10 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+import { Button } from '@/components/ui/button'
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { IconBook, IconChevronRight, IconGrid, IconHistory, IconTests } from '../components/Icons'
+import { Segmented } from '../components/Segmented'
 import { PageHeader } from '../components/PageHeader'
 import { useChartTheme, type ChartTheme } from '../components/useChartTheme'
 import {
@@ -28,6 +32,7 @@ import {
   type Period,
   type TopicPoint,
 } from '../lib/stats'
+import { liveStats, mistakeIds } from '../lib/session'
 import { formatPercent, pluralUk } from '../lib/util'
 import { useApp } from '../store/context'
 
@@ -55,7 +60,7 @@ function minutesLabel(min: number): string {
 }
 
 export function DashboardPage() {
-  const { bank, history, dictionary, settings } = useApp()
+  const { bank, history, dictionary, settings, session } = useApp()
   const theme = useChartTheme()
   const [period, setPeriod] = useState<Period>(30)
 
@@ -70,24 +75,65 @@ export function DashboardPage() {
       attempts: attemptSeries(history, range),
       topics: topicSeries(history, bank, range),
       streak: streakDays(history),
+      mistakes: mistakeIds(history, bank).size,
     }
   }, [period, history, dictionary, bank])
 
-  const { now, prev, activity, attempts, topics, streak } = data
+  // No activity at all yet: guide the first steps instead of showing empty charts or zeros.
+  if (history.length === 0 && dictionary.length === 0) {
+    return (
+      <div className="page">
+        <PageHeader title="Огляд" />
+        <Card className="grid items-center gap-8 p-8 lg:grid-cols-[1.2fr_1fr]">
+          <div className="onboarding">
+            <h2>Почніть підготовку до «Крок 1»</h2>
+            <p>
+              Тут з’являться ваша активність, результати спроб і точність за темами — щойно ви пройдете перший тест.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              <Button asChild size="lg">
+                <a href="#/exam">Почати іспит</a>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <a href="#/training">Тренування</a>
+              </Button>
+            </div>
+          </div>
+          <ol className="steps">
+            <li>
+              <span className="step-num">1</span>
+              <span>
+                <b>Пройдіть тест</b> — симуляцію іспиту на {settings.examQuestions} завдань або тренування за темою.
+              </span>
+            </li>
+            <li>
+              <span className="step-num">2</span>
+              <span>
+                <b>Натискайте на незнайомі слова</b> — переклад з’явиться поруч, а слово збережеться у словник.
+              </span>
+            </li>
+            <li>
+              <span className="step-num">3</span>
+              <span>
+                <b>Повертайтеся сюди</b> — стежте за точністю й слабкими темами.
+              </span>
+            </li>
+          </ol>
+        </Card>
+      </div>
+    )
+  }
+
+  const { now, prev, activity, attempts, topics, streak, mistakes } = data
   const periodWord = period === 'all' ? 'за весь час' : `за ${period} днів`
+  const toLearn = dictionary.filter((e) => !e.learned && e.translation).length
 
   return (
     <div className="page">
       <PageHeader
         title="Огляд"
         actions={
-          <div className="segmented" role="radiogroup" aria-label="Період">
-            {PERIODS.map(([key, label]) => (
-              <button key={key} type="button" role="radio" aria-checked={period === key} onClick={() => setPeriod(key)}>
-                {label}
-              </button>
-            ))}
-          </div>
+          <Segmented value={period} onChange={setPeriod} options={PERIODS} label="Період" />
         }
       />
 
@@ -115,9 +161,9 @@ export function DashboardPage() {
         <Kpi label="Час навчання" value={minutesLabel(Math.round(now.seconds / 60))} />
       </div>
 
-      <h2 className="section-title">Активність</h2>
-      <div className="dash-grid">
+      <div className="board">
         <ChartCard
+          className="span-8"
           title={activity.bucket === 'week' ? 'Відповіді за тижнями' : 'Відповіді за днями'}
           value={
             <>
@@ -126,13 +172,94 @@ export function DashboardPage() {
           }
         >
           {now.answered === 0 ? (
-            <div className="chart-empty">Ще немає відповідей</div>
+            <div className="chart-empty">Немає відповідей {periodWord}</div>
           ) : (
             <ActivityChart points={activity.points} bucket={activity.bucket} theme={theme} />
           )}
         </ChartCard>
 
+        <Card className="span-4">
+          <CardHeader>
+            <CardTitle className="text-base">Продовжити навчання</CardTitle>
+          </CardHeader>
+          <CardContent className="action-list">
+            {session ? (
+              <QuickAction
+                primary
+                href="#/test"
+                icon={<IconTests />}
+                title="Продовжити тест"
+                sub={`${session.title} · ${liveStats(session, bank).answered} з ${session.questions.length}`}
+              />
+            ) : (
+              <QuickAction
+                primary
+                href="#/exam"
+                icon={<IconTests />}
+                title="Симуляція іспиту"
+                sub={`${settings.examQuestions} завдань · ${settings.examMinutes} хв`}
+              />
+            )}
+            <QuickAction href="#/training" icon={<IconGrid />} title="Тренування за темами" sub="Без таймера" />
+            <QuickAction
+              href="#/flashcards"
+              icon={<IconBook />}
+              title="Повторити слова"
+              sub={`${toLearn} ${pluralUk(toLearn, 'слово', 'слова', 'слів')} до вивчення`}
+            />
+            {mistakes > 0 && (
+              <QuickAction
+                href="#/training"
+                icon={<IconHistory />}
+                title="Робота над помилками"
+                sub={`${mistakes} ${pluralUk(mistakes, 'питання', 'питання', 'питань')}`}
+              />
+            )}
+          </CardContent>
+        </Card>
+
         <ChartCard
+          className="span-7"
+          title="Результати спроб"
+          value={
+            attempts.length ? (
+              <>
+                <b>{formatPercent(attempts[attempts.length - 1].percent)}</b> остання
+              </>
+            ) : undefined
+          }
+        >
+          {attempts.length === 0 ? (
+            <div className="chart-empty">Немає спроб {periodWord}</div>
+          ) : (
+            <AttemptsChart points={attempts} threshold={settings.threshold} theme={theme} />
+          )}
+        </ChartCard>
+
+        <ChartCard className="span-5" title="Правильні відповіді" value={<span>{periodWord}</span>}>
+          {now.total === 0 ? (
+            <div className="chart-empty">Немає відповідей {periodWord}</div>
+          ) : (
+            <AccuracyMeter
+              correct={now.correct}
+              wrong={now.answered - now.correct}
+              skipped={now.skipped}
+              total={now.total}
+              threshold={settings.threshold}
+            />
+          )}
+        </ChartCard>
+
+        <ChartCard className="span-7" title="Точність за темами">
+          {topics.length === 0 ? (
+            <div className="chart-empty">Немає відповідей {periodWord}</div>
+          ) : (
+            <TopicMeters topics={topics} threshold={settings.threshold} />
+          )}
+        </ChartCard>
+
+        <ChartCard
+          className="span-5"
           title="Словник"
           value={
             <>
@@ -147,49 +274,35 @@ export function DashboardPage() {
           )}
         </ChartCard>
       </div>
-
-      <h2 className="section-title">Успішність</h2>
-      <div className="dash-grid">
-        <ChartCard
-          title="Результати спроб"
-          value={
-            attempts.length ? (
-              <>
-                <b>{formatPercent(attempts[attempts.length - 1].percent)}</b> остання
-              </>
-            ) : undefined
-          }
-        >
-          {attempts.length === 0 ? (
-            <div className="chart-empty">Ще немає спроб</div>
-          ) : (
-            <AttemptsChart points={attempts} threshold={settings.threshold} theme={theme} />
-          )}
-        </ChartCard>
-
-        <ChartCard title="Правильні відповіді">
-          {now.total === 0 ? (
-            <div className="chart-empty">Ще немає відповідей</div>
-          ) : (
-            <AccuracyMeter
-              correct={now.correct}
-              wrong={now.answered - now.correct}
-              skipped={now.skipped}
-              total={now.total}
-              threshold={settings.threshold}
-            />
-          )}
-        </ChartCard>
-
-        <ChartCard title="Точність за темами" wide>
-          {topics.length === 0 ? (
-            <div className="chart-empty">Ще немає даних</div>
-          ) : (
-            <TopicMeters topics={topics} threshold={settings.threshold} />
-          )}
-        </ChartCard>
-      </div>
     </div>
+  )
+}
+
+function QuickAction({
+  href,
+  icon,
+  title,
+  sub,
+  primary = false,
+}: {
+  href: string
+  icon: ReactNode
+  title: string
+  sub: string
+  primary?: boolean
+}) {
+  return (
+    <a className={`action${primary ? ' primary' : ''}`} href={href}>
+      <span className="action-icon" aria-hidden="true">
+        {icon}
+      </span>
+      <span className="action-main">
+        <span className="action-title">{title}</span>
+        <br />
+        <span className="action-sub">{sub}</span>
+      </span>
+      <IconChevronRight className="chev" />
+    </a>
   )
 }
 
@@ -219,22 +332,22 @@ function Kpi({ label, value, delta }: { label: string; value: string; delta?: { 
 function ChartCard({
   title,
   value,
-  wide = false,
+  className = '',
   children,
 }: {
   title: string
   value?: ReactNode
-  wide?: boolean
+  className?: string
   children: ReactNode
 }) {
   return (
-    <section className={`chart-card${wide ? ' chart-card-wide' : ''}`}>
-      <div className="chart-card-head">
-        <h3 className="t-headline">{title}</h3>
-        {value && <span className="chart-card-value">{value}</span>}
-      </div>
-      {children}
-    </section>
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle className="text-base">{title}</CardTitle>
+        {value && <CardAction className="chart-card-value">{value}</CardAction>}
+      </CardHeader>
+      <CardContent className="chart-card flex flex-1 flex-col">{children}</CardContent>
+    </Card>
   )
 }
 
