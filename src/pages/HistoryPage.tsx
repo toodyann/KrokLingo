@@ -1,40 +1,49 @@
 import { useMemo, useState } from 'react'
-import { ProgressChart, TopicBars } from '../components/Charts'
 import { IconChevronRight } from '../components/Icons'
 import { PageHeader } from '../components/PageHeader'
-import { topicStats } from '../lib/session'
-import { formatDate, formatDuration, formatPercent } from '../lib/util'
+import { startOfDay } from '../lib/stats'
+import { formatDuration, formatPercent } from '../lib/util'
 import { useApp } from '../store/context'
-import type { Mode } from '../types'
+import type { AttemptRecord, Mode } from '../types'
 
+const MODES: [Mode | 'all', string][] = [
+  ['all', 'Усі'],
+  ['exam', 'Іспити'],
+  ['training', 'Тренування'],
+]
+
+const dayFmt = new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
+const timeFmt = new Intl.DateTimeFormat('uk-UA', { hour: '2-digit', minute: '2-digit' })
+
+function dayTitle(day: number): string {
+  const today = startOfDay(Date.now())
+  if (day === today) return 'Сьогодні'
+  if (day === startOfDay(today - 1)) return 'Вчора'
+  return dayFmt.format(day)
+}
+
+/** All attempts, newest first, grouped by day. */
 export function HistoryPage() {
-  const { bank, history, settings } = useApp()
+  const { history } = useApp()
   const [mode, setMode] = useState<Mode | 'all'>('all')
-  const records = useMemo(
-    () => history.filter((r) => mode === 'all' || r.mode === mode).sort((a, b) => b.finishedAt - a.finishedAt),
-    [history, mode],
-  )
-  const stats = useMemo(() => topicStats(records, bank), [records, bank])
 
-  const chronological = [...records].reverse()
-  const avg = (list: typeof records) => list.reduce((s, r) => s + r.percent, 0) / (list.length || 1)
-  const delta = records.length >= 4 ? avg(chronological.slice(-3)) - avg(chronological.slice(0, 3)) : null
-  const best = records.length ? Math.max(...records.map((r) => r.percent)) : 0
-  const exams = records.filter((r) => r.mode === 'exam')
-
-  const modes: [Mode | 'all', string][] = [
-    ['all', 'Усі'],
-    ['exam', 'Іспити'],
-    ['training', 'Тренування'],
-  ]
+  const groups = useMemo(() => {
+    const byDay = new Map<number, AttemptRecord[]>()
+    for (const r of [...history].sort((a, b) => b.finishedAt - a.finishedAt)) {
+      if (mode !== 'all' && r.mode !== mode) continue
+      const day = startOfDay(r.finishedAt)
+      byDay.set(day, [...(byDay.get(day) ?? []), r])
+    }
+    return [...byDay]
+  }, [history, mode])
 
   return (
-    <div className="page">
+    <div className="page page-narrow">
       <PageHeader
-        title="Прогрес"
+        title="Історія"
         actions={
           <div className="segmented" role="radiogroup" aria-label="Режим">
-            {modes.map(([key, label]) => (
+            {MODES.map(([key, label]) => (
               <button key={key} type="button" role="radio" aria-checked={mode === key} onClick={() => setMode(key)}>
                 {label}
               </button>
@@ -43,75 +52,36 @@ export function HistoryPage() {
         }
       />
 
-      <div className="grid grid-stats section">
-        <div className="stat">
-          <div className="stat-value">{records.length}</div>
-          <div className="stat-label">спроб</div>
+      {groups.length === 0 ? (
+        <div className="card empty">
+          <h2 className="t-title3">Ще немає спроб</h2>
+          <a className="btn btn-primary" href="#/tests" style={{ marginTop: 12 }}>
+            До тестів
+          </a>
         </div>
-        <div className="stat">
-          <div className="stat-value">{records.length ? formatPercent(avg(records)) : '—'}</div>
-          <div className="stat-label">середній результат</div>
-        </div>
-        <div className="stat">
-          <div className="stat-value">{records.length ? formatPercent(best) : '—'}</div>
-          <div className="stat-label">найкращий</div>
-        </div>
-        <div className="stat">
-          <div className="stat-value">
-            {exams.filter((r) => r.passed).length}
-            <span className="secondary"> / {exams.length}</span>
-          </div>
-          <div className="stat-label">іспитів складено</div>
-        </div>
-        <div className="stat">
-          <div
-            className="stat-value"
-            style={{ color: delta == null ? undefined : delta >= 0 ? 'var(--success)' : 'var(--danger)' }}
-          >
-            {delta == null ? '—' : `${delta >= 0 ? '+' : '−'}${formatPercent(Math.abs(delta))}`}
-          </div>
-          <div className="stat-label">останні 3 проти перших 3</div>
-        </div>
-      </div>
-
-      <section className="card section">
-        <h2 className="t-title3" style={{ marginBottom: 12 }}>
-          Шкала прогресу
-        </h2>
-        <ProgressChart records={records} threshold={settings.threshold} />
-      </section>
-
-      <div className="grid grid-2">
-        <section className="card">
-          <h2 className="t-title3" style={{ marginBottom: 16 }}>
-            Успішність за темами
-          </h2>
-          <TopicBars stats={stats} threshold={settings.threshold} />
-        </section>
-        <section>
-          <h2 className="section-title">Усі спроби</h2>
-          {records.length === 0 ? (
-            <div className="card empty">Історія порожня — пройдіть перший тест.</div>
-          ) : (
+      ) : (
+        groups.map(([day, records]) => (
+          <section className="section" key={day}>
+            <h2 className="section-title">{dayTitle(day)}</h2>
             <div className="list">
               {records.map((r) => (
                 <a key={r.id} className="list-row" href={`#/results/${r.id}`}>
                   <div className="list-row-main">
                     <div>{r.mode === 'exam' ? 'Іспит' : r.title}</div>
                     <div className="secondary t-footnote tnum">
-                      {formatDate(r.finishedAt)} · {r.correct}/{r.total} · {formatDuration(r.durationSec)}
+                      {timeFmt.format(r.finishedAt)} · {r.correct}/{r.total} · {formatDuration(r.durationSec)}
                     </div>
                   </div>
                   <span className={`pill ${r.passed ? 'pill-success' : 'pill-danger'} tnum`}>
-                    {formatPercent(r.percent)}
+                    {r.passed ? '✓' : '✗'} {formatPercent(r.percent)}
                   </span>
                   <IconChevronRight className="chev" />
                 </a>
               ))}
             </div>
-          )}
-        </section>
-      </div>
+          </section>
+        ))
+      )}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState, type ComponentType } from 'react'
 import { BrandMark } from './components/BrandMark'
-import { IconBook, IconChart, IconChevronLeft, IconGear, IconOverview, IconTests } from './components/Icons'
+import { IconBook, IconChevronLeft, IconGear, IconHistory, IconOverview, IconTests } from './components/Icons'
 import { ToastProvider } from './components/Toast'
 import { WordLookupProvider } from './components/WordLookup'
 import { useMediaQuery, WIDE_QUERY } from './lib/hooks'
@@ -32,7 +32,7 @@ const TABS: Tab[] = [
   { path: '', label: 'Огляд', Icon: IconOverview, routes: ['home'] },
   { path: 'tests', label: 'Тести', Icon: IconTests, routes: ['tests', 'exam', 'training', 'test'] },
   { path: 'dictionary', label: 'Словник', Icon: IconBook, routes: ['dictionary', 'flashcards'] },
-  { path: 'history', label: 'Прогрес', Icon: IconChart, routes: ['history', 'results'] },
+  { path: 'history', label: 'Історія', Icon: IconHistory, routes: ['history', 'results'] },
   { path: 'settings', label: 'Налаштування', Icon: IconGear, routes: ['settings'] },
 ]
 

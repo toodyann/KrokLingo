@@ -1841,86 +1841,18 @@ kbd {
 
 /* ---------- charts ---------- */
 
-.chart svg {
-  width: 100%;
-  height: auto;
-  display: block;
-  overflow: visible;
-}
 
-.chart .grid-line {
-  stroke: var(--separator);
-  stroke-width: 1;
-}
 
-.chart .axis-label {
-  fill: var(--label-2);
-  font-size: 12px;
-  font-family: var(--font-ui);
-}
 
-.chart .threshold {
-  stroke: var(--label-2);
-  stroke-width: 1.5;
-  stroke-dasharray: 4 4;
-}
 
-.chart .threshold-label {
-  fill: var(--label-2);
-  font-size: 12px;
-  font-weight: 600;
-  font-family: var(--font-ui);
-}
 
-.chart .line {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 2.5;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
 
-.chart .trend {
-  fill: none;
-  stroke: var(--label-3);
-  stroke-width: 1.5;
-  stroke-dasharray: 2 4;
-}
 
-.chart .area {
-  fill: var(--accent);
-  opacity: 0.1;
-}
 
-.chart .dot {
-  stroke: var(--card);
-  stroke-width: 2;
-}
 
-.chart .dot.pass {
-  fill: var(--success);
-}
 
-.chart .dot.fail {
-  fill: var(--danger);
-}
 
-.chart-legend {
-  display: flex;
-  gap: 6px 16px;
-  flex-wrap: wrap;
-  font-size: 0.8125rem;
-  color: var(--label-2);
-  margin-top: 10px;
-}
 
-.chart-legend i {
-  display: inline-block;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  margin-right: 5px;
-}
 
 .bars {
   display: flex;

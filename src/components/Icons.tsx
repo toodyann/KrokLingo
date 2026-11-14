@@ -35,12 +35,13 @@ export function IconBook(p: IconProps) {
   )
 }
 
-export function IconChart(p: IconProps) {
+export function IconHistory(p: IconProps) {
   return (
     <Svg {...p}>
       <path
         fill="currentColor"
-        d="M5 3.5c.8 0 1.5.7 1.5 1.5v13.5H19a1.5 1.5 0 0 1 0 3H5A1.5 1.5 0 0 1 3.5 20V5c0-.8.7-1.5 1.5-1.5Zm14.6 3.8a1.2 1.2 0 0 1 .1 1.7l-4.4 5a1.2 1.2 0 0 1-1.7.1l-2.3-2-2.6 3a1.2 1.2 0 1 1-1.8-1.6l3.4-3.9a1.2 1.2 0 0 1 1.7-.1l2.3 2 3.6-4.1a1.2 1.2 0 0 1 1.7-.1Z"
+        fillRule="evenodd"
+        d="M12 3a9 9 0 1 1-8.5 12 1.1 1.1 0 1 1 2.1-.7A6.8 6.8 0 1 0 6.4 8H8a1.1 1.1 0 0 1 0 2.2H4.2A1.2 1.2 0 0 1 3 9V5.2a1.1 1.1 0 0 1 2.2 0v1.1A9 9 0 0 1 12 3Zm0 4a1.1 1.1 0 0 1 1.1 1.1v3.4l2.4 1.4a1.1 1.1 0 1 1-1.1 1.9l-3-1.7A1.1 1.1 0 0 1 10.9 12V8.1A1.1 1.1 0 0 1 12 7Z"
       />
     </Svg>
   )

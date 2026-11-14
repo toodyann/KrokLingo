@@ -20,7 +20,7 @@ export function ResultsPage({ id }: { id: string }) {
   if (!record) {
     return (
       <div className="page page-narrow">
-        <PageHeader back={{ href: '#/history', label: 'Прогрес' }} title="Результати" />
+        <PageHeader back={{ href: '#/history', label: 'Історія' }} title="Результати" />
         <div className="card empty">
           <h2 className="t-title3">Результат не знайдено</h2>
         </div>
@@ -55,7 +55,7 @@ export function ResultsPage({ id }: { id: string }) {
   return (
     <div className="page">
       <PageHeader
-        back={{ href: '#/history', label: 'Прогрес' }}
+        back={{ href: '#/history', label: 'Історія' }}
         title="Результати"
         subtitle={`${record.title} · ${formatDate(record.finishedAt)}`}
         actions={
