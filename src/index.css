@@ -247,7 +247,7 @@ textarea {
   top: 0;
   left: 0;
   bottom: 0;
-  z-index: 30;
+  z-index: 40;
   width: var(--sidebar-w);
   display: flex;
   flex-direction: column;
@@ -257,16 +257,23 @@ textarea {
   backdrop-filter: blur(30px) saturate(180%);
   border-right: 0.5px solid var(--separator);
   overflow: hidden;
-  transition: width 0.28s cubic-bezier(0.25, 0.9, 0.3, 1);
+  transition:
+    width 0.28s cubic-bezier(0.25, 0.9, 0.3, 1),
+    box-shadow 0.2s;
 }
 
+/*
+ * Geometry is identical in the rail and the expanded sidebar: the logo and every icon are
+ * centred on x = 38px, so expanding only reveals labels — nothing jumps sideways.
+ */
 .brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 6px 8px 18px;
+  padding: 6px 7px 18px;
   color: var(--label);
   min-height: var(--hit);
+  white-space: nowrap;
 }
 
 .brand-mark {
@@ -288,7 +295,6 @@ textarea {
 .brand-caption {
   font-size: 0.75rem;
   color: var(--label-2);
-  white-space: nowrap;
 }
 
 .side-nav {
@@ -300,9 +306,9 @@ textarea {
 .side-item {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   min-height: var(--hit);
-  padding: 0 12px;
+  padding: 0 12px 0 15px;
   border-radius: 12px;
   color: var(--label);
   font-size: 1rem;
@@ -352,6 +358,7 @@ textarea {
   margin-top: auto;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 8px;
 }
 
@@ -360,52 +367,77 @@ textarea {
   line-height: 1.4;
   color: var(--label-2);
   padding: 0 8px;
+  width: 228px;
 }
 
 .sidebar-toggle {
-  align-self: flex-start;
-}
-
-/* icon rail */
-.sidebar.rail {
-  padding-left: 10px;
-  padding-right: 10px;
-  align-items: center;
-}
-
-.sidebar.rail .brand {
-  padding: 6px 0 18px;
-}
-
-.sidebar.rail .brand-text,
-.sidebar.rail .side-item .label,
-.sidebar.rail .sidebar-note {
-  display: none;
-}
-
-.sidebar.rail .side-item {
-  width: 52px;
-  justify-content: center;
-  padding: 0;
-}
-
-.sidebar.rail .side-item .tab-badge {
-  position: absolute;
-  top: 4px;
-  right: 2px;
-  margin: 0;
-}
-
-.sidebar.rail .sidebar-toggle {
-  align-self: center;
+  margin-left: 4px;
 }
 
 .sidebar-toggle svg {
   transition: transform 0.2s;
 }
 
+/* ---------- icon rail, which peeks open on hover or keyboard focus ---------- */
+
+.sidebar .fade {
+  transition: opacity 0.18s ease-out 0.1s;
+}
+
+.sidebar.rail {
+  /* collapsing waits a beat, so a pointer briefly leaving doesn't snap it shut */
+  transition-delay: 0.12s;
+}
+
+.sidebar.rail .fade {
+  opacity: 0;
+  transition: opacity 0.1s ease-out 0s;
+}
+
+.sidebar.rail .side-item .tab-badge {
+  position: absolute;
+  top: 5px;
+  left: 33px;
+  margin: 0;
+}
+
 .sidebar.rail .sidebar-toggle svg {
   transform: rotate(180deg);
+}
+
+.sidebar.rail:focus-within {
+  width: 252px;
+  transition-delay: 0s;
+  box-shadow: 8px 0 32px rgb(0 0 0 / 0.14);
+}
+
+/* hover intent: open after a short pause so passing over the rail doesn't trigger it */
+@media (hover: hover) and (pointer: fine) {
+  .sidebar.rail:hover {
+    width: 252px;
+    transition-delay: 0.15s;
+    box-shadow: 8px 0 32px rgb(0 0 0 / 0.14);
+  }
+
+  .sidebar.rail:hover .fade {
+    opacity: 1;
+    transition: opacity 0.18s ease-out 0.24s;
+  }
+
+  .sidebar.rail:hover .side-item .tab-badge {
+    position: static;
+    margin-left: auto;
+  }
+}
+
+.sidebar.rail:focus-within .fade {
+  opacity: 1;
+  transition-delay: 0.1s;
+}
+
+.sidebar.rail:focus-within .side-item .tab-badge {
+  position: static;
+  margin-left: auto;
 }
 
 .with-sidebar {

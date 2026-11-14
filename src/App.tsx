@@ -48,7 +48,10 @@ function readCollapsed(): boolean {
   }
 }
 
-/** Wide screens: the tab bar becomes a sidebar; it can be collapsed to an icon rail. */
+/**
+ * Wide screens: the tab bar becomes a sidebar. It can be collapsed to an icon rail, which
+ * peeks open over the content on hover (after a short intent delay) or keyboard focus.
+ */
 function Sidebar({ route }: { route: Route }) {
   const wide = useMediaQuery(WIDE_QUERY)
   const [collapsed, setCollapsed] = useState(readCollapsed)
@@ -66,8 +69,8 @@ function Sidebar({ route }: { route: Route }) {
   return (
     <aside className={`sidebar${rail ? ' rail' : ''}`} aria-label="Розділи">
       <a className="brand" href="#/" aria-label="KrokLingo — на головну">
-        <BrandMark size={rail ? 36 : 40} />
-        <span className="brand-text">
+        <BrandMark size={38} />
+        <span className="brand-text fade">
           <span className="brand-name">KrokLingo</span>
           <br />
           <span className="brand-caption">Крок 1 · Стоматологія</span>
@@ -80,23 +83,22 @@ function Sidebar({ route }: { route: Route }) {
             className="side-item"
             href={`#/${path}`}
             aria-current={routes.includes(route.name) ? 'page' : undefined}
-            title={rail ? label : undefined}
           >
             <Icon />
-            <span className="label">{label}</span>
+            <span className="label fade">{label}</span>
             {path === 'dictionary' && <DictionaryBadge />}
           </a>
         ))}
       </nav>
       <div className="sidebar-footer">
-        <p className="sidebar-note">Дані зберігаються лише у вашому браузері.</p>
+        <p className="sidebar-note fade">Дані зберігаються лише у вашому браузері.</p>
         {wide && (
           <button
             type="button"
             className="icon-btn sidebar-toggle"
             onClick={() => setCollapsed((v) => !v)}
-            aria-label={collapsed ? 'Розгорнути бічну панель' : 'Згорнути бічну панель'}
-            title={collapsed ? 'Розгорнути' : 'Згорнути'}
+            aria-label={collapsed ? 'Закріпити бічну панель розгорнутою' : 'Згорнути бічну панель'}
+            title={collapsed ? 'Закріпити розгорнутою' : 'Згорнути (розкриватиметься при наведенні)'}
             aria-expanded={!collapsed}
           >
             <IconChevronLeft />
