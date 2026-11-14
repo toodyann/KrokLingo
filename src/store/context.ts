@@ -33,6 +33,8 @@ export interface AppState {
   addEntry: (word: string, translation: string, note?: string) => DictEntry
   updateEntry: (id: string, patch: Partial<DictEntry>) => void
   deleteEntries: (ids: string[]) => void
+  /** Puts previously deleted entries back (undo). */
+  restoreEntries: (entries: DictEntry[]) => void
   replaceDictionary: (entries: DictEntry[]) => void
 
   history: AttemptRecord[]

@@ -145,6 +145,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [setDictionary],
   )
 
+  const restoreEntries = useCallback(
+    (entries: DictEntry[]) =>
+      setDictionary((prev) => {
+        const present = new Set(prev.map((e) => e.id))
+        return [...entries.filter((e) => !present.has(e.id)), ...prev].sort((a, b) => b.addedAt - a.addedAt)
+      }),
+    [setDictionary],
+  )
+
   const addAttempt = useCallback(
     (record: AttemptRecord) => setHistory((prev) => [...prev, record]),
     [setHistory],
@@ -165,6 +174,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     addEntry,
     updateEntry,
     deleteEntries,
+    restoreEntries,
     replaceDictionary: setDictionary,
     history,
     addAttempt,

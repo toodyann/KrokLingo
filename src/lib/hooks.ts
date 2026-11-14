@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 
 /** Current time, refreshed every `intervalMs` while `active` is true. */
 export function useNow(intervalMs = 1000, active = true): number {
@@ -10,3 +10,19 @@ export function useNow(intervalMs = 1000, active = true): number {
   }, [intervalMs, active])
   return now
 }
+
+/** Subscribes to a CSS media query. */
+export function useMediaQuery(query: string): boolean {
+  return useSyncExternalStore(
+    (onChange) => {
+      const mql = matchMedia(query)
+      mql.addEventListener('change', onChange)
+      return () => mql.removeEventListener('change', onChange)
+    },
+    () => matchMedia(query).matches,
+    () => false,
+  )
+}
+
+/** Compact width: phones and narrow windows — bottom tab bar, sheets instead of popovers. */
+export const COMPACT_QUERY = '(max-width: 767px)'
