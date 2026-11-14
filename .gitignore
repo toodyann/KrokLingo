@@ -25,3 +25,8 @@ dist-ssr
 
 # Local Claude Code config
 .claude/
+
+# Secrets
+.env
+.env.*
+!.env.example
