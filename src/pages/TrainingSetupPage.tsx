@@ -57,7 +57,7 @@ export function TrainingSetupPage() {
 
   return (
     <div className="page page-narrow">
-      <PageHeader back={{ href: '#/', label: 'Тести' }} title="Тренування" />
+      <PageHeader back={{ href: '#/tests', label: 'Тести' }} title="Тренування" />
 
       <section className="section">
         <h2 className="section-title">Збірники</h2>

@@ -1,6 +1,6 @@
-import { useEffect, useState, type ComponentType } from 'react'
+import { lazy, Suspense, useEffect, useState, type ComponentType } from 'react'
 import { BrandMark } from './components/BrandMark'
-import { IconBook, IconChart, IconChevronLeft, IconGear, IconTests } from './components/Icons'
+import { IconBook, IconChart, IconChevronLeft, IconGear, IconOverview, IconTests } from './components/Icons'
 import { ToastProvider } from './components/Toast'
 import { WordLookupProvider } from './components/WordLookup'
 import { useMediaQuery, WIDE_QUERY } from './lib/hooks'
@@ -9,13 +9,16 @@ import { DictionaryPage } from './pages/DictionaryPage'
 import { ExamSetupPage } from './pages/ExamSetupPage'
 import { FlashcardsPage } from './pages/FlashcardsPage'
 import { HistoryPage } from './pages/HistoryPage'
-import { HomePage } from './pages/HomePage'
 import { ResultsPage } from './pages/ResultsPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { TestPage } from './pages/TestPage'
+import { TestsPage } from './pages/TestsPage'
 import { TrainingSetupPage } from './pages/TrainingSetupPage'
 import { AppProvider } from './store/AppStore'
 import { useApp } from './store/context'
+
+// Charts (Recharts) load as a separate chunk, so the other screens don't pay for them.
+const DashboardPage = lazy(() => import('./pages/DashboardPage').then((m) => ({ default: m.DashboardPage })))
 
 interface Tab {
   path: string
@@ -24,9 +27,10 @@ interface Tab {
   routes: Route['name'][]
 }
 
-// Four top-level sections, named for what they contain.
+// Top-level sections, named for what they contain.
 const TABS: Tab[] = [
-  { path: '', label: 'Тести', Icon: IconTests, routes: ['home', 'exam', 'training', 'test'] },
+  { path: '', label: 'Огляд', Icon: IconOverview, routes: ['home'] },
+  { path: 'tests', label: 'Тести', Icon: IconTests, routes: ['tests', 'exam', 'training', 'test'] },
   { path: 'dictionary', label: 'Словник', Icon: IconBook, routes: ['dictionary', 'flashcards'] },
   { path: 'history', label: 'Прогрес', Icon: IconChart, routes: ['history', 'results'] },
   { path: 'settings', label: 'Налаштування', Icon: IconGear, routes: ['settings'] },
@@ -147,8 +151,14 @@ function Page({ route }: { route: Route }) {
       return <FlashcardsPage />
     case 'settings':
       return <SettingsPage />
+    case 'tests':
+      return <TestsPage />
     default:
-      return <HomePage />
+      return (
+        <Suspense fallback={null}>
+          <DashboardPage />
+        </Suspense>
+      )
   }
 }
 

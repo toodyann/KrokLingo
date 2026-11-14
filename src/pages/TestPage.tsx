@@ -128,7 +128,7 @@ export function TestPage() {
   const abandon = () => {
     if (confirm('Вийти з тесту без збереження результату? Відповіді буде втрачено.')) {
       setSession(null)
-      navigate('')
+      navigate('tests')
     }
   }
 

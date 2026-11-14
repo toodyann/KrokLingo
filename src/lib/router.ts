@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 export type Route =
   | { name: 'home' }
+  | { name: 'tests' }
   | { name: 'exam' }
   | { name: 'training' }
   | { name: 'test' }
@@ -14,6 +15,8 @@ export type Route =
 export function parseHash(hash: string): Route {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean)
   switch (parts[0]) {
+    case 'tests':
+      return { name: 'tests' }
     case 'exam':
       return { name: 'exam' }
     case 'training':

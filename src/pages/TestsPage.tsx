@@ -4,7 +4,7 @@ import { liveStats, mistakeIds } from '../lib/session'
 import { formatPercent, pluralUk } from '../lib/util'
 import { useApp } from '../store/context'
 
-export function HomePage() {
+export function TestsPage() {
   const { bank, settings, history, dictionary, session } = useApp()
   const toLearn = dictionary.filter((e) => !e.learned && e.translation).length
   const mistakes = useMemo(() => mistakeIds(history, bank).size, [history, bank])

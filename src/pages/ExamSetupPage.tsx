@@ -30,7 +30,7 @@ export function ExamSetupPage() {
   return (
     <div className="page page-narrow">
       <PageHeader
-        back={{ href: '#/', label: 'Тести' }}
+        back={{ href: '#/tests', label: 'Тести' }}
         title="Симуляція іспиту"
         subtitle="Англійська мова професійного спрямування · «Крок 1. Стоматологія»"
       />

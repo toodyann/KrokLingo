@@ -129,3 +129,15 @@ export function IconTrash(p: IconProps) {
     </Svg>
   )
 }
+
+export function IconOverview(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M12 3.5a9.5 9.5 0 0 0-8.2 14.3c.3.4.7.7 1.2.7h14c.5 0 .9-.3 1.2-.7A9.5 9.5 0 0 0 12 3.5Zm0 3a1 1 0 0 1 1 1v.6a1 1 0 1 1-2 0v-.6a1 1 0 0 1 1-1Zm-4.6 2a1 1 0 0 1 1.4 0l.4.4a1 1 0 0 1-1.4 1.4l-.4-.4a1 1 0 0 1 0-1.4Zm9.9.1a.9.9 0 0 1 .1 1.2l-3.6 4.6a2 2 0 1 1-1.5-1.3l3.8-4.5a.9.9 0 0 1 1.2 0ZM5.5 13a1 1 0 0 1 1-1h.6a1 1 0 1 1 0 2h-.6a1 1 0 0 1-1-1Zm11.4 0a1 1 0 0 1 1-1h.6a1 1 0 1 1 0 2h-.6a1 1 0 0 1-1-1Z"
+      />
+    </Svg>
+  )
+}
