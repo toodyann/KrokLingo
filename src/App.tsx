@@ -1,3 +1,6 @@
+import type { ComponentType } from 'react'
+import { IconBook, IconChart, IconGear, IconTests } from './components/Icons'
+import { ToastProvider } from './components/Toast'
 import { WordLookupProvider } from './components/WordLookup'
 import { useRoute, type Route } from './lib/router'
 import { DictionaryPage } from './pages/DictionaryPage'
@@ -12,47 +15,74 @@ import { TrainingSetupPage } from './pages/TrainingSetupPage'
 import { AppProvider } from './store/AppStore'
 import { useApp } from './store/context'
 
-const NAV: { path: string; label: string; match: Route['name'][] }[] = [
-  { path: '', label: 'Головна', match: ['home'] },
-  { path: 'exam', label: 'Іспит', match: ['exam'] },
-  { path: 'training', label: 'Тренування', match: ['training'] },
-  { path: 'dictionary', label: 'Словник', match: ['dictionary', 'flashcards'] },
-  { path: 'history', label: 'Прогрес', match: ['history', 'results'] },
-  { path: 'settings', label: 'Налаштування', match: ['settings'] },
+interface Tab {
+  path: string
+  label: string
+  Icon: ComponentType<{ size?: number }>
+  routes: Route['name'][]
+}
+
+// Four top-level sections, named for what they contain.
+const TABS: Tab[] = [
+  { path: '', label: 'Тести', Icon: IconTests, routes: ['home', 'exam', 'training', 'test'] },
+  { path: 'dictionary', label: 'Словник', Icon: IconBook, routes: ['dictionary', 'flashcards'] },
+  { path: 'history', label: 'Прогрес', Icon: IconChart, routes: ['history', 'results'] },
+  { path: 'settings', label: 'Налаштування', Icon: IconGear, routes: ['settings'] },
 ]
 
-function Header({ route }: { route: Route }) {
-  const { dictionary, session } = useApp()
+function DictionaryBadge() {
+  const { dictionary } = useApp()
+  const toLearn = dictionary.filter((e) => !e.learned).length
+  return toLearn > 0 ? <span className="tab-badge">{toLearn > 99 ? '99+' : toLearn}</span> : null
+}
+
+function AppBar({ route }: { route: Route }) {
   return (
-    <header className="app-header">
-      <div className="app-header-inner">
+    <header className="app-bar material">
+      <div className="app-bar-inner">
         <a className="brand" href="#/">
           <span className="brand-mark" aria-hidden="true">
             K1
           </span>
           KrokLingo
         </a>
-        <nav className="nav" aria-label="Основна навігація">
-          {session && (
-            <a href="#/test" className={route.name === 'test' ? 'active' : ''}>
-              ▶ Тест
-            </a>
-          )}
-          {NAV.map((item) => (
+        <nav className="top-tabs" aria-label="Розділи">
+          {TABS.map(({ path, label, Icon, routes }) => (
             <a
-              key={item.path}
-              href={`#/${item.path}`}
-              className={item.match.includes(route.name) ? 'active' : ''}
+              key={path}
+              className="top-tab"
+              href={`#/${path}`}
+              aria-current={routes.includes(route.name) ? 'page' : undefined}
             >
-              {item.label}
-              {item.path === 'dictionary' && dictionary.length > 0 && (
-                <span className="badge">{dictionary.length}</span>
-              )}
+              <Icon />
+              {label}
+              {path === 'dictionary' && <DictionaryBadge />}
             </a>
           ))}
         </nav>
       </div>
     </header>
+  )
+}
+
+function TabBar({ route }: { route: Route }) {
+  return (
+    <nav className="tab-bar material" aria-label="Розділи">
+      <div className="tab-bar-inner">
+        {TABS.map(({ path, label, Icon, routes }) => (
+          <a
+            key={path}
+            className="tab"
+            href={`#/${path}`}
+            aria-current={routes.includes(route.name) ? 'page' : undefined}
+          >
+            <Icon />
+            {label}
+            {path === 'dictionary' && <DictionaryBadge />}
+          </a>
+        ))}
+      </div>
+    </nav>
   )
 }
 
@@ -85,8 +115,8 @@ function StorageWarning() {
   return (
     <div className="page" style={{ paddingBottom: 0 }}>
       <div className="banner banner-warn">
-        Не вдалося зберегти дані в пам'ять браузера (можливо, вона заповнена або вимкнена). Зробіть резервну копію в
-        налаштуваннях.
+        Не вдалося зберегти дані в пам'ять браузера (можливо, вона заповнена або вимкнена). Збережіть резервну
+        копію в налаштуваннях.
       </div>
     </div>
   )
@@ -94,17 +124,32 @@ function StorageWarning() {
 
 function Shell() {
   const route = useRoute()
+  // A running test is a focused, modal task: no tab bar, its own toolbar with a clear way out.
+  const inTest = route.name === 'test'
   return (
-    <WordLookupProvider>
-      <Header route={route} />
-      <StorageWarning />
-      <main>
-        <Page route={route} />
-      </main>
-      <footer className="footer">
-        KrokLingo — тренажер «Крок 1. Стоматологія» англійською. Дані зберігаються лише у вашому браузері.
-      </footer>
-    </WordLookupProvider>
+    <ToastProvider>
+      <WordLookupProvider inTest={inTest}>
+        {!inTest && (
+          <div className="regular-only">
+            <AppBar route={route} />
+          </div>
+        )}
+        <StorageWarning />
+        <main className={inTest ? 'main-test' : undefined}>
+          <Page route={route} />
+        </main>
+        {!inTest && (
+          <>
+            <footer className="footer">
+              KrokLingo — тренажер «Крок 1. Стоматологія» англійською. Дані зберігаються лише у вашому браузері.
+            </footer>
+            <div className="compact-only">
+              <TabBar route={route} />
+            </div>
+          </>
+        )}
+      </WordLookupProvider>
+    </ToastProvider>
   )
 }
 

@@ -2,6 +2,9 @@ import { useRef, useState, type ChangeEvent } from 'react'
 import { IMPORT_TEMPLATE, parseImport } from '../lib/importQuestions'
 import { clearAll } from '../lib/storage'
 import { downloadFile, pluralUk } from '../lib/util'
+import { IconClose } from '../components/Icons'
+import { PageHeader } from '../components/PageHeader'
+import { useToast } from '../components/toastContext'
 import { useApp } from '../store/context'
 import { DEFAULT_SETTINGS } from '../store/defaults'
 import type { AttemptRecord, CustomBank, DictEntry, Settings } from '../types'
@@ -22,6 +25,7 @@ function readFile(file: File): Promise<string> {
 
 export function SettingsPage() {
   const app = useApp()
+  const toast = useToast()
   const { settings, updateSettings, customBank, setCustomBank, bank } = app
   const [message, setMessage] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
   const importRef = useRef<HTMLInputElement>(null)
@@ -59,7 +63,8 @@ export function SettingsPage() {
   }
 
   const removeCollection = (id: string, name: string) => {
-    if (!confirm(`Видалити збірник «${name}» з усіма його питаннями?`)) return
+    const previous = customBank
+    toast({ message: `Збірник «${name}» видалено`, onAction: () => setCustomBank(previous) })
     const remaining = customBank.questions.filter((q) => q.collection !== id)
     const usedPassages = new Set(remaining.map((q) => q.passageId))
     setCustomBank({
@@ -112,137 +117,150 @@ export function SettingsPage() {
 
   return (
     <div className="page page-narrow">
-      <h1>Налаштування</h1>
+      <PageHeader title="Налаштування" />
 
       {message && (
-        <div className={`banner${message.kind === 'bad' ? ' banner-warn' : ''}`}>
-          <span>{message.text}</span>
-          <span className="spacer" />
-          <button type="button" className="icon-btn" onClick={() => setMessage(null)} aria-label="Закрити">
-            ×
+        <div className={`banner${message.kind === 'bad' ? ' banner-warn' : ''}`} role="status">
+          <span className="list-row-main">{message.text}</span>
+          <button type="button" className="icon-btn" onClick={() => setMessage(null)} aria-label="Закрити повідомлення">
+            <IconClose size={16} />
           </button>
         </div>
       )}
 
-      <div className="stack">
-        <section className="card stack">
-          <h2>Іспит</h2>
-          <div className="grid grid-4">
-            <label className="field">
-              <span>Прохідний поріг, %</span>
-              <input type="number" min={1} max={100} step={0.5} value={settings.threshold} onChange={num('threshold', 1, 100)} />
-            </label>
-            <label className="field">
-              <span>Кількість завдань</span>
-              <input type="number" min={5} max={200} value={settings.examQuestions} onChange={num('examQuestions', 5, 200)} />
-            </label>
-            <label className="field">
-              <span>Час, хвилин</span>
-              <input type="number" min={5} max={300} value={settings.examMinutes} onChange={num('examMinutes', 5, 300)} />
-            </label>
-          </div>
-          <div className="row">
-            <span className="muted small">
-              Стандарт для англійської мови професійного спрямування: 50 завдань, 100 хвилин, поріг 40%.
-            </span>
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm"
-              onClick={() =>
-                updateSettings({
-                  threshold: DEFAULT_SETTINGS.threshold,
-                  examQuestions: DEFAULT_SETTINGS.examQuestions,
-                  examMinutes: DEFAULT_SETTINGS.examMinutes,
-                })
-              }
-            >
-              Скинути до стандарту
-            </button>
-          </div>
-        </section>
+      <section className="section">
+        <h2 className="section-title">Іспит</h2>
+        <div className="list">
+          <label className="list-row">
+            <div className="list-row-main">Прохідний поріг, %</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              className="num-input"
+              min={1}
+              max={100}
+              step={0.5}
+              value={settings.threshold}
+              onChange={num('threshold', 1, 100)}
+            />
+          </label>
+          <label className="list-row">
+            <div className="list-row-main">Кількість завдань</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              className="num-input"
+              min={5}
+              max={200}
+              value={settings.examQuestions}
+              onChange={num('examQuestions', 5, 200)}
+            />
+          </label>
+          <label className="list-row">
+            <div className="list-row-main">Час, хвилин</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              className="num-input"
+              min={5}
+              max={300}
+              value={settings.examMinutes}
+              onChange={num('examMinutes', 5, 300)}
+            />
+          </label>
+          <button
+            type="button"
+            className="list-row"
+            style={{ color: 'var(--accent)' }}
+            onClick={() =>
+              updateSettings({
+                threshold: DEFAULT_SETTINGS.threshold,
+                examQuestions: DEFAULT_SETTINGS.examQuestions,
+                examMinutes: DEFAULT_SETTINGS.examMinutes,
+              })
+            }
+          >
+            Відновити стандарт: 50 завдань, 100 хв, 40%
+          </button>
+        </div>
+      </section>
 
-        <section className="card stack">
-          <h2>Переклад</h2>
-          <label className="check">
+      <section className="section">
+        <h2 className="section-title">Переклад</h2>
+        <div className="list">
+          <label className="list-row" style={{ cursor: 'pointer' }}>
+            <div className="list-row-main">Онлайн-переклад рідкісних слів</div>
             <input
               type="checkbox"
+              className="switch"
               checked={settings.onlineTranslate}
               onChange={(e) => updateSettings({ onlineTranslate: e.target.checked })}
             />
-            <span>
-              <b>Онлайн-переклад для слів поза вбудованим словником</b>
-              <br />
-              <span className="muted small">
-                Усі слова вбудованої бази перекладаються миттєво й офлайн. Для слів з імпортованих збірників, яких немає
-                у вбудованому словнику, слово надсилається до безкоштовного сервісу MyMemory.
-              </span>
-            </span>
           </label>
-        </section>
+        </div>
+        <p className="section-footer">
+          Слова вбудованої бази перекладаються миттєво й без інтернету. Слова з імпортованих збірників, яких немає у
+          вбудованому словнику, надсилаються до безкоштовного сервісу MyMemory.
+        </p>
+      </section>
 
-        <section className="card stack">
-          <h2>Імпорт питань</h2>
-          <p className="muted" style={{ margin: 0 }}>
-            Додайте власні збірники у форматі JSON — наприклад, питання з офіційних буклетів. Вони з’являться як окремі
-            збірники в тренуванні та потраплятимуть в іспит.
-          </p>
-          <div className="row">
-            <button type="button" className="btn btn-primary btn-sm" onClick={() => importRef.current?.click()}>
-              Імпортувати JSON
-            </button>
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm"
-              onClick={() =>
-                downloadFile('kroklingo-shablon.json', JSON.stringify(IMPORT_TEMPLATE, null, 2), 'application/json')
-              }
-            >
-              Завантажити шаблон
-            </button>
-            <input ref={importRef} type="file" accept=".json,application/json" hidden onChange={onImport} />
-          </div>
-          {customBank.collections.length > 0 && (
-            <div>
-              {customBank.collections.map((c) => {
-                const n = customBank.questions.filter((q) => q.collection === c.id).length
-                return (
-                  <div key={c.id} className="row" style={{ padding: '8px 0', borderTop: '1px solid var(--border)' }}>
-                    <b>{c.name}</b>
-                    <span className="muted small">
-                      {n} {pluralUk(n, 'питання', 'питання', 'питань')}
-                    </span>
-                    <span className="spacer" />
-                    <button type="button" className="btn btn-danger btn-sm" onClick={() => removeCollection(c.id, c.name)}>
-                      Видалити
-                    </button>
+      <section className="section">
+        <h2 className="section-title">Збірники питань</h2>
+        <div className="list">
+          {customBank.collections.map((c) => {
+            const n = customBank.questions.filter((q) => q.collection === c.id).length
+            return (
+              <div key={c.id} className="list-row">
+                <div className="list-row-main">
+                  {c.name}
+                  <div className="secondary t-footnote">
+                    {n} {pluralUk(n, 'питання', 'питання', 'питань')} · імпортовано
                   </div>
-                )
-              })}
-            </div>
-          )}
-          <span className="muted small">Усього в базі зараз: {bank.questions.length} питань.</span>
-        </section>
+                </div>
+                <button type="button" className="btn btn-destructive btn-sm" onClick={() => removeCollection(c.id, c.name)}>
+                  Видалити
+                </button>
+              </div>
+            )
+          })}
+          <button type="button" className="list-row" style={{ color: 'var(--accent)' }} onClick={() => importRef.current?.click()}>
+            Імпортувати збірник (JSON)…
+          </button>
+          <button
+            type="button"
+            className="list-row"
+            style={{ color: 'var(--accent)' }}
+            onClick={() => downloadFile('kroklingo-shablon.json', JSON.stringify(IMPORT_TEMPLATE, null, 2), 'application/json')}
+          >
+            Завантажити шаблон
+          </button>
+        </div>
+        <input ref={importRef} type="file" accept=".json,application/json" hidden onChange={onImport} />
+        <p className="section-footer">
+          Додайте власні питання, наприклад з офіційних буклетів. Вони з’являться окремим збірником у тренуванні й
+          потраплятимуть в іспит. Зараз у базі {bank.questions.length} питань.
+        </p>
+      </section>
 
-        <section className="card stack">
-          <h2>Резервна копія</h2>
-          <p className="muted" style={{ margin: 0 }}>
-            Дані зберігаються лише в цьому браузері. Збережіть копію, щоб перенести прогрес і словник на інший пристрій.
-          </p>
-          <div className="row">
-            <button type="button" className="btn btn-secondary btn-sm" onClick={backup}>
-              Зберегти копію
-            </button>
-            <button type="button" className="btn btn-secondary btn-sm" onClick={() => restoreRef.current?.click()}>
-              Відновити з копії
-            </button>
-            <input ref={restoreRef} type="file" accept=".json,application/json" hidden onChange={restore} />
-            <span className="spacer" />
-            <button type="button" className="btn btn-danger btn-sm" onClick={reset}>
-              Видалити всі дані
-            </button>
-          </div>
-        </section>
-      </div>
+      <section className="section">
+        <h2 className="section-title">Дані</h2>
+        <div className="list">
+          <button type="button" className="list-row" style={{ color: 'var(--accent)' }} onClick={backup}>
+            Зберегти резервну копію
+          </button>
+          <button type="button" className="list-row" style={{ color: 'var(--accent)' }} onClick={() => restoreRef.current?.click()}>
+            Відновити з копії…
+          </button>
+          <button type="button" className="list-row" style={{ color: 'var(--danger)' }} onClick={reset}>
+            Видалити всі дані
+          </button>
+        </div>
+        <input ref={restoreRef} type="file" accept=".json,application/json" hidden onChange={restore} />
+        <p className="section-footer">
+          Історія, словник і збірники зберігаються лише в цьому браузері. Резервна копія допоможе перенести їх на інший
+          пристрій.
+        </p>
+      </section>
     </div>
   )
 }

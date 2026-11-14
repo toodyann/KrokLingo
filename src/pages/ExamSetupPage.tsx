@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { PageHeader } from '../components/PageHeader'
 import { navigate } from '../lib/router'
 import { createSession } from '../lib/session'
 import { shuffle } from '../lib/util'
@@ -10,7 +11,7 @@ export function ExamSetupPage() {
   const count = Math.min(settings.examQuestions, bank.questions.length)
 
   const start = () => {
-    if (session && !confirm('У вас є незавершений тест. Почати новий іспит і скасувати попередній?')) return
+    if (session && !confirm('Незавершений тест буде скасовано, а його відповіді втрачено. Почати новий іспит?')) return
     const questions = shuffle(bank.questions).slice(0, count)
     setSession(
       createSession({
@@ -28,56 +29,60 @@ export function ExamSetupPage() {
 
   return (
     <div className="page page-narrow">
-      <h1>Симуляція іспиту</h1>
-      <p className="muted">Англійська мова професійного спрямування · «Крок 1. Стоматологія»</p>
+      <PageHeader
+        back={{ href: '#/', label: 'Тести' }}
+        title="Симуляція іспиту"
+        subtitle="Англійська мова професійного спрямування · «Крок 1. Стоматологія»"
+      />
 
-      <div className="card stack">
-        <div className="grid grid-4">
-          <div className="stat">
-            <div className="stat-value">{count}</div>
-            <div className="stat-label">тестових завдань</div>
+      <section className="section">
+        <div className="list">
+          <div className="list-row">
+            <div className="list-row-main">Тестових завдань</div>
+            <span className="list-row-value">{count}</span>
           </div>
-          <div className="stat">
-            <div className="stat-value">{settings.examMinutes} хв</div>
-            <div className="stat-label">зворотний таймер</div>
+          <div className="list-row">
+            <div className="list-row-main">Зворотний таймер</div>
+            <span className="list-row-value">{settings.examMinutes} хв</span>
           </div>
-          <div className="stat">
-            <div className="stat-value">{settings.threshold}%</div>
-            <div className="stat-label">прохідний поріг</div>
+          <div className="list-row">
+            <div className="list-row-main">Прохідний поріг</div>
+            <span className="list-row-value">{settings.threshold}% правильних</span>
           </div>
         </div>
+        <p className="section-footer">
+          Питання й варіанти перемішуються. Коли час вийде, тест завершиться сам — питання без відповіді
+          зараховуються як неправильні. Якщо закрити сторінку, тест можна продовжити, але таймер не зупиняється.
+        </p>
+      </section>
 
-        <ul className="muted" style={{ margin: 0, paddingLeft: 20 }}>
-          <li>Питання обираються випадково з усіх тем і збірників, варіанти відповідей перемішуються.</li>
-          <li>Коли час вийде, тест завершиться автоматично — питання без відповіді зараховуються як неправильні.</li>
-          <li>Натискайте на будь-яке англійське слово, щоб побачити переклад. Слово збережеться у словник.</li>
-          <li>Прогрес зберігається: якщо закрити сторінку, тест можна продовжити (таймер не зупиняється).</li>
-        </ul>
-
-        <label className="check">
-          <input type="checkbox" checked={instantFeedback} onChange={(e) => setInstantFeedback(e.target.checked)} />
-          <span>
-            <b>Показувати правильність відповіді одразу</b>
-            <br />
-            <span className="muted small">
-              Відповідь фіксується після вибору, а лічильник правильних/неправильних оновлюється наживо. Вимкніть для
-              умов, максимально наближених до реального іспиту.
-            </span>
-          </span>
-        </label>
-
-        {count < settings.examQuestions && (
-          <div className="banner banner-warn" style={{ margin: 0 }}>
-            У базі лише {bank.questions.length} питань — іспит буде коротшим за {settings.examQuestions}.
-          </div>
-        )}
-
-        <div>
-          <button type="button" className="btn btn-primary btn-lg" onClick={start} disabled={count === 0}>
-            Почати іспит
-          </button>
+      <section className="section">
+        <div className="list">
+          <label className="list-row" style={{ cursor: 'pointer' }}>
+            <div className="list-row-main">Показувати правильність одразу</div>
+            <input
+              type="checkbox"
+              className="switch"
+              checked={instantFeedback}
+              onChange={(e) => setInstantFeedback(e.target.checked)}
+            />
+          </label>
         </div>
-      </div>
+        <p className="section-footer">
+          Відповідь фіксується після вибору, а лічильник правильних і неправильних оновлюється наживо. Вимкніть, щоб
+          умови були як на справжньому іспиті.
+        </p>
+      </section>
+
+      {count < settings.examQuestions && (
+        <div className="banner banner-warn">
+          У базі лише {bank.questions.length} питань, тому іспит буде коротшим за {settings.examQuestions}.
+        </div>
+      )}
+
+      <button type="button" className="btn btn-primary btn-lg btn-block" onClick={start} disabled={count === 0}>
+        Почати іспит
+      </button>
     </div>
   )
 }

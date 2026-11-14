@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
-import { useApp } from '../store/context'
+import { PageHeader } from '../components/PageHeader'
 import { shuffle } from '../lib/util'
+import { useApp } from '../store/context'
 
 type Direction = 'en-uk' | 'uk-en'
 
@@ -50,55 +51,38 @@ export function FlashcardsPage() {
 
   return (
     <div className="page page-narrow">
-      <div className="page-head">
-        <div>
-          <h1>Повторення слів</h1>
-          <span className="muted">
-            Слово стає «вивченим», коли ви {LEARNED_BOX} рази поспіль відповіли «Знаю».
-          </span>
-        </div>
-        <a className="btn btn-ghost btn-sm" href="#/dictionary">
-          ← До словника
-        </a>
-      </div>
+      <PageHeader
+        back={{ href: '#/dictionary', label: 'Словник' }}
+        title="Картки"
+        subtitle={`Слово стає вивченим після ${LEARNED_BOX} відповідей «Знаю» поспіль.`}
+      />
 
       <div className="toolbar">
-        <div className="segmented">
-          <button type="button" className={direction === 'en-uk' ? 'on' : ''} onClick={() => setDirection('en-uk')}>
-            EN → UA
+        <div className="segmented" role="radiogroup" aria-label="Напрям">
+          <button type="button" role="radio" aria-checked={direction === 'en-uk'} onClick={() => setDirection('en-uk')}>
+            Англійська → українська
           </button>
-          <button type="button" className={direction === 'uk-en' ? 'on' : ''} onClick={() => setDirection('uk-en')}>
-            UA → EN
+          <button type="button" role="radio" aria-checked={direction === 'uk-en'} onClick={() => setDirection('uk-en')}>
+            Українська → англійська
           </button>
         </div>
-        <label className="check" style={{ alignItems: 'center' }}>
-          <input
-            type="checkbox"
-            checked={includeLearned}
-            onChange={(e) => {
-              setIncludeLearned(e.target.checked)
-              setIndex(0)
-              setRevealed(false)
-            }}
-          />
-          <span>включити вивчені</span>
-        </label>
         <span className="spacer" />
-        {deck.length > 0 && (
-          <span className="muted small">
-            {Math.min(index + 1, deck.length)} / {deck.length}
+        {deck.length > 0 && !done && (
+          <span className="secondary tnum">
+            {index + 1} / {deck.length}
           </span>
         )}
       </div>
 
       {deck.length === 0 ? (
         <div className="card empty">
-          Немає слів для повторення. Додавайте слова, натискаючи на них у тестах, або увімкніть «включити вивчені».
+          <h2 className="t-title3">Немає слів для повторення</h2>
+          <p>Додавайте слова, натискаючи на них у тестах, або ввімкніть вивчені слова нижче.</p>
         </div>
       ) : done ? (
         <div className="card flashcard">
-          <h2>Раунд завершено</h2>
-          <p className="muted">
+          <h2 className="t-title2">Раунд завершено</h2>
+          <p className="secondary">
             Знаю: {score.known} · Ще повторити: {score.again}
           </p>
           <button type="button" className="btn btn-primary" onClick={restart}>
@@ -107,14 +91,14 @@ export function FlashcardsPage() {
         </div>
       ) : (
         entry && (
-          <div className="card flashcard">
+          <div className="card flashcard" aria-live="polite">
             <div className="fc-front">{front}</div>
             {revealed ? (
               <>
                 <div className="fc-back">{back}</div>
                 {entry.note && <div className="fc-note">{entry.note}</div>}
-                <div className="row" style={{ justifyContent: 'center', marginTop: 12 }}>
-                  <button type="button" className="btn btn-secondary" onClick={() => answer(false)}>
+                <div className="row" style={{ justifyContent: 'center', marginTop: 16 }}>
+                  <button type="button" className="btn btn-gray" onClick={() => answer(false)}>
                     Ще повторю
                   </button>
                   <button type="button" className="btn btn-primary" onClick={() => answer(true)}>
@@ -123,13 +107,29 @@ export function FlashcardsPage() {
                 </div>
               </>
             ) : (
-              <button type="button" className="btn btn-primary" onClick={() => setRevealed(true)} style={{ marginTop: 12 }}>
+              <button type="button" className="btn btn-tinted" onClick={() => setRevealed(true)} style={{ marginTop: 16 }}>
                 Показати переклад
               </button>
             )}
           </div>
         )
       )}
+
+      <div className="list" style={{ marginTop: 20 }}>
+        <label className="list-row" style={{ cursor: 'pointer' }}>
+          <div className="list-row-main">Включати вивчені слова</div>
+          <input
+            type="checkbox"
+            className="switch"
+            checked={includeLearned}
+            onChange={(e) => {
+              setIncludeLearned(e.target.checked)
+              setIndex(0)
+              setRevealed(false)
+            }}
+          />
+        </label>
+      </div>
     </div>
   )
 }

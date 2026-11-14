@@ -1,14 +1,19 @@
-import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+import { IconChevronLeft, IconChevronRight, IconClose, IconGrid } from '../components/Icons'
 import { QuestionView } from '../components/QuestionView'
+import { useDraggableSheet } from '../components/useDraggableSheet'
 import { useNow } from '../lib/hooks'
 import { navigate } from '../lib/router'
 import { finalizeSession, liveStats } from '../lib/session'
-import { formatClock, formatPercent, LETTERS } from '../lib/util'
-import { useApp } from '../store/context'
+import { formatClock, formatPercent, LETTERS, pluralUk } from '../lib/util'
+import { useApp, type Bank } from '../store/context'
+import type { ActiveSession } from '../types'
 
 export function TestPage() {
   const { bank, session, setSession, addAttempt, dictionary } = useApp()
   const now = useNow(1000, session != null)
+  const [paletteOpen, setPaletteOpen] = useState(false)
 
   // Latest values for callbacks that must not go stale (timer, keyboard).
   const latest = useRef({ session, dictionary })
@@ -75,17 +80,22 @@ export function TestPage() {
     return () => window.removeEventListener('keydown', onKey)
   }, [go, choose])
 
+  // Each question starts at the top.
+  useEffect(() => {
+    window.scrollTo({ top: 0 })
+  }, [session?.current])
+
   if (!session) {
     return (
       <div className="page page-narrow">
         <div className="card empty">
-          <h2>Немає активного тесту</h2>
-          <p>Почніть симуляцію іспиту або тренування.</p>
+          <h2 className="t-title3">Немає активного тесту</h2>
+          <p style={{ marginBottom: 16 }}>Почніть симуляцію іспиту або тренування.</p>
           <div className="row" style={{ justifyContent: 'center' }}>
             <a className="btn btn-primary" href="#/exam">
               Іспит
             </a>
-            <a className="btn btn-secondary" href="#/training">
+            <a className="btn btn-tinted" href="#/training">
               Тренування
             </a>
           </div>
@@ -100,168 +110,260 @@ export function TestPage() {
   const chosen = session.answers[session.current]
   const reveal = session.instantFeedback && chosen != null
   const elapsed = Math.floor((now - session.startedAt) / 1000)
+  const isFirst = session.current === 0
   const isLast = session.current === session.questions.length - 1
+  const left = stats.total - stats.answered
 
   const askFinish = () => {
-    const left = stats.total - stats.answered
-    const msg =
-      left > 0
-        ? `Без відповіді залишилось ${left} питань — вони будуть зараховані як неправильні. Завершити тест?`
-        : 'Завершити тест і переглянути результати?'
-    if (confirm(msg)) finish(false)
+    if (
+      left === 0 ||
+      confirm(
+        `${left} ${pluralUk(left, 'питання залишилось', 'питання залишились', 'питань залишились')} без відповіді — їх буде зараховано як неправильні. Завершити тест?`,
+      )
+    ) {
+      finish(false)
+    }
   }
 
   const abandon = () => {
-    if (confirm('Скасувати тест без збереження результату?')) {
+    if (confirm('Вийти з тесту без збереження результату? Відповіді буде втрачено.')) {
       setSession(null)
       navigate('')
     }
   }
 
   return (
-    <div className="page">
-      <div className="statsbar" aria-live="polite">
-        {remaining !== null ? (
-          <div className={`sb-item timer${remaining < 300 ? ' low' : ''}`}>
-            <span className="sb-value">{formatClock(remaining)}</span>
-            <span className="sb-label">залишилось</span>
+    <>
+      <div className="test-bar material">
+        <div className="test-bar-inner">
+          <div className="left">
+            <button type="button" className="icon-btn" onClick={abandon} aria-label="Вийти з тесту без збереження">
+              <IconClose />
+            </button>
+            <span className="secondary t-subhead regular-only">{session.title}</span>
           </div>
-        ) : (
-          <div className="sb-item">
-            <span className="sb-value">{formatClock(elapsed)}</span>
-            <span className="sb-label">минуло</span>
+          {remaining !== null ? (
+            <div className={`timer${remaining < 300 ? ' low' : ''}`} role="timer" aria-label="Залишилось часу">
+              <div className="timer-value">{formatClock(remaining)}</div>
+              <div className="timer-label">залишилось</div>
+            </div>
+          ) : (
+            <div className="timer" role="timer" aria-label="Минуло часу">
+              <div className="timer-value">{formatClock(elapsed)}</div>
+              <div className="timer-label">минуло</div>
+            </div>
+          )}
+          <div className="right">
+            <button type="button" className="btn btn-primary btn-sm" onClick={askFinish}>
+              Завершити
+            </button>
           </div>
-        )}
-        <div className="sb-item">
-          <span className="sb-value">
-            {session.current + 1} / {stats.total}
-          </span>
-          <span className="sb-label">питання</span>
         </div>
-        {session.instantFeedback ? (
-          <>
-            <div className="sb-item sb-ok">
-              <span className="sb-value">✓ {stats.correct}</span>
-              <span className="sb-label">правильно</span>
-            </div>
-            <div className="sb-item sb-bad">
-              <span className="sb-value">✗ {stats.wrong}</span>
-              <span className="sb-label">неправильно</span>
-            </div>
-            <div className="sb-item">
-              <span className="sb-value">{stats.answered ? formatPercent(stats.percent) : '—'}</span>
-              <span className="sb-label">поточний відсоток</span>
-            </div>
-          </>
-        ) : (
-          <div className="sb-item">
-            <span className="sb-value">{stats.answered}</span>
-            <span className="sb-label">відповідей (результат — наприкінці)</span>
-          </div>
-        )}
-        <span className="spacer" />
-        <button type="button" className="btn btn-primary btn-sm" onClick={askFinish}>
-          Завершити
-        </button>
+        <div className="test-stats" aria-live="polite">
+          <span>
+            Питання <b>{session.current + 1}</b> з {stats.total}
+          </span>
+          {session.instantFeedback ? (
+            <>
+              <span className="ok">✓ {stats.correct}</span>
+              <span className="bad">✗ {stats.wrong}</span>
+              <span className="secondary">{stats.answered ? formatPercent(stats.percent) : '—'} правильних</span>
+            </>
+          ) : (
+            <span className="secondary">Відповідей: {stats.answered} · результат наприкінці</span>
+          )}
+        </div>
         <div className="progress" aria-hidden="true">
           <div style={{ width: `${(stats.answered / stats.total) * 100}%` }} />
         </div>
       </div>
 
-      <div className="runner">
-        <div className="card">
-          <div className="row" style={{ marginBottom: 12 }}>
-            <span className="badge badge-accent">{session.mode === 'exam' ? 'Іспит' : 'Тренування'}</span>
-            {question && <span className="badge">{bank.topicName(question.topic)}</span>}
-          </div>
+      <div className="page test-page">
+        <div className="runner">
+          <div>
+            <div className="question-meta">
+              <span className="pill pill-accent">{session.mode === 'exam' ? 'Іспит' : 'Тренування'}</span>
+              {question && <span className="pill">{bank.topicName(question.topic)}</span>}
+            </div>
 
-          {question ? (
-            <QuestionView
-              key={sq.qid}
-              question={question}
-              order={sq.order}
-              chosen={chosen}
-              reveal={reveal}
-              onChoose={reveal ? undefined : choose}
-            />
-          ) : (
-            <p className="muted">Це питання було видалене з бази (імпортований збірник). Перейдіть до наступного.</p>
-          )}
-
-          <div className="runner-nav">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => go(session.current - 1)}
-              disabled={session.current === 0}
-            >
-              ← Назад
-            </button>
-            {isLast ? (
-              <button type="button" className="btn btn-primary" onClick={askFinish}>
-                Завершити тест
-              </button>
+            {question ? (
+              <QuestionView
+                key={sq.qid}
+                question={question}
+                order={sq.order}
+                chosen={chosen}
+                reveal={reveal}
+                onChoose={reveal ? undefined : choose}
+              />
             ) : (
-              <button type="button" className="btn btn-primary" onClick={() => go(session.current + 1)}>
-                Далі →
-              </button>
+              <p className="secondary">Це питання видалене з бази (імпортований збірник). Перейдіть до наступного.</p>
             )}
-          </div>
 
-          <p className="hint">
-            Натисніть на літеру або порожнє місце варіанта, щоб обрати відповідь, і на будь-яке слово — щоб перекласти
-            його. Клавіші: <kbd>A</kbd>–<kbd>E</kbd> або <kbd>1</kbd>–<kbd>5</kbd> — відповідь, <kbd>←</kbd>{' '}
-            <kbd>→</kbd> — навігація.
-          </p>
-        </div>
-
-        <aside className="card">
-          <h3>Питання</h3>
-          <div className="palette">
-            {session.questions.map((q, i) => {
-              const a = session.answers[i]
-              let cls = ''
-              if (a != null) {
-                if (session.instantFeedback) cls = bank.questionById.get(q.qid)?.correct === a ? 'ok' : 'bad'
-                else cls = 'answered'
-              }
-              if (i === session.current) cls += ' current'
-              return (
-                <button key={q.qid + i} type="button" className={cls} onClick={() => go(i)} aria-label={`Питання ${i + 1}`}>
-                  {i + 1}
+            <div className="runner-nav">
+              <button type="button" className="btn btn-gray" onClick={() => go(session.current - 1)} disabled={isFirst}>
+                <IconChevronLeft />
+                Назад
+              </button>
+              {isLast ? (
+                <button type="button" className="btn btn-primary" onClick={askFinish}>
+                  Завершити тест
                 </button>
-              )
-            })}
-          </div>
-          <div className="legend">
-            {session.instantFeedback ? (
-              <>
-                <span>
-                  <i style={{ background: 'var(--ok-soft)', borderColor: 'var(--ok)' }} />
-                  правильно
-                </span>
-                <span>
-                  <i style={{ background: 'var(--bad-soft)', borderColor: 'var(--bad)' }} />
-                  неправильно
-                </span>
-              </>
-            ) : (
-              <span>
-                <i style={{ background: 'var(--accent-soft)' }} />
-                є відповідь
+              ) : (
+                <button type="button" className="btn btn-primary" onClick={() => go(session.current + 1)}>
+                  Далі
+                  <IconChevronRight />
+                </button>
+              )}
+            </div>
+
+            <p className="hint">
+              Натисніть на літеру або порожнє місце варіанта, щоб відповісти, і на будь-яке слово — щоб перекласти.
+              <span className="regular-only">
+                {' '}
+                Клавіші: <kbd>A</kbd>–<kbd>E</kbd> або <kbd>1</kbd>–<kbd>5</kbd>, <kbd>←</kbd> <kbd>→</kbd>.
               </span>
-            )}
-            <span>
-              <i />
-              без відповіді
-            </span>
+            </p>
           </div>
-          <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '16px 0' }} />
-          <button type="button" className="btn btn-ghost btn-sm" onClick={abandon}>
-            Скасувати тест
-          </button>
-        </aside>
+
+          <aside className="card">
+            <h2 className="t-headline" style={{ marginBottom: 12 }}>
+              Питання
+            </h2>
+            <Palette session={session} bank={bank} onGo={go} />
+          </aside>
+        </div>
       </div>
-    </div>
+
+      <div className="bottom-toolbar material">
+        <button
+          type="button"
+          className="icon-btn"
+          onClick={() => go(session.current - 1)}
+          disabled={isFirst}
+          aria-label="Попереднє питання"
+        >
+          <IconChevronLeft />
+        </button>
+        <button type="button" className="btn btn-gray" onClick={() => setPaletteOpen(true)} aria-label="Усі питання">
+          <IconGrid />
+          <span className="tnum">
+            {session.current + 1} / {stats.total}
+          </span>
+        </button>
+        {isLast ? (
+          <button type="button" className="btn btn-primary" onClick={askFinish}>
+            Завершити
+          </button>
+        ) : (
+          <button type="button" className="btn btn-primary" onClick={() => go(session.current + 1)}>
+            Далі
+            <IconChevronRight />
+          </button>
+        )}
+      </div>
+
+      {paletteOpen && (
+        <PaletteSheet onClose={() => setPaletteOpen(false)}>
+          {(dismiss) => (
+            <Palette
+              session={session}
+              bank={bank}
+              onGo={(i) => {
+                go(i)
+                dismiss()
+              }}
+            />
+          )}
+        </PaletteSheet>
+      )}
+    </>
+  )
+}
+
+function Palette({ session, bank, onGo }: { session: ActiveSession; bank: Bank; onGo: (i: number) => void }) {
+  return (
+    <>
+      <div className="palette">
+        {session.questions.map((q, i) => {
+          const a = session.answers[i]
+          let cls = ''
+          let state = 'без відповіді'
+          if (a != null) {
+            if (session.instantFeedback) {
+              const ok = bank.questionById.get(q.qid)?.correct === a
+              cls = ok ? 'ok' : 'bad'
+              state = ok ? 'правильно' : 'неправильно'
+            } else {
+              cls = 'answered'
+              state = 'є відповідь'
+            }
+          }
+          const current = i === session.current
+          if (current) cls += ' current'
+          return (
+            <button
+              key={q.qid + i}
+              type="button"
+              className={cls}
+              onClick={() => onGo(i)}
+              aria-label={`Питання ${i + 1}: ${state}`}
+              aria-current={current ? 'step' : undefined}
+            >
+              {i + 1}
+            </button>
+          )
+        })}
+      </div>
+      <div className="legend">
+        {session.instantFeedback ? (
+          <>
+            <span>
+              <i style={{ background: 'var(--success-tint)' }} />
+              правильно
+            </span>
+            <span>
+              <i style={{ background: 'var(--danger-tint)' }} />
+              <s>неправильно</s>
+            </span>
+          </>
+        ) : (
+          <span>
+            <i style={{ background: 'var(--accent-tint)' }} />є відповідь
+          </span>
+        )}
+        <span>
+          <i />
+          без відповіді
+        </span>
+      </div>
+    </>
+  )
+}
+
+/** Modal sheet: dims the test behind it, swipe down or tap outside to close. */
+function PaletteSheet({ onClose, children }: { onClose: () => void; children: (dismiss: () => void) => ReactNode }) {
+  const { ref, dismiss, handlers } = useDraggableSheet(onClose)
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && dismiss()
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [dismiss])
+
+  return createPortal(
+    <>
+      <div className="sheet-backdrop" onClick={() => dismiss()} aria-hidden="true" />
+      <div ref={ref} className="sheet" role="dialog" aria-modal="true" aria-label="Усі питання" {...handlers}>
+        <div className="grabber" aria-hidden="true" />
+        <div className="sheet-head">
+          <h2 className="t-headline">Усі питання</h2>
+          <button type="button" className="icon-btn filled" onClick={() => dismiss()} aria-label="Закрити">
+            <IconClose size={16} />
+          </button>
+        </div>
+        {children(() => dismiss())}
+      </div>
+    </>,
+    document.body,
   )
 }

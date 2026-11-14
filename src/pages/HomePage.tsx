@@ -1,106 +1,95 @@
-import { ProgressChart } from '../components/Charts'
-import { liveStats } from '../lib/session'
-import { formatPercent } from '../lib/util'
+import { useMemo } from 'react'
+import { IconChevronRight } from '../components/Icons'
+import { liveStats, mistakeIds } from '../lib/session'
+import { formatPercent, pluralUk } from '../lib/util'
 import { useApp } from '../store/context'
 
 export function HomePage() {
   const { bank, settings, history, dictionary, session } = useApp()
-  const exams = history.filter((r) => r.mode === 'exam')
-  const avg = history.length ? history.reduce((s, r) => s + r.percent, 0) / history.length : 0
-  const best = history.length ? Math.max(...history.map((r) => r.percent)) : 0
-  const passedExams = exams.filter((r) => r.passed).length
-  const toLearn = dictionary.filter((e) => !e.learned).length
+  const toLearn = dictionary.filter((e) => !e.learned && e.translation).length
+  const mistakes = useMemo(() => mistakeIds(history, bank).size, [history, bank])
+  const last = history.length ? [...history].sort((a, b) => b.finishedAt - a.finishedAt)[0] : null
 
   return (
     <div className="page">
-      <section className="hero">
-        <h1>Підготовка до «Крок 1. Стоматологія» англійською</h1>
-        <p>
-          Симуляція іспиту з таймером, вільне тренування за темами та словник невідомих слів: натисніть на будь-яке
-          англійське слово в тесті, щоб побачити переклад, і воно збережеться у ваш словник.
-        </p>
-      </section>
+      <header className="page-header">
+        <div>
+          <h1 className="t-large-title">Тести</h1>
+          <p className="secondary t-callout" style={{ marginTop: 6, maxWidth: 560 }}>
+            «Крок 1. Стоматологія» англійською. Натискайте на незнайомі слова — переклад з’явиться поруч, а слово
+            підсвітиться маркером і збережеться у словник.
+          </p>
+        </div>
+      </header>
 
       {session && (
         <div className="banner">
-          <div>
-            <b>Незавершений тест:</b> {session.title} · відповіли на {liveStats(session, bank).answered} з{' '}
-            {session.questions.length}
+          <div className="list-row-main">
+            <div className="t-headline">{session.title}</div>
+            <div className="secondary t-subhead">
+              Відповіли на {liveStats(session, bank).answered} з {session.questions.length}
+              {session.deadline ? ' · таймер іде' : ''}
+            </div>
           </div>
-          <span className="spacer" />
           <a className="btn btn-primary btn-sm" href="#/test">
             Продовжити
           </a>
         </div>
       )}
 
-      <div className="grid grid-2" style={{ marginBottom: 20 }}>
-        <div className="card mode-card">
-          <h2>Симуляція іспиту</h2>
+      <div className="grid grid-2 section">
+        <section className="card mode-card">
+          <h2 className="t-title2">Симуляція іспиту</h2>
           <div className="facts">
-            <span className="badge badge-accent">{settings.examQuestions} завдань</span>
-            <span className="badge badge-accent">{settings.examMinutes} хвилин</span>
-            <span className="badge badge-accent">поріг {settings.threshold}%</span>
+            <span className="pill">{settings.examQuestions} завдань</span>
+            <span className="pill">{settings.examMinutes} хв</span>
+            <span className="pill">поріг {settings.threshold}%</span>
           </div>
-          <p className="muted">
-            Повноцінний іспит з англійської мови професійного спрямування зі зворотним таймером і підсумковим звітом
-            «склав / не склав».
+          <p className="secondary">
+            Англійська мова професійного спрямування: зворотний таймер і підсумковий звіт «склав / не склав».
           </p>
           <a className="btn btn-primary" href="#/exam">
             Почати іспит
           </a>
-        </div>
-        <div className="card mode-card">
-          <h2>Вільне тренування</h2>
+        </section>
+        <section className="card mode-card">
+          <h2 className="t-title2">Тренування</h2>
           <div className="facts">
-            <span className="badge">без обмеження часу</span>
-            <span className="badge">{bank.topics.length} тем</span>
-            <span className="badge">{bank.questions.length} питань</span>
+            <span className="pill">без таймера</span>
+            <span className="pill">{bank.topics.length} тем</span>
+            <span className="pill">{bank.questions.length} питань</span>
           </div>
-          <p className="muted">
-            Оберіть окремі теми чи збірники, кількість питань і тренуйтеся у своєму темпі. Можна повторити лише ті
-            питання, де були помилки.
-          </p>
-          <a className="btn btn-secondary" href="#/training">
-            Налаштувати тренування
+          <p className="secondary">Окремі теми чи збірники у вашому темпі, з поясненням після кожної відповіді.</p>
+          <a className="btn btn-tinted" href="#/training">
+            Налаштувати
           </a>
-        </div>
+        </section>
       </div>
 
-      <div className="grid grid-4" style={{ marginBottom: 20 }}>
-        <div className="stat">
-          <div className="stat-value">{history.length}</div>
-          <div className="stat-label">спроб усього</div>
-        </div>
-        <div className="stat">
-          <div className="stat-value">{history.length ? formatPercent(avg) : '—'}</div>
-          <div className="stat-label">середній результат</div>
-        </div>
-        <div className="stat">
-          <div className="stat-value">{history.length ? formatPercent(best) : '—'}</div>
-          <div className="stat-label">найкращий результат</div>
-        </div>
-        <div className="stat">
-          <div className="stat-value">
-            {passedExams}/{exams.length}
-          </div>
-          <div className="stat-label">іспитів складено</div>
-        </div>
-        <a className="stat" href="#/dictionary" style={{ textDecoration: 'none' }}>
-          <div className="stat-value">{dictionary.length}</div>
-          <div className="stat-label">слів у словнику · {toLearn} до вивчення</div>
-        </a>
-      </div>
-
-      <div className="card">
-        <div className="card-title">
-          <h2>Шкала прогресу</h2>
-          <a href="#/history" className="btn btn-ghost btn-sm">
-            Уся історія →
+      <section className="section">
+        <h2 className="section-title">Що далі</h2>
+        <div className="list">
+          <a className="list-row" href="#/flashcards">
+            <div className="list-row-main">Повторити слова картками</div>
+            <span className="list-row-value">
+              {toLearn} {pluralUk(toLearn, 'слово', 'слова', 'слів')}
+            </span>
+            <IconChevronRight className="chev" />
+          </a>
+          <a className="list-row" href="#/training">
+            <div className="list-row-main">Робота над помилками</div>
+            <span className="list-row-value">
+              {mistakes} {pluralUk(mistakes, 'питання', 'питання', 'питань')}
+            </span>
+            <IconChevronRight className="chev" />
+          </a>
+          <a className="list-row" href={last ? `#/results/${last.id}` : '#/history'}>
+            <div className="list-row-main">Останній результат</div>
+            <span className="list-row-value">{last ? formatPercent(last.percent) : 'ще немає'}</span>
+            <IconChevronRight className="chev" />
           </a>
         </div>
-        <ProgressChart records={history} threshold={settings.threshold} />
-      </div>
+      </section>
     </div>
   )
 }

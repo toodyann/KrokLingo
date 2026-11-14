@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { TopicBars } from '../components/Charts'
+import { PageHeader } from '../components/PageHeader'
 import { QuestionView } from '../components/QuestionView'
+import { useToast } from '../components/toastContext'
 import { navigate } from '../lib/router'
 import { topicStats } from '../lib/session'
 import { formatDate, formatDuration, formatPercent, pluralUk } from '../lib/util'
@@ -9,7 +11,8 @@ import { useApp } from '../store/context'
 type Filter = 'all' | 'wrong' | 'skipped' | 'correct'
 
 export function ResultsPage({ id }: { id: string }) {
-  const { bank, history, deleteAttempt } = useApp()
+  const { bank, history, deleteAttempt, addAttempt } = useApp()
+  const toast = useToast()
   const record = history.find((r) => r.id === id)
   const [filter, setFilter] = useState<Filter>('all')
   const stats = useMemo(() => (record ? topicStats([record], bank) : []), [record, bank])
@@ -17,11 +20,10 @@ export function ResultsPage({ id }: { id: string }) {
   if (!record) {
     return (
       <div className="page page-narrow">
+        <PageHeader back={{ href: '#/history', label: 'Прогрес' }} title="Результати" />
         <div className="card empty">
-          <h2>Результат не знайдено</h2>
-          <a className="btn btn-secondary" href="#/history">
-            До історії
-          </a>
+          <h2 className="t-title3">Результат не знайдено</h2>
+          <p>Можливо, спробу видалено з історії.</p>
         </div>
       </div>
     )
@@ -39,64 +41,76 @@ export function ResultsPage({ id }: { id: string }) {
     })
 
   const remove = () => {
-    if (confirm('Видалити цю спробу з історії?')) {
-      deleteAttempt(record.id)
-      navigate('history')
-    }
+    deleteAttempt(record.id)
+    toast({ message: 'Спробу видалено з історії', onAction: () => addAttempt(record) })
+    navigate('history')
   }
+
+  const filters: [Filter, string][] = [
+    ['all', `Усі ${record.total}`],
+    ['wrong', `Помилки ${wrong}`],
+    ['skipped', `Без відповіді ${skipped}`],
+    ['correct', `Правильні ${record.correct}`],
+  ]
 
   return (
     <div className="page">
-      <div className="page-head">
-        <div>
-          <h1>Результати</h1>
-          <span className="muted">
-            {record.title} · {formatDate(record.finishedAt)}
-          </span>
-        </div>
-        <div className="row">
-          <a className="btn btn-secondary btn-sm" href={record.mode === 'exam' ? '#/exam' : '#/training'}>
-            Пройти ще раз
-          </a>
-          <button type="button" className="btn btn-ghost btn-sm" onClick={remove}>
-            Видалити спробу
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        back={{ href: '#/history', label: 'Прогрес' }}
+        title="Результати"
+        subtitle={`${record.title} · ${formatDate(record.finishedAt)}`}
+        actions={
+          <>
+            <a className="btn btn-tinted btn-sm" href={record.mode === 'exam' ? '#/exam' : '#/training'}>
+              Пройти ще раз
+            </a>
+            <button type="button" className="btn btn-destructive btn-sm" onClick={remove}>
+              Видалити
+            </button>
+          </>
+        }
+      />
 
-      <div className={`verdict ${record.passed ? 'pass' : 'fail'}`}>
+      <section className={`verdict ${record.passed ? 'pass' : 'fail'}`} aria-label="Підсумок">
         <div className="verdict-score">{formatPercent(record.percent)}</div>
         <div>
-          <div className="verdict-title">{record.passed ? 'Склав' : 'Не склав'}</div>
-          <div className="muted">
-            Прохідний поріг — {record.threshold}% правильних відповідей
+          <div className="verdict-title">{record.passed ? '✓ Склав' : '✗ Не склав'}</div>
+          <div className="secondary t-subhead">
+            Поріг {record.threshold}% ·{' '}
             {record.passed
-              ? `, запас ${formatPercent(record.percent - record.threshold)}`
-              : `, не вистачило ${formatPercent(record.threshold - record.percent)}`}
+              ? `запас ${formatPercent(record.percent - record.threshold)}`
+              : `не вистачило ${formatPercent(record.threshold - record.percent)}`}
           </div>
         </div>
-      </div>
+        <div className="verdict-gauge" aria-hidden="true">
+          <div style={{ width: `${Math.min(100, record.percent)}%` }} />
+          <span className="threshold-tick" style={{ left: `${record.threshold}%` }} />
+        </div>
+      </section>
 
-      <div className="grid grid-4" style={{ marginBottom: 20 }}>
+      <div className="grid grid-stats section">
         <div className="stat">
           <div className="stat-value">
-            {record.correct} / {record.total}
+            {record.correct}
+            <span className="secondary" style={{ fontWeight: 600 }}>
+              {' '}
+              / {record.total}
+            </span>
           </div>
           <div className="stat-label">набрано балів</div>
         </div>
         <div className="stat">
           <div className="stat-value">{formatDuration(record.durationSec)}</div>
           <div className="stat-label">
-            витрачено часу
-            {record.timeLimitSec ? ` з ${formatDuration(record.timeLimitSec)}` : ''}
+            витрачено{record.timeLimitSec ? ` з ${formatDuration(record.timeLimitSec)}` : ''}
             {record.timedOut ? ' · час вийшов' : ''}
           </div>
         </div>
         <div className="stat">
-          <div className="stat-value" style={{ color: 'var(--bad)' }}>
+          <div className="stat-value" style={{ color: wrong ? 'var(--danger)' : undefined }}>
             {wrong}
           </div>
-          <div className="stat-label">неправильних відповідей</div>
+          <div className="stat-label">неправильних</div>
         </div>
         <div className="stat">
           <div className="stat-value">{skipped}</div>
@@ -104,22 +118,25 @@ export function ResultsPage({ id }: { id: string }) {
         </div>
       </div>
 
-      <div className="grid grid-2" style={{ marginBottom: 20 }}>
-        <div className="card">
-          <h2>За темами</h2>
+      <div className="grid grid-2 section">
+        <section className="card">
+          <h2 className="t-title3" style={{ marginBottom: 16 }}>
+            За темами
+          </h2>
           <TopicBars stats={stats} threshold={record.threshold} />
-        </div>
-        <div className="card">
-          <div className="card-title">
-            <h2>Нові слова цієї сесії</h2>
-            <span className="badge badge-accent">
+        </section>
+        <section className="card">
+          <div className="row" style={{ marginBottom: 14 }}>
+            <h2 className="t-title3">Нові слова цієї сесії</h2>
+            <span className="spacer" />
+            <span className="pill">
               {record.newWords.length} {pluralUk(record.newWords.length, 'слово', 'слова', 'слів')}
             </span>
           </div>
           {record.newWords.length === 0 ? (
-            <p className="muted">
-              Під час цього тесту нових слів до словника не додано. Натискайте на незнайомі слова в питаннях, щоб
-              перекласти й зберегти їх.
+            <p className="secondary">
+              Під час цього тесту нових слів не додано. Натискайте на незнайомі слова в питаннях — вони
+              збережуться у словник.
             </p>
           ) : (
             <>
@@ -127,36 +144,30 @@ export function ResultsPage({ id }: { id: string }) {
                 {record.newWords.map((w) => (
                   <div className="word-chip" key={w.word}>
                     <b>{w.word}</b>
-                    <span>{w.translation || '— без перекладу —'}</span>
+                    <span>{w.translation || 'без перекладу'}</span>
                   </div>
                 ))}
               </div>
-              <div className="row" style={{ marginTop: 14 }}>
-                <a className="btn btn-secondary btn-sm" href="#/dictionary">
-                  Відкрити словник
-                </a>
-                <a className="btn btn-ghost btn-sm" href="#/flashcards">
+              <div className="row" style={{ marginTop: 16 }}>
+                <a className="btn btn-tinted btn-sm" href="#/flashcards">
                   Повторити картками
+                </a>
+                <a className="btn btn-plain btn-sm" href="#/dictionary">
+                  Відкрити словник
                 </a>
               </div>
             </>
           )}
-        </div>
+        </section>
       </div>
 
-      <div className="card">
-        <div className="card-title">
-          <h2>Детальний розбір</h2>
-          <div className="segmented">
-            {(
-              [
-                ['all', `Усі (${record.total})`],
-                ['wrong', `Помилки (${wrong})`],
-                ['skipped', `Без відповіді (${skipped})`],
-                ['correct', `Правильні (${record.correct})`],
-              ] as [Filter, string][]
-            ).map(([key, label]) => (
-              <button key={key} type="button" className={filter === key ? 'on' : ''} onClick={() => setFilter(key)}>
+      <section className="card">
+        <div className="row" style={{ marginBottom: 12 }}>
+          <h2 className="t-title3">Детальний розбір</h2>
+          <span className="spacer" />
+          <div className="segmented" role="radiogroup" aria-label="Фільтр питань">
+            {filters.map(([key, label]) => (
+              <button key={key} type="button" role="radio" aria-checked={filter === key} onClick={() => setFilter(key)}>
                 {label}
               </button>
             ))}
@@ -168,27 +179,27 @@ export function ResultsPage({ id }: { id: string }) {
         {items.map(({ item, index, question }) => {
           const ok = question && item.chosen === question.correct
           return (
-            <div className="review-item" key={item.qid + index}>
+            <article className="review-item" key={item.qid + index}>
               <div className="review-head">
-                <b>Питання {index + 1}</b>
-                {question && <span className="badge">{bank.topicName(question.topic)}</span>}
+                <b className="tnum">Питання {index + 1}</b>
+                {question && <span className="pill">{bank.topicName(question.topic)}</span>}
                 {item.chosen == null ? (
-                  <span className="badge badge-warn">без відповіді</span>
+                  <span className="pill pill-warning">без відповіді</span>
                 ) : ok ? (
-                  <span className="badge badge-ok">правильно</span>
+                  <span className="pill pill-success">✓ правильно</span>
                 ) : (
-                  <span className="badge badge-bad">неправильно</span>
+                  <span className="pill pill-danger">✗ неправильно</span>
                 )}
               </div>
               {question ? (
                 <QuestionView question={question} order={item.order} chosen={item.chosen} reveal passageOpen={false} />
               ) : (
-                <p className="muted">Питання видалене з бази.</p>
+                <p className="secondary">Питання видалене з бази.</p>
               )}
-            </div>
+            </article>
           )
         })}
-      </div>
+      </section>
     </div>
   )
 }
