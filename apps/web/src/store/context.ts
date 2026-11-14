@@ -11,6 +11,7 @@ import type {
   Topic,
 } from '../types'
 import type { Resolution } from '../lib/translate'
+import type { Account } from './useCloudSync'
 
 export interface Bank {
   topics: Topic[]
@@ -52,6 +53,11 @@ export interface AppState {
   setCustomBank: (bank: CustomBank) => void
 
   storageError: boolean
+
+  /** Google account and server sync (disabled when the build has no sync configuration). */
+  account: Account
+  /** Deletes all user data here and, when signed in, in the account. */
+  resetAll: () => void
 }
 
 export const AppContext = createContext<AppState | null>(null)

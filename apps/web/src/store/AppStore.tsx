@@ -3,7 +3,9 @@ import { BUILTIN_BANK } from '../data/bank'
 import { STORAGE_KEYS, loadJSON, saveJSON } from '../lib/storage'
 import { uid } from '../lib/util'
 import { refreshedTranslation, storedText, type Resolution } from '../lib/translate'
+import { EMPTY_STATE, type UserState } from '@kroklingo/shared'
 import type { ActiveSession, AttemptRecord, CustomBank, DictEntry, Settings, TranslationSource } from '../types'
+import { useCloudSync } from './useCloudSync'
 import { AppContext, type AppState, type Bank } from './context'
 import { DEFAULT_SETTINGS } from './defaults'
 
@@ -29,11 +31,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [storageError, setStorageError] = useState(false)
   const onError = useCallback(() => setStorageError(true), [])
 
-  const [storedSettings, setSettings] = usePersistent<Settings>(STORAGE_KEYS.settings, DEFAULT_SETTINGS, onError)
+  // null = never changed (defaults apply); lets the first sign-in tell an untouched browser apart
+  const [storedSettings, setSettings] = usePersistent<Partial<Settings> | null>(STORAGE_KEYS.settings, null, onError)
   const [dictionary, setDictionary] = usePersistent<DictEntry[]>(STORAGE_KEYS.dictionary, [], onError)
   const [history, setHistory] = usePersistent<AttemptRecord[]>(STORAGE_KEYS.history, [], onError)
   const [session, setSession] = usePersistent<ActiveSession | null>(STORAGE_KEYS.session, null, onError)
-  const [customBank, setCustomBank] = usePersistent<CustomBank>(STORAGE_KEYS.customBank, EMPTY_BANK, onError)
+  const [storedBank, setStoredBank] = usePersistent<CustomBank | null>(STORAGE_KEYS.customBank, null, onError)
+  const customBank = storedBank ?? EMPTY_BANK
+  const setCustomBank = useCallback((bank: CustomBank) => setStoredBank(bank), [setStoredBank])
 
   const settings = useMemo(() => ({ ...DEFAULT_SETTINGS, ...storedSettings }), [storedSettings])
   const booklets = use(bookletsPromise)
@@ -66,6 +71,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
     (patch: Partial<Settings>) => setSettings((prev) => ({ ...DEFAULT_SETTINGS, ...prev, ...patch })),
     [setSettings],
   )
+
+  // ----- account sync: the same data as one UserState -----
+  const userState = useMemo<UserState>(
+    () => ({ settings: storedSettings, dictionary, history, session, customBank: storedBank }),
+    [storedSettings, dictionary, history, session, storedBank],
+  )
+  const applyState = useCallback(
+    (next: UserState) => {
+      setSettings(next.settings)
+      setDictionary(next.dictionary)
+      setHistory(next.history)
+      setSession(next.session)
+      setStoredBank(next.customBank)
+    },
+    [setSettings, setDictionary, setHistory, setSession, setStoredBank],
+  )
+  const account = useCloudSync(userState, applyState)
+  /** Deletes everything: in this browser and, when signed in, in the account. */
+  const resetAll = useCallback(() => applyState(EMPTY_STATE), [applyState])
 
   const findEntry = useCallback(
     (word: string) => {
@@ -238,6 +262,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     customBank,
     setCustomBank,
     storageError,
+    account,
+    resetAll,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

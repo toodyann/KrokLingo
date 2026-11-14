@@ -1,7 +1,7 @@
 import { useRef, useState, type ChangeEvent } from 'react'
 import { useConfirm } from '../components/confirmContext'
 import { IMPORT_TEMPLATE, parseImport } from '../lib/importQuestions'
-import { clearAll } from '../lib/storage'
+import { AccountCard } from '../components/AccountCard'
 import { downloadFile, pluralUk } from '../lib/util'
 import { Alert, AlertAction, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -130,9 +130,11 @@ export function SettingsPage() {
       destructive: true,
     })
     if (!ok) return
-    clearAll()
-    location.reload()
+    app.resetAll()
+    setMessage({ kind: 'ok', text: account.user ? 'Усі дані видалено з цього браузера й облікового запису.' : 'Усі дані видалено.' })
   }
+
+  const { account } = app
 
   return (
     <div className="page">
@@ -258,10 +260,16 @@ export function SettingsPage() {
             <input ref={importRef} type="file" accept=".json,application/json" hidden onChange={onImport} />
           </Card>
 
+          <AccountCard />
+
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Дані</CardTitle>
-              <CardDescription>Історія, словник і збірники зберігаються лише в цьому браузері</CardDescription>
+              <CardDescription>
+                {account.user
+                  ? 'Історія, словник і збірники зберігаються у вашому обліковому записі'
+                  : 'Історія, словник і збірники зберігаються лише в цьому браузері'}
+              </CardDescription>
             </CardHeader>
             <CardFooter className="flex flex-wrap gap-2">
               <Button variant="outline" onClick={backup}>
