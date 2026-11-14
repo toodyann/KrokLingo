@@ -23,7 +23,6 @@ export function ResultsPage({ id }: { id: string }) {
         <PageHeader back={{ href: '#/history', label: 'Прогрес' }} title="Результати" />
         <div className="card empty">
           <h2 className="t-title3">Результат не знайдено</h2>
-          <p>Можливо, спробу видалено з історії.</p>
         </div>
       </div>
     )
@@ -134,10 +133,7 @@ export function ResultsPage({ id }: { id: string }) {
             </span>
           </div>
           {record.newWords.length === 0 ? (
-            <p className="secondary">
-              Під час цього тесту нових слів не додано. Натискайте на незнайомі слова в питаннях — вони
-              збережуться у словник.
-            </p>
+            <p className="secondary">Нових слів немає</p>
           ) : (
             <>
               <div className="word-list">

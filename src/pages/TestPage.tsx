@@ -170,7 +170,7 @@ export function TestPage() {
               <span className="secondary">{stats.answered ? formatPercent(stats.percent) : '—'} правильних</span>
             </>
           ) : (
-            <span className="secondary">Відповідей: {stats.answered} · результат наприкінці</span>
+            <span className="secondary">Відповідей: {stats.answered}</span>
           )}
         </div>
         <div className="progress" aria-hidden="true">
@@ -215,14 +215,6 @@ export function TestPage() {
                 </button>
               )}
             </div>
-
-            <p className="hint">
-              Натисніть на літеру або порожнє місце варіанта, щоб відповісти, і на будь-яке слово — щоб перекласти.
-              <span className="regular-only">
-                {' '}
-                Клавіші: <kbd>A</kbd>–<kbd>E</kbd> або <kbd>1</kbd>–<kbd>5</kbd>, <kbd>←</kbd> <kbd>→</kbd>.
-              </span>
-            </p>
           </div>
 
           <aside className="card">

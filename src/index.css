@@ -362,13 +362,6 @@ textarea {
   gap: 8px;
 }
 
-.sidebar-note {
-  font-size: 0.75rem;
-  line-height: 1.4;
-  color: var(--label-2);
-  padding: 0 8px;
-  width: 228px;
-}
 
 .sidebar-toggle {
   margin-left: 4px;
@@ -562,12 +555,6 @@ main {
   margin: 0 16px 8px;
 }
 
-.section-footer {
-  font-size: 0.8125rem;
-  color: var(--label-2);
-  margin: 8px 16px 0;
-  line-height: 1.4;
-}
 
 .card {
   background: var(--card);
@@ -1680,12 +1667,6 @@ textarea::placeholder {
   background: var(--fill);
 }
 
-.hint {
-  font-size: 0.8125rem;
-  color: var(--label-2);
-  margin-top: 16px;
-  line-height: 1.5;
-}
 
 kbd {
   font-family: inherit;
@@ -2169,13 +2150,6 @@ tr.clickable:hover td {
   white-space: pre-wrap;
 }
 
-.footer {
-  max-width: 1040px;
-  margin: 0 auto;
-  padding: 0 20px 32px;
-  font-size: 0.8125rem;
-  color: var(--label-2);
-}
 
 /* ---------- accessibility preferences ---------- */
 

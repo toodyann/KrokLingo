@@ -10,7 +10,7 @@ const PAD = { top: 16, right: 16, bottom: 28, left: 40 }
 /** Line chart of the percentage of correct answers across all attempts. */
 export function ProgressChart({ records, threshold }: { records: AttemptRecord[]; threshold: number }) {
   if (records.length === 0) {
-    return <div className="empty">Пройдіть перший тест — тут з’явиться графік вашого прогресу.</div>
+    return <div className="empty">Ще немає спроб</div>
   }
 
   const sorted = [...records].sort((a, b) => a.finishedAt - b.finishedAt)
@@ -89,7 +89,7 @@ export function ProgressChart({ records, threshold }: { records: AttemptRecord[]
 
 export function TopicBars({ stats, threshold }: { stats: TopicStat[]; threshold: number }) {
   const { bank } = useApp()
-  if (stats.length === 0) return <div className="empty">Статистика з'явиться після першого тесту.</div>
+  if (stats.length === 0) return <div className="empty">Ще немає даних</div>
   return (
     <div className="bars">
       {stats.map((s) => {

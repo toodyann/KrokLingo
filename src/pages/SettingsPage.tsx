@@ -26,7 +26,7 @@ function readFile(file: File): Promise<string> {
 export function SettingsPage() {
   const app = useApp()
   const toast = useToast()
-  const { settings, updateSettings, customBank, setCustomBank, bank } = app
+  const { settings, updateSettings, customBank, setCustomBank } = app
   const [message, setMessage] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
   const importRef = useRef<HTMLInputElement>(null)
   const restoreRef = useRef<HTMLInputElement>(null)
@@ -180,7 +180,7 @@ export function SettingsPage() {
               })
             }
           >
-            Відновити стандарт: 50 завдань, 100 хв, 40%
+            Відновити стандарт
           </button>
         </div>
       </section>
@@ -198,10 +198,6 @@ export function SettingsPage() {
             />
           </label>
         </div>
-        <p className="section-footer">
-          Слова вбудованої бази перекладаються миттєво й без інтернету. Слова з імпортованих збірників, яких немає у
-          вбудованому словнику, надсилаються до безкоштовного сервісу MyMemory.
-        </p>
       </section>
 
       <section className="section">
@@ -236,10 +232,6 @@ export function SettingsPage() {
           </button>
         </div>
         <input ref={importRef} type="file" accept=".json,application/json" hidden onChange={onImport} />
-        <p className="section-footer">
-          Додайте власні питання, наприклад з офіційних буклетів. Вони з’являться окремим збірником у тренуванні й
-          потраплятимуть в іспит. Зараз у базі {bank.questions.length} питань.
-        </p>
       </section>
 
       <section className="section">
@@ -256,10 +248,6 @@ export function SettingsPage() {
           </button>
         </div>
         <input ref={restoreRef} type="file" accept=".json,application/json" hidden onChange={restore} />
-        <p className="section-footer">
-          Історія, словник і збірники зберігаються лише в цьому браузері. Резервна копія допоможе перенести їх на інший
-          пристрій.
-        </p>
       </section>
     </div>
   )

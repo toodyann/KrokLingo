@@ -15,10 +15,6 @@ export function HomePage() {
       <header className="page-header">
         <div>
           <h1 className="t-large-title">Тести</h1>
-          <p className="secondary t-callout" style={{ marginTop: 6, maxWidth: 560 }}>
-            «Крок 1. Стоматологія» англійською. Натискайте на незнайомі слова — переклад з’явиться поруч, а слово
-            підсвітиться маркером і збережеться у словник.
-          </p>
         </div>
       </header>
 
@@ -45,9 +41,6 @@ export function HomePage() {
             <span className="pill">{settings.examMinutes} хв</span>
             <span className="pill">поріг {settings.threshold}%</span>
           </div>
-          <p className="secondary">
-            Англійська мова професійного спрямування: зворотний таймер і підсумковий звіт «склав / не склав».
-          </p>
           <a className="btn btn-primary" href="#/exam">
             Почати іспит
           </a>
@@ -59,7 +52,6 @@ export function HomePage() {
             <span className="pill">{bank.topics.length} тем</span>
             <span className="pill">{bank.questions.length} питань</span>
           </div>
-          <p className="secondary">Окремі теми чи збірники у вашому темпі, з поясненням після кожної відповіді.</p>
           <a className="btn btn-tinted" href="#/training">
             Налаштувати
           </a>

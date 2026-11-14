@@ -107,7 +107,6 @@ export function DictionaryPage() {
           {dictionary.length === 0 ? (
             <>
               <h2 className="t-title3">Словник порожній</h2>
-              <p>Натискайте на незнайомі англійські слова в тестах — вони з’являться тут разом із перекладом.</p>
             </>
           ) : (
             'Нічого не знайдено.'
@@ -170,9 +169,6 @@ export function DictionaryPage() {
           </button>
         )}
       </div>
-      {visible.length > 0 && visible.length !== dictionary.length && (
-        <p className="section-footer">Експортуються лише слова, показані за поточним фільтром і пошуком.</p>
-      )}
     </div>
   )
 }

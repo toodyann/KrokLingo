@@ -91,7 +91,6 @@ function Sidebar({ route }: { route: Route }) {
         ))}
       </nav>
       <div className="sidebar-footer">
-        <p className="sidebar-note fade">Дані зберігаються лише у вашому браузері.</p>
         {wide && (
           <button
             type="button"
@@ -183,11 +182,6 @@ function Shell() {
           <main className={inTest ? 'main-test' : undefined}>
             <Page route={route} />
           </main>
-          {!inTest && (
-            <footer className="footer compact-only">
-              KrokLingo — тренажер «Крок 1. Стоматологія» англійською. Дані зберігаються лише у вашому браузері.
-            </footer>
-          )}
         </div>
         {!inTest && (
           <div className="compact-only">

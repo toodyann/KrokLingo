@@ -50,10 +50,6 @@ export function ExamSetupPage() {
             <span className="list-row-value">{settings.threshold}% правильних</span>
           </div>
         </div>
-        <p className="section-footer">
-          Питання й варіанти перемішуються. Коли час вийде, тест завершиться сам — питання без відповіді
-          зараховуються як неправильні. Якщо закрити сторінку, тест можна продовжити, але таймер не зупиняється.
-        </p>
       </section>
 
       <section className="section">
@@ -68,10 +64,6 @@ export function ExamSetupPage() {
             />
           </label>
         </div>
-        <p className="section-footer">
-          Відповідь фіксується після вибору, а лічильник правильних і неправильних оновлюється наживо. Вимкніть, щоб
-          умови були як на справжньому іспиті.
-        </p>
       </section>
 
       {count < settings.examQuestions && (

@@ -57,7 +57,7 @@ export function TrainingSetupPage() {
 
   return (
     <div className="page page-narrow">
-      <PageHeader back={{ href: '#/', label: 'Тести' }} title="Тренування" subtitle="Без обмеження часу" />
+      <PageHeader back={{ href: '#/', label: 'Тести' }} title="Тренування" />
 
       <section className="section">
         <h2 className="section-title">Збірники</h2>
@@ -124,10 +124,8 @@ export function TrainingSetupPage() {
       <section className="section">
         <div className="list">
           <label className="list-row" style={{ cursor: 'pointer' }}>
-            <div className="list-row-main">
-              Лише питання з помилками
-              <div className="secondary t-footnote">Востаннє неправильні або пропущені: {mistakes.size}</div>
-            </div>
+            <div className="list-row-main">Лише питання з помилками</div>
+            <span className="list-row-value">{mistakes.size}</span>
             <input type="checkbox" className="switch" checked={onlyMistakes} onChange={(e) => setOnlyMistakes(e.target.checked)} />
           </label>
           <label className="list-row" style={{ cursor: 'pointer' }}>
@@ -147,11 +145,6 @@ export function TrainingSetupPage() {
           ? `Почати · ${finalCount} ${pluralUk(finalCount, 'питання', 'питання', 'питань')}`
           : 'Немає питань для цих умов'}
       </button>
-      {finalCount > 0 && pool.length > finalCount && (
-        <p className="section-footer" style={{ textAlign: 'center' }}>
-          Випадкові {finalCount} з {pool.length} доступних
-        </p>
-      )}
     </div>
   )
 }

@@ -54,7 +54,6 @@ export function FlashcardsPage() {
       <PageHeader
         back={{ href: '#/dictionary', label: 'Словник' }}
         title="Картки"
-        subtitle={`Слово стає вивченим після ${LEARNED_BOX} відповідей «Знаю» поспіль.`}
       />
 
       <div className="toolbar">
@@ -77,7 +76,6 @@ export function FlashcardsPage() {
       {deck.length === 0 ? (
         <div className="card empty">
           <h2 className="t-title3">Немає слів для повторення</h2>
-          <p>Додавайте слова, натискаючи на них у тестах, або ввімкніть вивчені слова нижче.</p>
         </div>
       ) : done ? (
         <div className="card flashcard">
