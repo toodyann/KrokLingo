@@ -86,7 +86,7 @@ export function DashboardPage() {
       <div className="page">
         <PageHeader title="Головна" />
         <Card className="onboarding flex-row flex-wrap items-center justify-between gap-x-6 gap-y-4 p-6 md:p-8">
-          <h2>Почніть підготовку до «Крок 1»</h2>
+          <h2>Ваш шлях до Кроку</h2>
           <div className="flex flex-wrap gap-2">
             <Button asChild size="lg">
               <a href={link('exam')}>Почати іспит</a>
