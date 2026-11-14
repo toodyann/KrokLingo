@@ -1,32 +1,61 @@
-# React + TypeScript + Vite
+# KrokLingo
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Вебзастосунок на React + TypeScript, зібраний на Vite.
 
-Currently, two official plugins are available:
+## Стек
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- [React 19](https://react.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vite.dev/)
+- [Oxlint](https://oxc.rs/docs/guide/usage/linter) — лінтер
 
-## React Compiler
+## Вимоги
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js 22.12+ (версія закріплена в `.nvmrc`)
+- npm
 
-## Expanding the Oxlint configuration
+З nvm:
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+nvm install 22.23.5
+nvm use 22.23.5
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Початок роботи
+
+```bash
+npm install
+npm run dev
+```
+
+Застосунок відкриється на http://localhost:5173.
+
+## Скрипти
+
+| Команда             | Що робить                               |
+| ------------------- | --------------------------------------- |
+| `npm run dev`       | Дев-сервер з гарячим перезавантаженням  |
+| `npm run build`     | Перевірка типів і продакшн-збірка в `dist/` |
+| `npm run preview`   | Локальний перегляд продакшн-збірки      |
+| `npm run lint`      | Перевірка коду Oxlint                   |
+| `npm run lint:fix`  | Автовиправлення того, що можна виправити |
+| `npm run typecheck` | Лише перевірка типів TypeScript         |
+
+## Структура
+
+```
+├── public/          статичні файли (копіюються як є)
+├── src/
+│   ├── App.tsx      кореневий компонент
+│   ├── main.tsx     точка входу
+│   └── index.css    глобальні стилі
+├── index.html
+└── vite.config.ts
+```
+
+## Редактор
+
+Для VS Code рекомендовані розширення (запропонуються автоматично):
+
+- **Oxc** — підсвічування помилок Oxlint
+- **EditorConfig** — єдині відступи й закінчення рядків
