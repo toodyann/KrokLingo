@@ -13,10 +13,10 @@
   --fill: rgb(120 120 128 / 0.12);
   --fill-2: rgb(120 120 128 / 0.2);
 
-  --accent: #2b54d6; /* 6.28:1 on card */
-  --accent-press: #1f43b8;
+  --accent: #0066cc; /* brand blue from the logo, 5.57:1 on card */
+  --accent-press: #0058b6;
   --on-accent: #ffffff;
-  --accent-tint: rgb(43 84 214 / 0.11);
+  --accent-tint: rgb(0 102 204 / 0.11);
 
   --success: #1a7f37; /* 5.08:1 */
   --success-tint: rgb(26 127 55 / 0.12);
@@ -32,6 +32,7 @@
   --material-strong: rgb(252 252 253 / 0.86);
   --material-edge: rgb(255 255 255 / 0.6);
   --material-shadow: 0 8px 32px rgb(0 0 0 / 0.12), 0 1px 3px rgb(0 0 0 / 0.08);
+  --sidebar-bg: rgb(234 234 240 / 0.82);
 
   --radius-lg: 20px;
   --radius: 14px;
@@ -66,10 +67,10 @@
     --fill: rgb(120 120 128 / 0.24);
     --fill-2: rgb(120 120 128 / 0.34);
 
-    --accent: #8aa4ff; /* 7.16:1 on card */
-    --accent-press: #a9bcff;
-    --on-accent: #0a1640;
-    --accent-tint: rgb(138 164 255 / 0.18);
+    --accent: #5aa9ff; /* 6.93:1 on card */
+    --accent-press: #82beff;
+    --on-accent: #0a1a33;
+    --accent-tint: rgb(90 169 255 / 0.18);
 
     --success: #4cd964;
     --success-tint: rgb(76 217 100 / 0.16);
@@ -85,6 +86,7 @@
     --material-strong: rgb(36 36 38 / 0.86);
     --material-edge: rgb(255 255 255 / 0.08);
     --material-shadow: 0 8px 32px rgb(0 0 0 / 0.5), 0 1px 3px rgb(0 0 0 / 0.4);
+    --sidebar-bg: rgb(22 22 24 / 0.86);
   }
 }
 
@@ -95,6 +97,7 @@
     --material: var(--card);
     --material-strong: var(--card);
     --material-edge: var(--label-2);
+    --sidebar-bg: var(--card);
   }
 }
 
@@ -210,7 +213,7 @@ textarea {
   outline-offset: 2px;
 }
 
-/* ---------- functional layer: app bar (regular) & tab bar (compact) ---------- */
+/* ---------- functional layer: sidebar (regular) & tab bar (compact) ---------- */
 
 .material {
   background: var(--material);
@@ -218,106 +221,196 @@ textarea {
   backdrop-filter: blur(24px) saturate(180%);
 }
 
-.app-bar {
-  position: sticky;
+/*
+ * Sidebar: the tab bar adapted for wide screens (HIG › Tab bars: "a tab bar that adapts to a sidebar").
+ * A slightly heavier material than the content separates the structural region.
+ * ≥1100px: full width with labels; 768–1099px or collapsed by the user: an icon rail.
+ */
+:root {
+  --sidebar-w: 0px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --sidebar-w: 76px;
+  }
+}
+
+@media (min-width: 1100px) {
+  :root:not(.sidebar-collapsed) {
+    --sidebar-w: 252px;
+  }
+}
+
+.sidebar {
+  position: fixed;
   top: 0;
+  left: 0;
+  bottom: 0;
   z-index: 30;
-}
-
-.app-bar-inner {
-  max-width: 1040px;
-  margin: 0 auto;
-  height: 56px;
-  padding: 0 20px;
+  width: var(--sidebar-w);
   display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-/* scroll edge effect: a soft fade where content meets the bar, not a hard rule */
-.app-bar::after {
-  content: '';
-  position: absolute;
-  inset: 100% 0 auto;
-  height: 14px;
-  background: linear-gradient(var(--bg), transparent);
-  opacity: 0.7;
-  pointer-events: none;
+  flex-direction: column;
+  padding: 16px 12px 14px;
+  background: var(--sidebar-bg);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(30px) saturate(180%);
+  border-right: 0.5px solid var(--separator);
+  overflow: hidden;
+  transition: width 0.28s cubic-bezier(0.25, 0.9, 0.3, 1);
 }
 
 .brand {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  font-size: 1.0625rem;
-  letter-spacing: -0.01em;
+  gap: 12px;
+  padding: 6px 8px 18px;
   color: var(--label);
+  min-height: var(--hit);
 }
 
 .brand-mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  background: var(--label);
-  color: var(--bg);
-  font-size: 0.8125rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  position: relative;
-  overflow: hidden;
+  flex: none;
+  display: block;
 }
 
-/* the marker stroke in the logo — the product's signature */
-.brand-mark::after {
-  content: '';
-  position: absolute;
-  left: 4px;
-  right: 4px;
-  bottom: 6px;
-  height: 5px;
-  border-radius: 2px;
-  background: var(--marker-strong);
-  mix-blend-mode: multiply;
-  opacity: 0.9;
+.brand-text {
+  min-width: 0;
+  line-height: 1.2;
 }
 
-.top-tabs {
-  display: flex;
-  gap: 4px;
-  margin-left: auto;
+.brand-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
 }
 
-.top-tab {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 999px;
+.brand-caption {
+  font-size: 0.75rem;
   color: var(--label-2);
-  font-size: 0.9375rem;
-  font-weight: 500;
-  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
 }
 
-.top-tab svg {
-  width: 18px;
-  height: 18px;
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.top-tab:hover {
+.side-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--hit);
+  padding: 0 12px;
+  border-radius: 12px;
   color: var(--label);
+  font-size: 1rem;
+  font-weight: 500;
+  white-space: nowrap;
+  position: relative;
+  transition:
+    background 0.15s,
+    transform 0.1s ease-out;
+}
+
+.side-item svg {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  color: var(--accent);
+}
+
+.side-item:hover {
   background: var(--fill);
 }
 
-.top-tab[aria-current='page'] {
-  color: var(--label);
-  background: var(--card);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
+.side-item:active {
+  transform: scale(0.98);
+}
+
+.side-item[aria-current='page'] {
+  background: var(--accent);
+  color: var(--on-accent);
   font-weight: 600;
+}
+
+.side-item[aria-current='page'] svg {
+  color: inherit;
+}
+
+.side-item .tab-badge {
+  margin-left: auto;
+}
+
+.side-item[aria-current='page'] .tab-badge {
+  background: color-mix(in srgb, var(--on-accent) 22%, transparent);
+  color: var(--on-accent);
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-note {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--label-2);
+  padding: 0 8px;
+}
+
+.sidebar-toggle {
+  align-self: flex-start;
+}
+
+/* icon rail */
+.sidebar.rail {
+  padding-left: 10px;
+  padding-right: 10px;
+  align-items: center;
+}
+
+.sidebar.rail .brand {
+  padding: 6px 0 18px;
+}
+
+.sidebar.rail .brand-text,
+.sidebar.rail .side-item .label,
+.sidebar.rail .sidebar-note {
+  display: none;
+}
+
+.sidebar.rail .side-item {
+  width: 52px;
+  justify-content: center;
+  padding: 0;
+}
+
+.sidebar.rail .side-item .tab-badge {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  margin: 0;
+}
+
+.sidebar.rail .sidebar-toggle {
+  align-self: center;
+}
+
+.sidebar-toggle svg {
+  transition: transform 0.2s;
+}
+
+.sidebar.rail .sidebar-toggle svg {
+  transform: rotate(180deg);
+}
+
+.with-sidebar {
+  margin-left: var(--sidebar-w);
+  transition: margin-left 0.28s cubic-bezier(0.25, 0.9, 0.3, 1);
 }
 
 .tab-bar {
@@ -360,7 +453,7 @@ textarea {
 }
 
 .tab .tab-badge,
-.top-tab .tab-badge {
+.side-item .tab-badge {
   font-size: 0.6875rem;
   font-weight: 700;
   min-width: 18px;
@@ -2078,6 +2171,12 @@ tr.clickable:hover td {
 }
 
 @media (prefers-reduced-transparency: reduce) {
+  .sidebar {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--bg);
+  }
+
   .material,
   .word-popover,
   .word-sheet,

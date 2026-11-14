@@ -1,7 +1,9 @@
-import type { ComponentType } from 'react'
-import { IconBook, IconChart, IconGear, IconTests } from './components/Icons'
+import { useEffect, useState, type ComponentType } from 'react'
+import { BrandMark } from './components/BrandMark'
+import { IconBook, IconChart, IconChevronLeft, IconGear, IconTests } from './components/Icons'
 import { ToastProvider } from './components/Toast'
 import { WordLookupProvider } from './components/WordLookup'
+import { useMediaQuery, WIDE_QUERY } from './lib/hooks'
 import { useRoute, type Route } from './lib/router'
 import { DictionaryPage } from './pages/DictionaryPage'
 import { ExamSetupPage } from './pages/ExamSetupPage'
@@ -36,32 +38,72 @@ function DictionaryBadge() {
   return toLearn > 0 ? <span className="tab-badge">{toLearn > 99 ? '99+' : toLearn}</span> : null
 }
 
-function AppBar({ route }: { route: Route }) {
+const COLLAPSE_KEY = 'kroklingo:sidebar-collapsed'
+
+function readCollapsed(): boolean {
+  try {
+    return localStorage.getItem(COLLAPSE_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+/** Wide screens: the tab bar becomes a sidebar; it can be collapsed to an icon rail. */
+function Sidebar({ route }: { route: Route }) {
+  const wide = useMediaQuery(WIDE_QUERY)
+  const [collapsed, setCollapsed] = useState(readCollapsed)
+  const rail = !wide || collapsed
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('sidebar-collapsed', collapsed)
+    try {
+      localStorage.setItem(COLLAPSE_KEY, collapsed ? '1' : '0')
+    } catch {
+      // per-viewer convenience only
+    }
+  }, [collapsed])
+
   return (
-    <header className="app-bar material">
-      <div className="app-bar-inner">
-        <a className="brand" href="#/">
-          <span className="brand-mark" aria-hidden="true">
-            K1
-          </span>
-          KrokLingo
-        </a>
-        <nav className="top-tabs" aria-label="Розділи">
-          {TABS.map(({ path, label, Icon, routes }) => (
-            <a
-              key={path}
-              className="top-tab"
-              href={`#/${path}`}
-              aria-current={routes.includes(route.name) ? 'page' : undefined}
-            >
-              <Icon />
-              {label}
-              {path === 'dictionary' && <DictionaryBadge />}
-            </a>
-          ))}
-        </nav>
+    <aside className={`sidebar${rail ? ' rail' : ''}`} aria-label="Розділи">
+      <a className="brand" href="#/" aria-label="KrokLingo — на головну">
+        <BrandMark size={rail ? 36 : 40} />
+        <span className="brand-text">
+          <span className="brand-name">KrokLingo</span>
+          <br />
+          <span className="brand-caption">Крок 1 · Стоматологія</span>
+        </span>
+      </a>
+      <nav className="side-nav">
+        {TABS.map(({ path, label, Icon, routes }) => (
+          <a
+            key={path}
+            className="side-item"
+            href={`#/${path}`}
+            aria-current={routes.includes(route.name) ? 'page' : undefined}
+            title={rail ? label : undefined}
+          >
+            <Icon />
+            <span className="label">{label}</span>
+            {path === 'dictionary' && <DictionaryBadge />}
+          </a>
+        ))}
+      </nav>
+      <div className="sidebar-footer">
+        <p className="sidebar-note">Дані зберігаються лише у вашому браузері.</p>
+        {wide && (
+          <button
+            type="button"
+            className="icon-btn sidebar-toggle"
+            onClick={() => setCollapsed((v) => !v)}
+            aria-label={collapsed ? 'Розгорнути бічну панель' : 'Згорнути бічну панель'}
+            title={collapsed ? 'Розгорнути' : 'Згорнути'}
+            aria-expanded={!collapsed}
+          >
+            <IconChevronLeft />
+          </button>
+        )}
       </div>
-    </header>
+    </aside>
   )
 }
 
@@ -124,29 +166,31 @@ function StorageWarning() {
 
 function Shell() {
   const route = useRoute()
-  // A running test is a focused, modal task: no tab bar, its own toolbar with a clear way out.
+  // A running test is a focused, modal task: no sidebar or tab bar, its own toolbar with a clear way out.
   const inTest = route.name === 'test'
   return (
     <ToastProvider>
       <WordLookupProvider inTest={inTest}>
         {!inTest && (
           <div className="regular-only">
-            <AppBar route={route} />
+            <Sidebar route={route} />
           </div>
         )}
-        <StorageWarning />
-        <main className={inTest ? 'main-test' : undefined}>
-          <Page route={route} />
-        </main>
-        {!inTest && (
-          <>
-            <footer className="footer">
+        <div className={inTest ? undefined : 'with-sidebar'}>
+          <StorageWarning />
+          <main className={inTest ? 'main-test' : undefined}>
+            <Page route={route} />
+          </main>
+          {!inTest && (
+            <footer className="footer compact-only">
               KrokLingo — тренажер «Крок 1. Стоматологія» англійською. Дані зберігаються лише у вашому браузері.
             </footer>
-            <div className="compact-only">
-              <TabBar route={route} />
-            </div>
-          </>
+          )}
+        </div>
+        {!inTest && (
+          <div className="compact-only">
+            <TabBar route={route} />
+          </div>
         )}
       </WordLookupProvider>
     </ToastProvider>
