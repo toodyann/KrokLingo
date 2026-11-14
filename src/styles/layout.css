@@ -30,7 +30,6 @@
 
 .with-sidebar {
   margin-left: var(--sidebar-w);
-  transition: margin-left 0.28s var(--ease);
 }
 
 main {
@@ -268,8 +267,9 @@ body:has(.main-test) {
   border-right: 1px solid var(--border);
   overflow: hidden;
   transition:
-    width 0.28s var(--ease),
-    box-shadow 0.2s;
+    width var(--sidebar-dur) var(--ease),
+    box-shadow var(--sidebar-dur);
+  contain: layout paint;
 }
 
 /* geometry is identical in rail and expanded states: logo and icons sit on x = 36px */
@@ -372,20 +372,24 @@ body:has(.main-test) {
 }
 
 .sidebar-toggle svg {
-  transition: transform 0.2s;
+  transition: transform var(--sidebar-dur) var(--ease);
+}
+
+/*
+ * Rail (collapsed) state and peek. No delays anywhere: the panel and its labels move together.
+ * Peek (.peek, set from JS) opens on mouse hover or keyboard focus, not on touch or a mouse click,
+ * and it overlays the content, so nothing behind it is laid out again.
+ */
+.sidebar {
+  --sidebar-dur: 0.16s;
 }
 
 .sidebar .fade {
-  transition: opacity 0.18s ease-out 0.1s;
-}
-
-.sidebar.rail {
-  transition-delay: 0.12s;
+  transition: opacity var(--sidebar-dur) ease-out;
 }
 
 .sidebar.rail .fade {
   opacity: 0;
-  transition: opacity 0.1s ease-out 0s;
 }
 
 .sidebar.rail .side-item .tab-badge {
@@ -399,38 +403,24 @@ body:has(.main-test) {
   transform: rotate(180deg);
 }
 
-.sidebar.rail:not(.no-peek):focus-within {
+.sidebar.rail.peek {
   width: 248px;
-  transition-delay: 0s;
   box-shadow: var(--shadow-lg);
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .sidebar.rail:not(.no-peek):hover {
-    width: 248px;
-    transition-delay: 0.15s;
-    box-shadow: var(--shadow-lg);
-  }
-
-  .sidebar.rail:not(.no-peek):hover .fade {
-    opacity: 1;
-    transition: opacity 0.18s ease-out 0.24s;
-  }
-
-  .sidebar.rail:not(.no-peek):hover .side-item .tab-badge {
-    position: static;
-    margin-left: auto;
-  }
-}
-
-.sidebar.rail:not(.no-peek):focus-within .fade {
+.sidebar.rail.peek .fade {
   opacity: 1;
-  transition-delay: 0.1s;
 }
 
-.sidebar.rail:not(.no-peek):focus-within .side-item .tab-badge {
+.sidebar.rail.peek .side-item .tab-badge {
   position: static;
   margin-left: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    --sidebar-dur: 0s;
+  }
 }
 
 /* ---------- tab bar (compact widths) ---------- */

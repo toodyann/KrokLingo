@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState, type ComponentType } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type ComponentType } from 'react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -57,24 +57,30 @@ function readCollapsed(): boolean {
 
 /**
  * Wide screens: the tab bar becomes a sidebar. It can be collapsed to an icon rail, which
- * peeks open over the content on hover (after a short intent delay) or keyboard focus.
+ * peeks open over the content (no layout shift) on mouse hover or keyboard focus.
  */
 function Sidebar({ route }: { route: Route }) {
   const wide = useMediaQuery(WIDE_QUERY)
   const [collapsed, setCollapsed] = useState(readCollapsed)
-  // Right after "collapse" the pointer (and focus) is still on the sidebar; without this the
-  // peek-on-hover would reopen it at once. Peeking resumes once the pointer or focus leaves.
-  const [peekSuppressed, setPeekSuppressed] = useState(false)
+  const [peek, setPeek] = useState(false)
+  // Right after "collapse" the pointer is still over the panel; it must not peek straight back
+  // open. Hover-peek re-arms once the pointer leaves.
+  const suppressPeek = useRef(false)
   const rail = !wide || collapsed
 
   const toggle = () => {
     const next = !collapsed
     setCollapsed(next)
-    setPeekSuppressed(next)
+    setPeek(false)
+    suppressPeek.current = next
   }
 
-  useEffect(() => {
+  // Layout effect: the content margin (driven by this class) changes in the same frame as the panel.
+  useLayoutEffect(() => {
     document.documentElement.classList.toggle('sidebar-collapsed', collapsed)
+  }, [collapsed])
+
+  useEffect(() => {
     try {
       localStorage.setItem(COLLAPSE_KEY, collapsed ? '1' : '0')
     } catch {
@@ -84,11 +90,28 @@ function Sidebar({ route }: { route: Route }) {
 
   return (
     <aside
-      className={`sidebar${rail ? ' rail' : ''}${peekSuppressed ? ' no-peek' : ''}`}
+      className={`sidebar${rail ? ' rail' : ''}${rail && peek ? ' peek' : ''}`}
       aria-label="Розділи"
-      onPointerLeave={() => setPeekSuppressed(false)}
+      onPointerEnter={(e) => {
+        // touch taps navigate directly; only a mouse or pen hover peeks
+        if (e.pointerType !== 'touch' && !suppressPeek.current) setPeek(true)
+      }}
+      onPointerLeave={() => {
+        suppressPeek.current = false
+        setPeek(false)
+      }}
+      onFocus={(e) => {
+        if (e.target.matches(':focus-visible')) setPeek(true)
+      }}
       onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setPeekSuppressed(false)
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setPeek(false)
+      }}
+      onClick={(e) => {
+        // choosing a section from a peeked rail closes it right away
+        if (rail && (e.target as HTMLElement).closest('a')) {
+          suppressPeek.current = true
+          setPeek(false)
+        }
       }}
     >
       <a className="brand" href="#/" aria-label="KrokLingo — на головну">
