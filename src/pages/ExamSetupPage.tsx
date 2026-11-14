@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { PageHeader } from '../components/PageHeader'
+import { discardSessionOptions, useConfirm } from '../components/confirmContext'
 import { navigate } from '../lib/router'
 import { createSession } from '../lib/session'
 import { shuffle } from '../lib/util'
@@ -13,12 +14,13 @@ import { useApp } from '../store/context'
 
 export function ExamSetupPage() {
   const { bank, settings, session, setSession } = useApp()
+  const confirm = useConfirm()
   const [instantFeedback, setInstantFeedback] = useState(true)
   const count = Math.min(settings.examQuestions, bank.questions.length)
   const topicCount = new Set(bank.questions.map((q) => q.topic)).size
 
-  const start = () => {
-    if (session && !confirm('Незавершений тест буде скасовано, а його відповіді втрачено. Почати новий іспит?')) return
+  const start = async () => {
+    if (session && !(await confirm(discardSessionOptions('Почати новий іспит?')))) return
     const questions = shuffle(bank.questions).slice(0, count)
     setSession(
       createSession({

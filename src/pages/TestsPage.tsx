@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { IconGrid, IconHistory, IconTests } from '../components/Icons'
 import { PageHeader } from '../components/PageHeader'
+import { discardSessionOptions, useConfirm } from '../components/confirmContext'
 import { navigate } from '../lib/router'
 import { createSession, liveStats, mistakeIds, topicStats } from '../lib/session'
 import { formatPercent, pluralUk, shuffle } from '../lib/util'
@@ -23,6 +24,7 @@ function Fact({ value, label }: { value: string | number; label: string }) {
 
 export function TestsPage() {
   const { bank, settings, history, session, setSession } = useApp()
+  const confirm = useConfirm()
   const mistakes = useMemo(() => mistakeIds(history, bank).size, [history, bank])
   const accuracy = useMemo(() => new Map(topicStats(history, bank).map((t) => [t.topic, t])), [history, bank])
 
@@ -30,8 +32,8 @@ export function TestsPage() {
     .map((t) => ({ ...t, questions: bank.questions.filter((q) => q.topic === t.id) }))
     .filter((t) => t.questions.length > 0)
 
-  const startTopic = (id: string, name: string) => {
-    if (session && !confirm('Незавершений тест буде скасовано, а його відповіді втрачено. Почати нове тренування?')) return
+  const startTopic = async (id: string, name: string) => {
+    if (session && !(await confirm(discardSessionOptions('Почати нове тренування?')))) return
     const questions = shuffle(bank.questions.filter((q) => q.topic === id)).slice(0, TOPIC_QUIZ_SIZE)
     setSession(
       createSession({

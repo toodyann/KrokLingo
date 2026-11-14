@@ -1,4 +1,5 @@
 import { useRef, useState, type ChangeEvent } from 'react'
+import { useConfirm } from '../components/confirmContext'
 import { IMPORT_TEMPLATE, parseImport } from '../lib/importQuestions'
 import { clearAll } from '../lib/storage'
 import { downloadFile, pluralUk } from '../lib/util'
@@ -31,6 +32,7 @@ function readFile(file: File): Promise<string> {
 
 export function SettingsPage() {
   const app = useApp()
+  const confirm = useConfirm()
   const toast = useToast()
   const { settings, updateSettings, customBank, setCustomBank, bank } = app
   const [message, setMessage] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
@@ -104,7 +106,12 @@ export function SettingsPage() {
     try {
       const data = JSON.parse(await readFile(file)) as Partial<Backup>
       if (data.app !== 'kroklingo') throw new Error('це не резервна копія KrokLingo')
-      if (!confirm('Відновлення замінить поточний словник, історію та імпортовані збірники. Продовжити?')) return
+      const ok = await confirm({
+        title: 'Відновити з резервної копії?',
+        description: 'Поточний словник, історію та імпортовані збірники буде замінено даними з файлу.',
+        confirmLabel: 'Відновити',
+      })
+      if (!ok) return
       updateSettings({ ...DEFAULT_SETTINGS, ...data.settings })
       app.replaceDictionary(Array.isArray(data.dictionary) ? data.dictionary : [])
       app.replaceHistory(Array.isArray(data.history) ? data.history : [])
@@ -115,8 +122,14 @@ export function SettingsPage() {
     }
   }
 
-  const reset = () => {
-    if (!confirm('Видалити ВСІ дані: історію, словник, імпортовані збірники та налаштування? Це не можна скасувати.')) return
+  const reset = async () => {
+    const ok = await confirm({
+      title: 'Видалити всі дані?',
+      description: 'Історію, словник, імпортовані збірники та налаштування буде видалено. Це не можна скасувати.',
+      confirmLabel: 'Видалити все',
+      destructive: true,
+    })
+    if (!ok) return
     clearAll()
     location.reload()
   }

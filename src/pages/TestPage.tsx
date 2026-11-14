@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNo
 import { createPortal } from 'react-dom'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { useConfirm } from '../components/confirmContext'
 import { EmptyState } from '../components/EmptyState'
 import { IconChevronLeft, IconChevronRight, IconClose, IconGrid, IconTests } from '../components/Icons'
 import { QuestionView } from '../components/QuestionView'
@@ -15,6 +16,7 @@ import type { ActiveSession } from '../types'
 
 export function TestPage() {
   const { bank, session, setSession, addAttempt, dictionary } = useApp()
+  const confirm = useConfirm()
   const now = useNow(1000, session != null)
   const [paletteOpen, setPaletteOpen] = useState(false)
 
@@ -121,19 +123,29 @@ export function TestPage() {
   const isLast = session.current === session.questions.length - 1
   const left = stats.total - stats.answered
 
-  const askFinish = () => {
+  const askFinish = async () => {
     if (
       left === 0 ||
-      confirm(
-        `${left} ${pluralUk(left, 'питання залишилось', 'питання залишились', 'питань залишились')} без відповіді — їх буде зараховано як неправильні. Завершити тест?`,
-      )
+      (await confirm({
+        title: 'Завершити тест?',
+        description: `${left} ${pluralUk(left, 'питання залишилось', 'питання залишились', 'питань залишились')} без відповіді — їх буде зараховано як неправильні.`,
+        confirmLabel: 'Завершити',
+        cancelLabel: 'Продовжити тест',
+      }))
     ) {
       finish(false)
     }
   }
 
-  const abandon = () => {
-    if (confirm('Вийти з тесту без збереження результату? Відповіді буде втрачено.')) {
+  const abandon = async () => {
+    const ok = await confirm({
+      title: 'Вийти без збереження?',
+      description: 'Результат не буде збережено, а відповіді цього тесту буде втрачено.',
+      confirmLabel: 'Вийти',
+      cancelLabel: 'Залишитися',
+      destructive: true,
+    })
+    if (ok) {
       setSession(null)
       navigate('tests')
     }

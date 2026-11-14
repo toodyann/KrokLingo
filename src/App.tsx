@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { BrandMark } from './components/BrandMark'
 import { IconBook, IconChevronLeft, IconGear, IconHistory, IconHome, IconTests } from './components/Icons'
+import { ConfirmProvider } from './components/ConfirmDialog'
 import { ToastProvider } from './components/Toast'
 import { WordLookupProvider } from './components/WordLookup'
 import { useMediaQuery, WIDE_QUERY } from './lib/hooks'
@@ -227,6 +228,7 @@ function Shell() {
   return (
     <TooltipProvider delayDuration={300}>
     <ToastProvider>
+    <ConfirmProvider>
       <WordLookupProvider inTest={inTest}>
         {!inTest && (
           <div className="regular-only">
@@ -247,6 +249,7 @@ function Shell() {
           </div>
         )}
       </WordLookupProvider>
+    </ConfirmProvider>
     </ToastProvider>
     </TooltipProvider>
   )

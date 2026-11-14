@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { PageHeader } from '../components/PageHeader'
+import { discardSessionOptions, useConfirm } from '../components/confirmContext'
 import { Segmented } from '../components/Segmented'
 import { navigate } from '../lib/router'
 import { createSession, mistakeIds } from '../lib/session'
@@ -17,6 +18,7 @@ const COUNTS = [10, 20, 30, 50, 0] as const
 
 export function TrainingSetupPage() {
   const { bank, settings, history, session, setSession } = useApp()
+  const confirm = useConfirm()
   const [collections, setCollections] = useState<string[]>(() => bank.collections.map((c) => c.id))
   const [topics, setTopics] = useState<string[]>(() => bank.topics.map((t) => t.id))
   const [count, setCount] = useState<(typeof COUNTS)[number]>(20)
@@ -38,8 +40,8 @@ export function TrainingSetupPage() {
   const pool = inCollections.filter((q) => topics.includes(q.topic) && (!onlyMistakes || mistakes.has(q.id)))
   const finalCount = count === 0 ? pool.length : Math.min(count, pool.length)
 
-  const start = () => {
-    if (session && !confirm('Незавершений тест буде скасовано, а його відповіді втрачено. Почати тренування?')) return
+  const start = async () => {
+    if (session && !(await confirm(discardSessionOptions('Почати тренування?')))) return
     const questions = shuffle(pool).slice(0, finalCount)
     const topicNames = [...new Set(questions.map((q) => q.topic))]
     setSession(
