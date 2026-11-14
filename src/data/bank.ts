@@ -1,19 +1,9 @@
 import type { Collection, Passage, Question, Topic } from '../types'
+import { refineTopic, TOPICS } from './topics'
 import { anatomy, biochemistry, histology, microbiology, pathology, pharmacology, physiology } from './questions/basic'
 import { passages, reading, terminology } from './questions/english'
 
-export const TOPICS: Topic[] = [
-  { id: 'biology', name: 'Медична біологія' },
-  { id: 'anatomy', name: 'Анатомія' },
-  { id: 'histology', name: 'Гістологія та ембріологія' },
-  { id: 'physiology', name: 'Фізіологія' },
-  { id: 'biochemistry', name: 'Біохімія' },
-  { id: 'microbiology', name: 'Мікробіологія' },
-  { id: 'pharmacology', name: 'Фармакологія' },
-  { id: 'pathology', name: 'Патологія' },
-  { id: 'terminology', name: 'Термінологія та граматика' },
-  { id: 'reading', name: 'Читання (Reading)' },
-]
+export { TOPICS }
 
 export const COLLECTIONS: Collection[] = [
   {
@@ -46,6 +36,6 @@ export const BUILTIN_BANK: {
     ...pathology,
     ...terminology,
     ...reading,
-  ],
+  ].map((q) => ({ ...q, topic: refineTopic(q.topic, q.text, q.options) })),
   passages,
 }

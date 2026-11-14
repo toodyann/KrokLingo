@@ -1,4 +1,5 @@
 import type { Collection, Passage, Question } from '../types'
+import { refineTopic } from './topics'
 
 // Real Krok 1 (Dentistry, English) items, built by scripts/booklets from the official 2007–2018 booklets
 // (ONMedU mirror of the Testing Center PDFs) and the 2018–2024 English sets on medical-club.net.
@@ -34,7 +35,7 @@ export async function loadBooklets(): Promise<BookletBank> {
     questions: parts.flatMap((p) =>
       p.questions.map(([id, topic, text, options, passageId]) => ({
         id,
-        topic,
+        topic: refineTopic(topic, text, options),
         collection: p.collection.id,
         text,
         options,
