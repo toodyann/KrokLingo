@@ -3,7 +3,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { BrandMark } from './components/BrandMark'
-import { IconBook, IconChevronLeft, IconGear, IconHistory, IconOverview, IconTests } from './components/Icons'
+import { IconBook, IconChevronLeft, IconGear, IconHistory, IconHome, IconTests } from './components/Icons'
 import { ToastProvider } from './components/Toast'
 import { WordLookupProvider } from './components/WordLookup'
 import { useMediaQuery, WIDE_QUERY } from './lib/hooks'
@@ -32,7 +32,7 @@ interface Tab {
 
 // Top-level sections, named for what they contain.
 const TABS: Tab[] = [
-  { path: '', label: 'Огляд', Icon: IconOverview, routes: ['home'] },
+  { path: '', label: 'Головна', Icon: IconHome, routes: ['home'] },
   { path: 'tests', label: 'Тести', Icon: IconTests, routes: ['tests', 'exam', 'training', 'test'] },
   { path: 'dictionary', label: 'Словник', Icon: IconBook, routes: ['dictionary', 'flashcards'] },
   { path: 'history', label: 'Історія', Icon: IconHistory, routes: ['history', 'results'] },

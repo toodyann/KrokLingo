@@ -131,13 +131,13 @@ export function IconTrash(p: IconProps) {
   )
 }
 
-export function IconOverview(p: IconProps) {
+/** House outline on its original 256-unit grid; scales with the other 24px icons. */
+export function IconHome(p: IconProps) {
   return (
-    <Svg {...p}>
+    <Svg viewBox="0 0 256 256" {...p}>
       <path
         fill="currentColor"
-        fillRule="evenodd"
-        d="M12 3.5a9.5 9.5 0 0 0-8.2 14.3c.3.4.7.7 1.2.7h14c.5 0 .9-.3 1.2-.7A9.5 9.5 0 0 0 12 3.5Zm0 3a1 1 0 0 1 1 1v.6a1 1 0 1 1-2 0v-.6a1 1 0 0 1 1-1Zm-4.6 2a1 1 0 0 1 1.4 0l.4.4a1 1 0 0 1-1.4 1.4l-.4-.4a1 1 0 0 1 0-1.4Zm9.9.1a.9.9 0 0 1 .1 1.2l-3.6 4.6a2 2 0 1 1-1.5-1.3l3.8-4.5a.9.9 0 0 1 1.2 0ZM5.5 13a1 1 0 0 1 1-1h.6a1 1 0 1 1 0 2h-.6a1 1 0 0 1-1-1Zm11.4 0a1 1 0 0 1 1-1h.6a1 1 0 1 1 0 2h-.6a1 1 0 0 1-1-1Z"
+        d="M240,208H224V136l2.34,2.34A8,8,0,0,0,237.66,127L139.31,28.68a16,16,0,0,0-22.62,0L18.34,127a8,8,0,0,0,11.32,11.31L32,136v72H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM48,120l80-80,80,80v88H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48Zm96,88H112V160h32Z"
       />
     </Svg>
   )

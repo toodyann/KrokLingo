@@ -83,7 +83,7 @@ export function DashboardPage() {
   if (history.length === 0 && dictionary.length === 0) {
     return (
       <div className="page">
-        <PageHeader title="Огляд" />
+        <PageHeader title="Головна" />
         <Card className="onboarding flex-row flex-wrap items-center justify-between gap-x-6 gap-y-4 p-6 md:p-8">
           <h2>Почніть підготовку до «Крок 1»</h2>
           <div className="flex flex-wrap gap-2">
@@ -106,7 +106,7 @@ export function DashboardPage() {
   return (
     <div className="page">
       <PageHeader
-        title="Огляд"
+        title="Головна"
         actions={
           <Segmented value={period} onChange={setPeriod} options={PERIODS} label="Період" />
         }
