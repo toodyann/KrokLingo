@@ -24,8 +24,8 @@ export function useChartTheme(): ChartTheme {
     () => ({
       series: read('--chart-series', '#0066cc'),
       grid: read('--chart-grid', '#e5e5ea'),
-      label2: read('--label-2', '#6e6e73'),
-      surface: read('--card', '#ffffff'),
+      label2: read('--text-2', '#5b6170'),
+      surface: read('--surface-1', '#ffffff'),
       reducedMotion,
     }),
     // re-read tokens whenever an appearance preference flips

@@ -8,7 +8,7 @@ interface Props {
   actions?: ReactNode
 }
 
-/** Large title with optional back link — answers "where am I, how do I get out". */
+/** Page title with optional back link and actions — answers "where am I, how do I get out". */
 export function PageHeader({ title, subtitle, back, actions }: Props) {
   return (
     <header className="page-header">
@@ -19,10 +19,10 @@ export function PageHeader({ title, subtitle, back, actions }: Props) {
             {back.label}
           </a>
         )}
-        <h1 className="t-large-title">{title}</h1>
-        {subtitle && <p className="secondary t-subhead" style={{ marginTop: 4 }}>{subtitle}</p>}
+        <h1 className="t-page">{title}</h1>
+        {subtitle && <p className="page-header-sub">{subtitle}</p>}
       </div>
-      {actions && <div className="row">{actions}</div>}
+      {actions && <div className="page-actions">{actions}</div>}
     </header>
   )
 }

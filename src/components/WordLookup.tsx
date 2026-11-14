@@ -10,6 +10,10 @@ import {
 } from 'react'
 import { createPortal } from 'react-dom'
 import { COMPACT_QUERY, useMediaQuery } from '../lib/hooks'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { normalizeWord } from '../lib/lemmatize'
 import { useDraggableSheet } from './useDraggableSheet'
 import { lookupBuiltin, lookupOnline, storageKeys } from '../lib/translate'
@@ -159,41 +163,42 @@ function WordCard({ state, onClose }: { state: LookupState; onClose: () => void 
           </span>
           {showLemma && <span className="wp-lemma">→ {lemma}</span>}
         </div>
-        <button type="button" className="icon-btn filled" onClick={onClose} aria-label="Закрити">
+        <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Закрити">
           <IconClose size={16} />
-        </button>
+        </Button>
       </div>
 
       {state.status === 'loading' ? (
         <div className="wp-translation muted">Шукаю переклад…</div>
       ) : editing ? (
         <div className="wp-edit">
-          <label className="field">
-            <span>Переклад</span>
-            <input
-              type="text"
+          <div className="grid gap-1.5">
+            <Label htmlFor="wp-translation">Переклад</Label>
+            <Input
+              id="wp-translation"
               autoFocus
               value={draft.translation}
               onChange={(e) => setDraft((d) => ({ ...d, translation: e.target.value }))}
               onKeyDown={(e) => e.key === 'Enter' && save()}
             />
-          </label>
-          <label className="field">
-            <span>Примітка</span>
-            <textarea
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="wp-note">Примітка</Label>
+            <Textarea
+              id="wp-note"
               rows={2}
               value={draft.note}
               placeholder="Медичне значення, приклад вживання…"
               onChange={(e) => setDraft((d) => ({ ...d, note: e.target.value }))}
             />
-          </label>
+          </div>
           <div className="row">
-            <button type="button" className="btn btn-primary btn-sm" onClick={save}>
+            <Button size="sm" onClick={save}>
               Зберегти
-            </button>
-            <button type="button" className="btn btn-plain btn-sm" onClick={() => setEditing(false)}>
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>
               Скасувати
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
@@ -206,13 +211,13 @@ function WordCard({ state, onClose }: { state: LookupState; onClose: () => void 
             {source && <span>{SOURCE_LABEL[source]}</span>}
             <span className="wp-saved">{state.isNew ? 'Додано до словника' : 'Уже у словнику'}</span>
           </div>
-          <div className="wp-actions">
-            <button type="button" className="btn btn-plain btn-sm" onClick={startEdit}>
+          <div className="row">
+            <Button size="sm" variant="outline" onClick={startEdit}>
               Редагувати
-            </button>
-            <button type="button" className="btn btn-destructive btn-sm" onClick={remove}>
+            </Button>
+            <Button size="sm" variant="destructive" onClick={remove}>
               Прибрати
-            </button>
+            </Button>
           </div>
         </>
       )}

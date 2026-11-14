@@ -1,24 +1,27 @@
 import { lazy, Suspense, useEffect, useState, type ComponentType } from 'react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { BrandMark } from './components/BrandMark'
 import { IconBook, IconChevronLeft, IconGear, IconHistory, IconOverview, IconTests } from './components/Icons'
 import { ToastProvider } from './components/Toast'
 import { WordLookupProvider } from './components/WordLookup'
 import { useMediaQuery, WIDE_QUERY } from './lib/hooks'
 import { useRoute, type Route } from './lib/router'
-import { DictionaryPage } from './pages/DictionaryPage'
-import { ExamSetupPage } from './pages/ExamSetupPage'
-import { FlashcardsPage } from './pages/FlashcardsPage'
-import { HistoryPage } from './pages/HistoryPage'
-import { ResultsPage } from './pages/ResultsPage'
-import { SettingsPage } from './pages/SettingsPage'
-import { TestPage } from './pages/TestPage'
-import { TestsPage } from './pages/TestsPage'
-import { TrainingSetupPage } from './pages/TrainingSetupPage'
 import { AppProvider } from './store/AppStore'
 import { useApp } from './store/context'
 
-// Charts (Recharts) load as a separate chunk, so the other screens don't pay for them.
+// Every screen is its own chunk; charts (Recharts) and Radix widgets load only where used.
 const DashboardPage = lazy(() => import('./pages/DashboardPage').then((m) => ({ default: m.DashboardPage })))
+const DictionaryPage = lazy(() => import('./pages/DictionaryPage').then((m) => ({ default: m.DictionaryPage })))
+const ExamSetupPage = lazy(() => import('./pages/ExamSetupPage').then((m) => ({ default: m.ExamSetupPage })))
+const FlashcardsPage = lazy(() => import('./pages/FlashcardsPage').then((m) => ({ default: m.FlashcardsPage })))
+const HistoryPage = lazy(() => import('./pages/HistoryPage').then((m) => ({ default: m.HistoryPage })))
+const ResultsPage = lazy(() => import('./pages/ResultsPage').then((m) => ({ default: m.ResultsPage })))
+const SettingsPage = lazy(() => import('./pages/SettingsPage').then((m) => ({ default: m.SettingsPage })))
+const TestPage = lazy(() => import('./pages/TestPage').then((m) => ({ default: m.TestPage })))
+const TestsPage = lazy(() => import('./pages/TestsPage').then((m) => ({ default: m.TestsPage })))
+const TrainingSetupPage = lazy(() => import('./pages/TrainingSetupPage').then((m) => ({ default: m.TrainingSetupPage })))
 
 interface Tab {
   path: string
@@ -89,7 +92,7 @@ function Sidebar({ route }: { route: Route }) {
       }}
     >
       <a className="brand" href="#/" aria-label="KrokLingo — на головну">
-        <BrandMark size={38} />
+        <BrandMark size={32} />
         <span className="brand-text fade">
           <span className="brand-name">KrokLingo</span>
           <br />
@@ -112,16 +115,21 @@ function Sidebar({ route }: { route: Route }) {
       </nav>
       <div className="sidebar-footer">
         {wide && (
-          <button
-            type="button"
-            className="icon-btn sidebar-toggle"
-            onClick={toggle}
-            aria-label={collapsed ? 'Закріпити бічну панель розгорнутою' : 'Згорнути бічну панель'}
-            title={collapsed ? 'Закріпити розгорнутою' : 'Згорнути (розкриватиметься при наведенні)'}
-            aria-expanded={!collapsed}
-          >
-            <IconChevronLeft />
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="sidebar-toggle text-muted-foreground"
+                onClick={toggle}
+                aria-label={collapsed ? 'Закріпити бічну панель розгорнутою' : 'Згорнути бічну панель'}
+                aria-expanded={!collapsed}
+              >
+                <IconChevronLeft />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">{collapsed ? 'Закріпити розгорнутою' : 'Згорнути'}</TooltipContent>
+          </Tooltip>
         )}
       </div>
     </aside>
@@ -170,11 +178,7 @@ function Page({ route }: { route: Route }) {
     case 'tests':
       return <TestsPage />
     default:
-      return (
-        <Suspense fallback={null}>
-          <DashboardPage />
-        </Suspense>
-      )
+      return <DashboardPage />
   }
 }
 
@@ -183,10 +187,12 @@ function StorageWarning() {
   if (!storageError) return null
   return (
     <div className="page" style={{ paddingBottom: 0 }}>
-      <div className="banner banner-warn">
-        Не вдалося зберегти дані в пам'ять браузера (можливо, вона заповнена або вимкнена). Збережіть резервну
-        копію в налаштуваннях.
-      </div>
+      <Alert variant="destructive">
+        <AlertTitle>Не вдалося зберегти дані</AlertTitle>
+        <AlertDescription>
+          Пам'ять браузера заповнена або вимкнена. Збережіть резервну копію в налаштуваннях.
+        </AlertDescription>
+      </Alert>
     </div>
   )
 }
@@ -196,6 +202,7 @@ function Shell() {
   // A running test is a focused, modal task: no sidebar or tab bar, its own toolbar with a clear way out.
   const inTest = route.name === 'test'
   return (
+    <TooltipProvider delayDuration={300}>
     <ToastProvider>
       <WordLookupProvider inTest={inTest}>
         {!inTest && (
@@ -206,7 +213,9 @@ function Shell() {
         <div className={inTest ? undefined : 'with-sidebar'}>
           <StorageWarning />
           <main className={inTest ? 'main-test' : undefined}>
-            <Page route={route} />
+            <Suspense fallback={null}>
+              <Page route={route} />
+            </Suspense>
           </main>
         </div>
         {!inTest && (
@@ -216,6 +225,7 @@ function Shell() {
         )}
       </WordLookupProvider>
     </ToastProvider>
+    </TooltipProvider>
   )
 }
 

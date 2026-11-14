@@ -142,3 +142,26 @@ export function IconOverview(p: IconProps) {
     </Svg>
   )
 }
+
+export function IconPlus(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
+    </Svg>
+  )
+}
+
+export function IconDownload(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <path
+        d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </Svg>
+  )
+}
