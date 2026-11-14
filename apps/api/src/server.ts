@@ -2,11 +2,19 @@
 import { buildApp } from './app.ts'
 import { supabaseVerifier } from './auth.ts'
 import { connect } from './db/client.ts'
+import { runMigrations } from './db/migrations.ts'
 
 const env = process.env
 if (!env.DATABASE_URL) throw new Error('DATABASE_URL is not set')
 
-const { db, close } = connect(env.DATABASE_URL)
+const { db, close } = connect(env.DATABASE_URL, { max: Number(env.DB_POOL_MAX ?? 5) })
+
+// Hosts without a pre-deploy step (e.g. Render's free plan) apply migrations on start.
+if (env.MIGRATE_ON_START === 'true') {
+  await runMigrations(db)
+  console.log('migrations applied')
+}
+
 const app = await buildApp({
   db,
   verify: supabaseVerifier({ supabaseUrl: env.SUPABASE_URL, jwtSecret: env.SUPABASE_JWT_SECRET }),
@@ -14,7 +22,7 @@ const app = await buildApp({
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean),
-  logger: true,
+  logger: env.LOG !== 'false',
 })
 
 const port = Number(env.PORT ?? 8787)

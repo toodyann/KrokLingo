@@ -1,6 +1,6 @@
 import cors from '@fastify/cors'
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify'
-import { and, asc, eq } from 'drizzle-orm'
+import { and, asc, eq, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import type { UserState } from '@kroklingo/shared'
 import type { AuthUser, Verify } from './auth.ts'
@@ -92,7 +92,16 @@ export async function buildApp(opts: AppOptions): Promise<FastifyInstance> {
     return reply.code(status).send({ error: status >= 500 ? 'internal error' : (err as Error).message })
   })
 
+  // liveness (no database) for the host's health check; readiness also reaches the database
   app.get('/health', async () => ({ ok: true }))
+  app.get('/ready', async (_req, reply) => {
+    try {
+      await db.execute(sql`select 1`)
+      return { ok: true, db: true }
+    } catch {
+      return reply.code(503).send({ ok: false, db: false })
+    }
+  })
 
   // every /api route needs a valid Supabase access token
   app.addHook('onRequest', async (req: FastifyRequest, reply: FastifyReply) => {
