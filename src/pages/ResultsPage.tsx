@@ -8,7 +8,7 @@ import { Segmented } from '../components/Segmented'
 import { PageHeader } from '../components/PageHeader'
 import { QuestionView } from '../components/QuestionView'
 import { useToast } from '../components/toastContext'
-import { navigate } from '../lib/router'
+import { navigate, link } from '../lib/router'
 import { topicStats } from '../lib/session'
 import { formatDate, formatDuration, formatPercent, pluralUk } from '../lib/util'
 import { useApp } from '../store/context'
@@ -25,10 +25,10 @@ export function ResultsPage({ id }: { id: string }) {
   if (!record) {
     return (
       <div className="page">
-        <PageHeader back={{ href: '#/history', label: 'Історія' }} title="Результати" />
+        <PageHeader back={{ href: link('history'), label: 'Історія' }} title="Результати" />
         <EmptyState title="Результат не знайдено" actions={
             <Button asChild variant="outline">
-              <a href="#/history">До історії</a>
+              <a href={link('history')}>До історії</a>
             </Button>
           } />
       </div>
@@ -62,13 +62,13 @@ export function ResultsPage({ id }: { id: string }) {
   return (
     <div className="page">
       <PageHeader
-        back={{ href: '#/history', label: 'Історія' }}
+        back={{ href: link('history'), label: 'Історія' }}
         title="Результати"
         subtitle={`${record.title} · ${formatDate(record.finishedAt)}`}
         actions={
           <>
             <Button asChild variant="outline">
-              <a href={record.mode === 'exam' ? '#/exam' : '#/training'}>Пройти ще раз</a>
+              <a href={record.mode === 'exam' ? link('exam') : link('training')}>Пройти ще раз</a>
             </Button>
             <Button variant="destructive" onClick={remove}>
               Видалити
@@ -195,10 +195,10 @@ export function ResultsPage({ id }: { id: string }) {
               </div>
               <div className="row" style={{ marginTop: 16 }}>
                 <Button asChild size="sm" variant="secondary">
-                  <a href="#/flashcards">Повторити картками</a>
+                  <a href={link('flashcards')}>Повторити картками</a>
                 </Button>
                 <Button asChild size="sm" variant="ghost">
-                  <a href="#/dictionary">Відкрити словник</a>
+                  <a href={link('dictionary')}>Відкрити словник</a>
                 </Button>
               </div>
             </>

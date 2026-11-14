@@ -10,6 +10,7 @@ import { startOfDay } from '../lib/stats'
 import { formatDuration, formatPercent } from '../lib/util'
 import { useApp } from '../store/context'
 import type { AttemptRecord, Mode } from '../types'
+import { link } from '../lib/router'
 
 const ScoreTrend = lazy(() => import('../components/ScoreTrend'))
 
@@ -89,7 +90,7 @@ export function HistoryPage() {
           title="Ще немає спроб"
           actions={
             <Button asChild>
-              <a href="#/tests">До тестів</a>
+              <a href={link('tests')}>До тестів</a>
             </Button>
           }
         >
@@ -112,7 +113,7 @@ export function HistoryPage() {
                       const d = deltas.get(r.id)
                       const dir = d == null || Math.abs(d) < 0.05 ? '' : d > 0 ? 'up' : 'down'
                       return (
-                        <a key={r.id} className="list-row" href={`#/results/${r.id}`}>
+                        <a key={r.id} className="list-row" href={link(`results/${r.id}`)}>
                           <div className="list-row-main">
                             <div>{r.mode === 'exam' ? 'Іспит' : r.title}</div>
                             <div className="secondary t-footnote tnum">

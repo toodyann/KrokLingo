@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { IconGrid, IconHistory, IconTests } from '../components/Icons'
 import { PageHeader } from '../components/PageHeader'
 import { discardSessionOptions, useConfirm } from '../components/confirmContext'
-import { navigate } from '../lib/router'
+import { navigate, link } from '../lib/router'
 import { createSession, liveStats, mistakeIds, topicStats } from '../lib/session'
 import { formatPercent, pluralUk, shuffle } from '../lib/util'
 import { useApp } from '../store/context'
@@ -63,7 +63,7 @@ export function TestsPage() {
           </AlertDescription>
           <AlertAction>
             <Button asChild size="sm">
-              <a href="#/test">Продовжити</a>
+              <a href={link('test')}>Продовжити</a>
             </Button>
           </AlertAction>
         </Alert>
@@ -84,7 +84,7 @@ export function TestsPage() {
           </CardContent>
           <CardFooter className="mt-auto">
             <Button asChild size="lg">
-              <a href="#/exam">
+              <a href={link('exam')}>
                 <IconTests />
                 Почати іспит
               </a>
@@ -106,7 +106,7 @@ export function TestsPage() {
           </CardContent>
           <CardFooter className="mt-auto">
             <Button asChild size="lg" variant="outline">
-              <a href="#/training">
+              <a href={link('training')}>
                 <IconGrid />
                 Налаштувати тренування
               </a>
@@ -120,7 +120,7 @@ export function TestsPage() {
           <h2 className="section-title">Тести за темами</h2>
           {mistakes > 0 && (
             <Button asChild variant="ghost" size="sm">
-              <a href="#/training">
+              <a href={link('training')}>
                 <IconHistory />
                 Робота над помилками · {mistakes}
               </a>

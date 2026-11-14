@@ -8,7 +8,7 @@ import { ConfirmProvider } from './components/ConfirmDialog'
 import { ToastProvider } from './components/Toast'
 import { WordLookupProvider } from './components/WordLookup'
 import { useMediaQuery, WIDE_QUERY } from './lib/hooks'
-import { useRoute, type Route } from './lib/router'
+import { useRoute, type Route, link } from './lib/router'
 import { AppProvider } from './store/AppStore'
 import { useApp } from './store/context'
 
@@ -115,7 +115,7 @@ function Sidebar({ route }: { route: Route }) {
         }
       }}
     >
-      <a className="brand" href="#/" aria-label="KrokLingo — на головну">
+      <a className="brand" href={link('')} aria-label="KrokLingo — на головну">
         <BrandMark size={32} />
         <span className="brand-text fade">
           <span className="brand-name">KrokLingo</span>
@@ -126,7 +126,7 @@ function Sidebar({ route }: { route: Route }) {
           <a
             key={path}
             className="side-item"
-            href={`#/${path}`}
+            href={link(path)}
             aria-current={routes.includes(route.name) ? 'page' : undefined}
           >
             <Icon />
@@ -166,7 +166,7 @@ function TabBar({ route }: { route: Route }) {
           <a
             key={path}
             className="tab"
-            href={`#/${path}`}
+            href={link(path)}
             aria-current={routes.includes(route.name) ? 'page' : undefined}
           >
             <Icon />

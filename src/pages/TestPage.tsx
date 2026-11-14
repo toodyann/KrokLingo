@@ -8,7 +8,7 @@ import { IconChevronLeft, IconChevronRight, IconClose, IconGrid, IconTests } fro
 import { QuestionView } from '../components/QuestionView'
 import { useDraggableSheet } from '../components/useDraggableSheet'
 import { useNow } from '../lib/hooks'
-import { navigate } from '../lib/router'
+import { navigate, link } from '../lib/router'
 import { finalizeSession, liveStats } from '../lib/session'
 import { formatClock, formatPercent, LETTERS, pluralUk } from '../lib/util'
 import { useApp, type Bank } from '../store/context'
@@ -99,10 +99,10 @@ export function TestPage() {
           actions={
             <>
               <Button asChild>
-                <a href="#/exam">Почати іспит</a>
+                <a href={link('exam')}>Почати іспит</a>
               </Button>
               <Button asChild variant="outline">
-                <a href="#/training">Тренування</a>
+                <a href={link('training')}>Тренування</a>
               </Button>
             </>
           }

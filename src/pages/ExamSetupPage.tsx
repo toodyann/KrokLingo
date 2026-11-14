@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { PageHeader } from '../components/PageHeader'
 import { discardSessionOptions, useConfirm } from '../components/confirmContext'
-import { navigate } from '../lib/router'
+import { navigate, link } from '../lib/router'
 import { createSession } from '../lib/session'
 import { shuffle } from '../lib/util'
 import { useApp } from '../store/context'
@@ -39,7 +39,7 @@ export function ExamSetupPage() {
   return (
     <div className="page">
       <PageHeader
-        back={{ href: '#/tests', label: 'Тести' }}
+        back={{ href: link('tests'), label: 'Тести' }}
         title="Симуляція іспиту"
         subtitle="Англійська мова професійного спрямування · «Крок 1. Стоматологія»"
       />

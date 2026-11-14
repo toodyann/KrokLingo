@@ -24,6 +24,7 @@ import { exportDocx, exportTxt } from '../lib/exportDictionary'
 import { formatDate, pluralUk } from '../lib/util'
 import { useApp } from '../store/context'
 import type { DictEntry } from '../types'
+import { link } from '../lib/router'
 
 type Filter = 'all' | 'learning' | 'learned' | 'untranslated'
 type Sort = 'new' | 'az' | 'lookups'
@@ -86,7 +87,7 @@ export function DictionaryPage() {
             </Button>
             {dictionary.length > 0 && (
               <Button asChild>
-                <a href="#/flashcards">Повторити картками</a>
+                <a href={link('flashcards')}>Повторити картками</a>
               </Button>
             )}
           </>
@@ -117,7 +118,7 @@ export function DictionaryPage() {
           title="Словник порожній"
           actions={
             <Button asChild>
-              <a href="#/tests">До тестів</a>
+              <a href={link('tests')}>До тестів</a>
             </Button>
           }
         >

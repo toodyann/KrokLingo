@@ -9,6 +9,7 @@ import { PageHeader } from '../components/PageHeader'
 import { Segmented } from '../components/Segmented'
 import { shuffle } from '../lib/util'
 import { useApp } from '../store/context'
+import { link } from '../lib/router'
 
 type Direction = 'en-uk' | 'uk-en'
 
@@ -63,7 +64,7 @@ export function FlashcardsPage() {
 
   return (
     <div className="page flashcards-page">
-      <PageHeader back={{ href: '#/dictionary', label: 'Словник' }} title="Картки" />
+      <PageHeader back={{ href: link('dictionary'), label: 'Словник' }} title="Картки" />
 
       <div className="toolbar">
         <Segmented value={direction} onChange={setDirection} options={DIRECTIONS} label="Напрям" />
@@ -81,7 +82,7 @@ export function FlashcardsPage() {
           title="Немає слів для повторення"
           actions={
             <Button asChild variant="outline">
-              <a href="#/dictionary">До словника</a>
+              <a href={link('dictionary')}>До словника</a>
             </Button>
           }
         />

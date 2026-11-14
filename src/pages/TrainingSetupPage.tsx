@@ -9,7 +9,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { PageHeader } from '../components/PageHeader'
 import { discardSessionOptions, useConfirm } from '../components/confirmContext'
 import { Segmented } from '../components/Segmented'
-import { navigate } from '../lib/router'
+import { navigate, link } from '../lib/router'
 import { createSession, mistakeIds } from '../lib/session'
 import { pluralUk, shuffle } from '../lib/util'
 import { useApp } from '../store/context'
@@ -65,7 +65,7 @@ export function TrainingSetupPage() {
 
   return (
     <div className="page">
-      <PageHeader back={{ href: '#/tests', label: 'Тести' }} title="Тренування" />
+      <PageHeader back={{ href: link('tests'), label: 'Тести' }} title="Тренування" />
 
       <div className="split">
         <Card>

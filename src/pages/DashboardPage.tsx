@@ -35,6 +35,7 @@ import {
 import { liveStats, mistakeIds } from '../lib/session'
 import { formatPercent, pluralUk } from '../lib/util'
 import { useApp } from '../store/context'
+import { link } from '../lib/router'
 
 /** Only what our tooltip renderers read from Recharts. */
 type TipProps = { active?: boolean; payload?: ReadonlyArray<{ payload?: unknown }> }
@@ -88,10 +89,10 @@ export function DashboardPage() {
           <h2>Почніть підготовку до «Крок 1»</h2>
           <div className="flex flex-wrap gap-2">
             <Button asChild size="lg">
-              <a href="#/exam">Почати іспит</a>
+              <a href={link('exam')}>Почати іспит</a>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <a href="#/training">Тренування</a>
+              <a href={link('training')}>Тренування</a>
             </Button>
           </div>
         </Card>
@@ -161,7 +162,7 @@ export function DashboardPage() {
             {session ? (
               <QuickAction
                 primary
-                href="#/test"
+                href={link('test')}
                 icon={<IconTests />}
                 title="Продовжити тест"
                 sub={`${session.title} · ${liveStats(session, bank).answered} з ${session.questions.length}`}
@@ -169,22 +170,22 @@ export function DashboardPage() {
             ) : (
               <QuickAction
                 primary
-                href="#/exam"
+                href={link('exam')}
                 icon={<IconTests />}
                 title="Симуляція іспиту"
                 sub={`${settings.examQuestions} завдань · ${settings.examMinutes} хв`}
               />
             )}
-            <QuickAction href="#/training" icon={<IconGrid />} title="Тренування за темами" sub="Без таймера" />
+            <QuickAction href={link('training')} icon={<IconGrid />} title="Тренування за темами" sub="Без таймера" />
             <QuickAction
-              href="#/flashcards"
+              href={link('flashcards')}
               icon={<IconBook />}
               title="Повторити слова"
               sub={`${toLearn} ${pluralUk(toLearn, 'слово', 'слова', 'слів')} до вивчення`}
             />
             {mistakes > 0 && (
               <QuickAction
-                href="#/training"
+                href={link('training')}
                 icon={<IconHistory />}
                 title="Робота над помилками"
                 sub={`${mistakes} ${pluralUk(mistakes, 'питання', 'питання', 'питань')}`}
