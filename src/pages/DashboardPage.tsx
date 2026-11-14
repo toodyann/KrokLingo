@@ -84,41 +84,16 @@ export function DashboardPage() {
     return (
       <div className="page">
         <PageHeader title="Огляд" />
-        <Card className="grid items-center gap-8 p-8 lg:grid-cols-[1.2fr_1fr]">
-          <div className="onboarding">
-            <h2>Почніть підготовку до «Крок 1»</h2>
-            <p>
-              Тут з’являться ваша активність, результати спроб і точність за темами — щойно ви пройдете перший тест.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              <Button asChild size="lg">
-                <a href="#/exam">Почати іспит</a>
-              </Button>
-              <Button asChild size="lg" variant="outline">
-                <a href="#/training">Тренування</a>
-              </Button>
-            </div>
+        <Card className="onboarding flex-row flex-wrap items-center justify-between gap-x-6 gap-y-4 p-6 md:p-8">
+          <h2>Почніть підготовку до «Крок 1»</h2>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild size="lg">
+              <a href="#/exam">Почати іспит</a>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <a href="#/training">Тренування</a>
+            </Button>
           </div>
-          <ol className="steps">
-            <li>
-              <span className="step-num">1</span>
-              <span>
-                <b>Пройдіть тест</b> — симуляцію іспиту на {settings.examQuestions} завдань або тренування за темою.
-              </span>
-            </li>
-            <li>
-              <span className="step-num">2</span>
-              <span>
-                <b>Натискайте на незнайомі слова</b> — переклад з’явиться поруч, а слово збережеться у словник.
-              </span>
-            </li>
-            <li>
-              <span className="step-num">3</span>
-              <span>
-                <b>Повертайтеся сюди</b> — стежте за точністю й слабкими темами.
-              </span>
-            </li>
-          </ol>
         </Card>
       </div>
     )

@@ -222,64 +222,9 @@
 }
 
 /* onboarding (no data yet) */
-.onboarding {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  gap: var(--s-8);
-  align-items: center;
-  padding: var(--s-8);
-}
-
 .onboarding h2 {
   font-size: var(--fs-2xl);
   font-weight: 700;
   letter-spacing: -0.015em;
-  margin-bottom: var(--s-2);
-}
-
-.onboarding p {
-  color: var(--text-2);
-  max-width: 52ch;
-}
-
-.steps {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-3);
-}
-
-.steps li {
-  display: flex;
-  gap: var(--s-3);
-  align-items: flex-start;
-  color: var(--text-2);
-}
-
-.steps li b {
-  color: var(--text);
-  font-weight: 600;
-}
-
-.step-num {
-  flex: none;
-  width: 26px;
-  height: 26px;
-  border-radius: var(--r-full);
-  display: grid;
-  place-items: center;
-  background: var(--brand-soft);
-  color: var(--brand);
-  font-size: var(--fs-sm);
-  font-weight: 700;
-}
-
-@media (max-width: 1023px) {
-  .onboarding {
-    grid-template-columns: minmax(0, 1fr);
-    padding: var(--s-6);
-    gap: var(--s-6);
-  }
+  text-wrap: balance;
 }
