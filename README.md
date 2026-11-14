@@ -150,14 +150,25 @@ packages/
 2. **Вхід через Google.**
    - У [Google Cloud Console](https://console.cloud.google.com/apis/credentials) створіть OAuth Client ID (*Web application*). Як *Authorized redirect URI* вкажіть `https://<project-ref>.supabase.co/auth/v1/callback`.
    - У Supabase увімкніть *Authentication → Sign In / Providers → Google* і вставте Client ID та Secret.
-   - У *Authentication → URL Configuration* додайте до *Redirect URLs* `https://toodyann.github.io/KrokLingo/` і `http://localhost:5174/`.
+   - У *Authentication → URL Configuration* додайте до *Redirect URLs* `https://toodyann.github.io/KrokLingo/` і `http://localhost:5173/`.
 3. **База даних.** Створіть `apps/api/.env` за зразком `apps/api/.env.example` і застосуйте міграції:
    ```bash
    npm run db:migrate -w @kroklingo/api
    ```
-4. **API.** Локальний запуск: `npm run dev:api` (порт 8787). Для продакшну API потрібен Node-хостинг, наприклад Render, Fly.io чи Railway:
-   - команда запуску: `npm start -w @kroklingo/api`;
-   - змінні середовища: ті самі, що в `.env`;
+4. **API.** Локальний запуск: `npm run dev:api` (порт 8787).
+
+   **Продакшн на Render** (безкоштовний план) уже описано в [`render.yaml`](render.yaml):
+   - *Render → New → Blueprint* → виберіть цей репозиторій.
+   - Заповніть `DATABASE_URL` і `SUPABASE_URL`, решта змінних уже задана.
+   - Міграції застосовуються під час старту (`MIGRATE_ON_START=true`). Нові пуші в `main`, що змінюють API, деплояться автоматично.
+   - Адреса сервісу (`https://kroklingo-api.onrender.com` або схожа) — це і є `VITE_API_URL`.
+   - Безкоштовний сервіс засинає без запитів, тож перший запит після паузи триває 30–60 с.
+
+   **Інший хостинг з контейнерами** (Fly.io, Railway, Cloud Run): образ збирається з кореня репозиторію командою `docker build -f apps/api/Dockerfile -t kroklingo-api .`, змінні середовища ті самі.
+
+   Перевірка після деплою:
+   - `GET /health` відповідає `{"ok":true}`;
+   - `GET /ready` додатково перевіряє з'єднання з базою;
    - `CORS_ORIGINS` має містити `https://toodyann.github.io`.
 5. **Фронтенд.**
    - Для розробки: `apps/web/.env.local` за зразком `apps/web/.env.example`.

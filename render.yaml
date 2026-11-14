@@ -1,0 +1,38 @@
+# Render Blueprint for the API (https://render.com/docs/blueprint-spec).
+# Render → New → Blueprint → pick this repository; then fill in the variables marked "sync: false".
+# The free plan sleeps after ~15 minutes without requests; the first request then takes ~30–60 s.
+services:
+  - type: web
+    name: kroklingo-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    # Only the API and the shared package are installed; Node runs the TypeScript sources directly.
+    buildCommand: npm ci --workspace @kroklingo/api --omit=dev
+    startCommand: npm start --workspace @kroklingo/api
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    buildFilter:
+      paths:
+        - apps/api/**
+        - packages/shared/**
+        - package.json
+        - package-lock.json
+        - .nvmrc
+        - render.yaml
+    envVars:
+      - key: NODE_VERSION
+        value: 22.23.5
+      # Supabase → Connect → Connection string (pooler, port 6543)
+      - key: DATABASE_URL
+        sync: false
+      # Supabase → Project Settings → API → Project URL; tokens are checked with its JWKS
+      - key: SUPABASE_URL
+        sync: false
+      # Free plan has no pre-deploy step, so migrations run when the service starts
+      - key: MIGRATE_ON_START
+        value: "true"
+      - key: CORS_ORIGINS
+        value: https://toodyann.github.io
+      - key: DB_POOL_MAX
+        value: "5"
