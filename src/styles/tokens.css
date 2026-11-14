@@ -1,0 +1,187 @@
+/*
+ * KrokLingo design tokens — the single source for colour, type, space, radius and elevation.
+ * Every text/background pair below is WCAG AA (>= 4.5:1); ratios are noted next to the value.
+ * Dark is the primary theme: a blue-tinted near-black with layered surfaces and hairline borders,
+ * never flat black with identical grey boxes.
+ */
+:root {
+  color-scheme: light dark;
+
+  /* surfaces — light */
+  --bg: #f6f7f9;
+  --surface-1: #ffffff; /* cards, panels */
+  --surface-2: #f3f4f7; /* inputs, hover rows, nested blocks */
+  --surface-3: #eaecf1; /* pressed / selected on surface-2 */
+  --sidebar-bg: #eff1f5;
+  --border: #e4e6ec;
+  --border-strong: #d3d7df;
+
+  /* text — light */
+  --text: #14161c; /* 16.9:1 on bg */
+  --text-2: #5b6170; /* 6.2:1 on surface-1 */
+  --text-3: #6b7180; /* 4.9:1 on surface-1 — captions, meta */
+
+  /* accent (logo blue) */
+  --brand: #0066cc; /* 5.57:1 as text on surface-1 */
+  --brand-strong: #0058b6;
+  --brand-bg: #0066cc; /* primary buttons, white text 5.57:1 */
+  --brand-bg-hover: #0058b6;
+  --on-brand: #ffffff;
+  --brand-soft: rgb(0 102 204 / 0.1);
+  --brand-ring: rgb(0 102 204 / 0.45);
+
+  /* status */
+  --success: #1a7f37; /* 5.1:1 */
+  --success-soft: rgb(26 127 55 / 0.1);
+  --danger: #c4161c; /* 6.0:1 */
+  --danger-soft: rgb(196 22 28 / 0.08);
+  --warning: #8a5a00; /* 5.9:1 */
+  --warning-soft: rgb(229 160 0 / 0.14);
+
+  /* highlighter marker — the product signature (words already in the dictionary) */
+  --marker: #ffe98a; /* text on marker 13.8:1 */
+  --marker-strong: #ffd84d;
+
+  /* charts (validated with dataviz validate_palette) */
+  --chart-series: #0066cc;
+  --chart-track: #d9e6f5;
+  --chart-grid: #e8eaef;
+
+  /* elevation */
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.05);
+  --shadow-md: 0 4px 16px rgb(16 24 40 / 0.08), 0 1px 2px rgb(16 24 40 / 0.06);
+  --shadow-lg: 0 16px 48px rgb(16 24 40 / 0.16), 0 2px 6px rgb(16 24 40 / 0.08);
+  --overlay-bg: rgb(255 255 255 / 0.86);
+  --scrim: rgb(15 18 25 / 0.35);
+
+  /* radius */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 14px; /* = shadcn rounded-xl */
+  --r-xl: 18px;
+  /* hairline ring that matches shadcn Card (ring-1 ring-foreground/10) */
+  --ring-surface: 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent);
+  --r-full: 999px;
+
+  /* space (4px grid) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+
+  /* type scale */
+  --font-ui: 'Geist Variable', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-read: ui-serif, 'New York', 'Iowan Old Style', 'Palatino Linotype', Charter, Georgia, serif;
+  --fs-xs: 0.75rem; /* 12 */
+  --fs-sm: 0.8125rem; /* 13 */
+  --fs-base: 0.9375rem; /* 15 — UI body */
+  --fs-md: 1rem; /* 16 */
+  --fs-lg: 1.125rem; /* 18 — section titles */
+  --fs-xl: 1.25rem; /* 20 */
+  --fs-2xl: 1.5rem; /* 24 */
+  --fs-3xl: 1.875rem; /* 30 — page titles */
+  --fs-kpi: 1.875rem; /* 30 */
+
+  /* controls */
+  --h-sm: 32px;
+  --h-md: 38px;
+  --h-lg: 44px;
+  --hit: 44px;
+
+  /* layout */
+  --content-max: 1560px;
+  --page-pad-x: 40px;
+  --page-pad-y: 32px;
+  --gap: 20px;
+  --sidebar-w: 0px;
+  --tabbar-h: 0px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  --ease: cubic-bezier(0.25, 0.9, 0.3, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b0c10;
+    --surface-1: #13151c; /* +1 step: cards */
+    --surface-2: #1a1d26; /* +2: inputs, hover rows, nested */
+    --surface-3: #232735; /* +3: selected */
+    --sidebar-bg: #0e1015;
+    --border: rgb(255 255 255 / 0.07);
+    --border-strong: rgb(255 255 255 / 0.12);
+
+    --text: #ecedf1; /* 15.6:1 on surface-1 */
+    --text-2: #a3a8b6; /* 7.7:1 */
+    --text-3: #8a8f9e; /* 5.7:1 */
+
+    --brand: #6aa8ff; /* 7.5:1 as text */
+    --brand-strong: #8dbcff;
+    --brand-bg: #2563d0; /* white text 5.56:1 */
+    --brand-bg-hover: #2f6fe0;
+    --on-brand: #ffffff;
+    --brand-soft: rgb(106 168 255 / 0.12);
+    --brand-ring: rgb(106 168 255 / 0.5);
+
+    --success: #4ccf7a; /* 9.1:1 */
+    --success-soft: rgb(76 207 122 / 0.12);
+    --danger: #ff7a7a; /* 7.2:1 */
+    --danger-soft: rgb(255 122 122 / 0.12);
+    --warning: #e8b64c; /* 9.8:1 */
+    --warning-soft: rgb(232 182 76 / 0.12);
+
+    --marker: #5c4d12; /* text on marker 7.6:1 */
+    --marker-strong: #7a6618;
+
+    --chart-series: #3987e5;
+    --chart-track: #1d2a3e;
+    --chart-grid: #232735;
+
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-md: 0 8px 24px rgb(0 0 0 / 0.45), 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-lg: 0 24px 64px rgb(0 0 0 / 0.6), 0 2px 8px rgb(0 0 0 / 0.5);
+    --overlay-bg: rgb(26 29 38 / 0.88);
+    --scrim: rgb(0 0 0 / 0.55);
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --border: var(--border-strong);
+    --text-2: var(--text);
+    --text-3: var(--text-2);
+  }
+}
+
+/* responsive layout tokens */
+@media (max-width: 1279px) {
+  :root {
+    --page-pad-x: 28px;
+    --page-pad-y: 28px;
+    --gap: 16px;
+  }
+}
+
+@media (max-width: 767px) {
+  :root {
+    --page-pad-x: 16px;
+    --page-pad-y: 20px;
+    --gap: 12px;
+    --tabbar-h: 58px;
+    --fs-3xl: 1.75rem; /* 28 */
+    --fs-kpi: 1.625rem; /* 26 */
+  }
+}
+
+/* comfortable targets on touch screens */
+@media (pointer: coarse) {
+  :root {
+    --h-sm: 40px;
+    --h-md: 44px;
+  }
+}

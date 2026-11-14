@@ -28,4 +28,4 @@ export function useMediaQuery(query: string): boolean {
 export const COMPACT_QUERY = '(max-width: 767px)'
 
 /** Wide enough for the full sidebar with labels. */
-export const WIDE_QUERY = '(min-width: 1100px)'
+export const WIDE_QUERY = '(min-width: 1200px)'

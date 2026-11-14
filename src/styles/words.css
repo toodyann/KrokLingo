@@ -1,0 +1,185 @@
+/* Clickable words, the highlighter marker, and the translation popover / sheet. */
+
+.ctext .w {
+  cursor: pointer;
+  border-radius: 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: background-color 0.12s;
+}
+
+@media (hover: hover) {
+  .ctext .w:hover {
+    background-color: var(--brand-soft);
+  }
+}
+
+/* words already in the dictionary carry a highlighter stroke */
+.ctext .w.known {
+  background-image: linear-gradient(transparent 60%, var(--marker) 60%, var(--marker) 92%, transparent 92%);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.ctext .w.w-active {
+  background-color: var(--marker);
+  background-image: none;
+  box-shadow: 0 0 0 2px var(--marker);
+}
+
+.ctext .w.just-added {
+  animation: marker-swipe 0.32s var(--ease);
+}
+
+@keyframes marker-swipe {
+  from {
+    background-size: 0% 100%;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .ctext .w.known {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+}
+
+/* ---------- popover (regular widths) ---------- */
+
+.word-popover {
+  position: absolute;
+  z-index: 100;
+  width: min(340px, calc(100vw - 16px));
+  padding: var(--s-4) var(--s-4) var(--s-3);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-lg);
+  animation: materialize 0.18s var(--ease);
+}
+
+@keyframes materialize {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+.word-popover .arrow {
+  position: absolute;
+  top: -7px;
+  width: 14px;
+  height: 14px;
+  background: var(--surface-1);
+  border-left: 1px solid var(--border-strong);
+  border-top: 1px solid var(--border-strong);
+  transform: rotate(45deg);
+  border-radius: 3px 0 0 0;
+}
+
+.word-popover.above .arrow {
+  top: auto;
+  bottom: -7px;
+  border: none;
+  border-right: 1px solid var(--border-strong);
+  border-bottom: 1px solid var(--border-strong);
+  border-radius: 0 0 3px 0;
+}
+
+/* ---------- sheet (compact widths) ---------- */
+
+.word-sheet {
+  position: fixed;
+  left: 8px;
+  right: 8px;
+  bottom: calc(8px + var(--tabbar-h) + var(--safe-bottom));
+  z-index: 100;
+  padding: 4px var(--s-5) var(--s-4);
+  border-radius: var(--r-xl);
+  background: var(--surface-1);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-lg);
+  touch-action: none;
+  will-change: transform;
+}
+
+.word-sheet.in-test {
+  bottom: calc(8px + var(--safe-bottom));
+}
+
+/* ---------- card content ---------- */
+
+.wp-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.wp-word {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.wp-word mark {
+  background: linear-gradient(transparent 60%, var(--marker) 60%, var(--marker) 92%, transparent 92%);
+  color: inherit;
+  padding: 0 1px;
+}
+
+.wp-lemma {
+  margin-left: var(--s-2);
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+
+.wp-translation {
+  margin: 6px 0 var(--s-2);
+  font-size: var(--fs-lg);
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.wp-translation.muted {
+  color: var(--text-2);
+  font-weight: 400;
+  font-size: var(--fs-base);
+}
+
+.wp-note {
+  margin-bottom: var(--s-2);
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  white-space: pre-wrap;
+}
+
+.wp-meta {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px var(--s-3);
+  margin-bottom: var(--s-2);
+  padding-top: var(--s-2);
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+
+.wp-saved {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.wp-actions {
+  display: flex;
+  gap: 4px;
+  margin: 0 -8px;
+}
+
+.wp-edit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  margin: var(--s-2) 0 4px;
+}

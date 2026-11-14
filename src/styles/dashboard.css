@@ -1,0 +1,285 @@
+/* Dashboard & chart cards (Recharts chrome mapped to tokens). */
+
+/* chart body inside a shadcn Card */
+.chart-card {
+  min-width: 0;
+}
+
+.chart-card-value {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.chart-card-value b {
+  color: var(--text);
+  font-size: var(--fs-lg);
+  letter-spacing: -0.01em;
+}
+
+.chart-empty {
+  flex: 1;
+  min-height: 200px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--text-3);
+  font-size: var(--fs-base);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-md);
+  margin-bottom: var(--s-2);
+}
+
+.chart-card .recharts-cartesian-axis-tick-value {
+  fill: var(--text-3);
+  font-size: 12px;
+  font-family: var(--font-ui);
+}
+
+.chart-card .recharts-reference-line-label {
+  fill: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-ui);
+}
+
+.chart-card .recharts-surface:focus,
+.chart-card .recharts-wrapper:focus,
+.chart-card :focus:not(:focus-visible) {
+  outline: none;
+}
+
+.chart-tooltip {
+  min-width: 150px;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-md);
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+}
+
+.chart-tooltip .tt-title {
+  margin-bottom: 4px;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+
+.chart-tooltip .tt-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.chart-tooltip .tt-row b {
+  color: var(--text);
+  font-size: var(--fs-base);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-tooltip .tt-key {
+  display: inline-block;
+  width: 12px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--chart-series);
+  align-self: center;
+}
+
+/* overall accuracy (meter) */
+.meter-hero {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--s-4);
+}
+
+.meter-hero .hero {
+  font-size: clamp(2.25rem, 1.8rem + 1.4vw, 3rem);
+  line-height: 1;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+}
+
+.meter-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--s-2);
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.split-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s-2);
+  margin-top: var(--s-5);
+}
+
+.split-list div {
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.split-list b {
+  display: block;
+  font-size: var(--fs-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.split-list span {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+
+/* quick start actions */
+.action-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  transition:
+    border-color 0.12s,
+    background 0.12s;
+}
+
+.action:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-3);
+}
+
+.action-icon {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-md);
+  display: grid;
+  place-items: center;
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.action-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.action-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.action-title {
+  font-weight: 600;
+}
+
+.action-sub {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+}
+
+.action .chev {
+  width: 16px;
+  height: 16px;
+  color: var(--text-3);
+}
+
+.action.primary {
+  background: var(--brand-bg);
+  border-color: transparent;
+  color: var(--on-brand);
+}
+
+.action.primary:hover {
+  background: var(--brand-bg-hover);
+}
+
+.action.primary .action-icon {
+  background: rgb(255 255 255 / 0.16);
+  color: var(--on-brand);
+}
+
+.action.primary .action-sub,
+.action.primary .chev {
+  color: rgb(255 255 255 / 0.85);
+}
+
+/* onboarding (no data yet) */
+.onboarding {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: var(--s-8);
+  align-items: center;
+  padding: var(--s-8);
+}
+
+.onboarding h2 {
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin-bottom: var(--s-2);
+}
+
+.onboarding p {
+  color: var(--text-2);
+  max-width: 52ch;
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.steps li {
+  display: flex;
+  gap: var(--s-3);
+  align-items: flex-start;
+  color: var(--text-2);
+}
+
+.steps li b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.step-num {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-full);
+  display: grid;
+  place-items: center;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+@media (max-width: 1023px) {
+  .onboarding {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--s-6);
+    gap: var(--s-6);
+  }
+}
