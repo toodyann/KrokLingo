@@ -299,11 +299,6 @@ body:has(.main-test) {
   letter-spacing: -0.01em;
 }
 
-.brand-caption {
-  font-size: var(--fs-xs);
-  color: var(--text-3);
-}
-
 .side-nav {
   display: flex;
   flex-direction: column;

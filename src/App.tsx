@@ -119,8 +119,6 @@ function Sidebar({ route }: { route: Route }) {
         <BrandMark size={32} />
         <span className="brand-text fade">
           <span className="brand-name">KrokLingo</span>
-          <br />
-          <span className="brand-caption">Крок 1 · Стоматологія</span>
         </span>
       </a>
       <nav className="side-nav">
