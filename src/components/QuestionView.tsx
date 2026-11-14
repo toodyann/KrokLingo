@@ -25,11 +25,11 @@ export function QuestionView({ question, order, chosen, reveal, onChoose, passag
       {passage && (
         <details className="passage" open={passageOpen}>
           <summary>Текст для читання: {passage.title}</summary>
-          <ClickableText as="div" text={passage.text} />
+          <ClickableText as="div" text={passage.text} contextId={`passage:${passage.id}`} />
         </details>
       )}
 
-      <ClickableText as="div" className="question-text" text={question.text} />
+      <ClickableText as="div" className="question-text" text={question.text} contextId={question.id} />
 
       <div className="options" role="radiogroup">
         {order.map((original, displayIndex) => {
@@ -55,7 +55,12 @@ export function QuestionView({ question, order, chosen, reveal, onChoose, passag
               >
                 {LETTERS[displayIndex]}
               </button>
-              <ClickableText className="option-text" text={question.options[original]} />
+              <ClickableText
+                className="option-text"
+                text={question.options[original]}
+                contextId={question.id}
+                related={question.text}
+              />
               {reveal && isCorrect && <span className="mark">✓ правильна</span>}
               {reveal && isChosen && !isCorrect && <span className="mark">✗ ваша відповідь</span>}
             </div>
@@ -66,7 +71,7 @@ export function QuestionView({ question, order, chosen, reveal, onChoose, passag
       {reveal && question.explanation && (
         <div className="explanation">
           <b>Пояснення: </b>
-          <ClickableText text={question.explanation} />
+          <ClickableText text={question.explanation} contextId={question.id} related={question.text} />
         </div>
       )}
     </div>

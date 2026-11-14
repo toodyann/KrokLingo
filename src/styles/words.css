@@ -171,6 +171,67 @@
   font-weight: 600;
 }
 
+.wp-unit {
+  margin-top: 2px;
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+}
+
+.wp-word-meaning,
+.wp-alternatives,
+.wp-hint {
+  margin-bottom: var(--s-2);
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+}
+
+.wp-word-meaning b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.wp-hint {
+  color: var(--warning);
+}
+
+/* the sentence the word was clicked in, with the translated unit in bold */
+.wp-context {
+  margin-bottom: var(--s-2);
+  padding-left: var(--s-2);
+  border-left: 2px solid var(--border-strong);
+  font-size: var(--fs-xs);
+  line-height: 1.45;
+  color: var(--text-3);
+}
+
+.wp-context b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.wp-certainty {
+  padding: 0 6px;
+  border-radius: var(--r-full);
+  font-weight: 600;
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+.wp-certainty.verified {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.wp-certainty.likely {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.wp-certainty.uncertain {
+  background: var(--warning-soft, var(--surface-2));
+  color: var(--warning);
+}
+
 .wp-actions {
   display: flex;
   gap: 4px;

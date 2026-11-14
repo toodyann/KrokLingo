@@ -1,57 +1,63 @@
-import { memo, useMemo, type MouseEvent } from 'react'
+import { memo, useMemo, type MouseEvent, type ReactNode } from 'react'
 import { lemmaCandidates } from '../lib/lemmatize'
+import { analyzeText } from '../lib/text'
+import { knownPhraseTokens } from '../lib/translate'
 import { useKnownWords, useWordLookup } from './wordLookupContext'
-
-const TOKEN_RE = /([A-Za-z]+(?:['’-][A-Za-z]+)*)/g
 
 interface Props {
   text: string
   className?: string
   as?: 'span' | 'p' | 'div'
+  /** Question or passage id: lets the translator use translations verified for this text. */
+  contextId?: string
+  /** Extra context for short texts (the question stem for an answer option). */
+  related?: string
 }
 
 /**
- * Renders English text with every word clickable for instant translation.
- * Words already in the dictionary carry the highlighter marker.
+ * Renders English text with every word clickable for instant translation. A click passes the whole
+ * text and the token position, so the translator sees the sentence, the neighbours and the question.
+ * Words (and saved phrases) already in the dictionary carry the highlighter marker.
  */
-export const ClickableText = memo(function ClickableText({ text, className, as = 'span' }: Props) {
+export const ClickableText = memo(function ClickableText({ text, className, as = 'span', contextId, related }: Props) {
   const lookup = useWordLookup()
   const { known, justAdded } = useKnownWords()
 
   const parts = useMemo(() => {
-    return text.split(TOKEN_RE).map((part, i) => {
-      if (i % 2 === 0) return { part, word: false as const }
-      const keys = lemmaCandidates(part)
-      const hit = keys.find((k) => known.has(k))
-      return { part, word: true as const, known: !!hit, fresh: !!hit && hit === justAdded }
+    const { tokens } = analyzeText(text)
+    const hasPhrases = [...known].some((k) => k.includes(' '))
+    const inPhrase = hasPhrases ? knownPhraseTokens(text, (k) => known.has(k)) : new Set<number>()
+    const out: ReactNode[] = []
+    let pos = 0
+    tokens.forEach((t, i) => {
+      if (t.start > pos) out.push(text.slice(pos, t.start))
+      const hit = lemmaCandidates(t.text).find((k) => known.has(k))
+      const isKnown = !!hit || inPhrase.has(i)
+      const fresh = !!hit && hit === justAdded
+      out.push(
+        <span key={i} className={`w${isKnown ? ' known' : ''}${fresh ? ' just-added' : ''}`} data-i={i}>
+          {t.text}
+        </span>,
+      )
+      pos = t.end
     })
+    if (pos < text.length) out.push(text.slice(pos))
+    return out
   }, [text, known, justAdded])
 
   const onClick = (e: MouseEvent<HTMLElement>) => {
     const target = e.target as HTMLElement
-    const word = target.dataset?.w
-    if (!word) return
+    const index = target.dataset?.i
+    if (index === undefined) return
     e.stopPropagation()
     e.preventDefault()
-    lookup(word, target)
+    lookup({ text, index: Number(index), contextId, related }, target)
   }
 
   const Tag = as
   return (
     <Tag className={className ? `ctext ${className}` : 'ctext'} onClick={onClick}>
-      {parts.map((p, i) =>
-        p.word ? (
-          <span
-            key={i}
-            className={`w${p.known ? ' known' : ''}${p.fresh ? ' just-added' : ''}`}
-            data-w={p.part}
-          >
-            {p.part}
-          </span>
-        ) : (
-          p.part
-        ),
-      )}
+      {parts}
     </Tag>
   )
 })

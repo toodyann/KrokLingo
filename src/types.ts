@@ -30,10 +30,30 @@ export interface Collection {
   custom?: boolean
 }
 
+/** Stored origin of a dictionary translation. 'manual' marks the user's own text, which is never replaced. */
 export type TranslationSource = 'builtin' | 'online' | 'manual' | 'none'
+
+/** Where a translation shown for a click came from, highest priority first. */
+export type ResolutionSource =
+  | 'user-context'
+  | 'user'
+  | 'question'
+  | 'phrase'
+  | 'latin'
+  | 'abbr'
+  | 'context'
+  | 'dictionary'
+  | 'online'
+  | 'none'
+
+/** verified: confirmed data; likely: chosen from context or a single-sense entry; uncertain: a best guess. */
+export type Certainty = 'verified' | 'likely' | 'uncertain' | 'unknown'
+
+export type LexicalUnit = 'word' | 'phrase' | 'latin' | 'abbr'
 
 export interface DictEntry {
   id: string
+  /** Dictionary key: base form of a word, or a whole phrase ("mental nerve"). */
   word: string
   translation: string
   note: string
@@ -46,6 +66,17 @@ export interface DictEntry {
   learned: boolean
   /** Flashcard box (0 = new / forgotten). */
   box: number
+  /** Form as first clicked ("teeth", "Mental"). */
+  surface?: string
+  /** Sentence it was first clicked in. */
+  context?: string
+  /** Question (or passage) id of that sentence. */
+  contextId?: string
+  kind?: LexicalUnit
+  origin?: ResolutionSource
+  certainty?: Certainty
+  /** The user's own translations for particular questions: context id → translation. */
+  contextual?: Record<string, string>
 }
 
 export interface SessionQuestion {

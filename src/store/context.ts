@@ -9,8 +9,8 @@ import type {
   Question,
   Settings,
   Topic,
-  TranslationSource,
 } from '../types'
+import type { Resolution } from '../lib/translate'
 
 export interface Bank {
   topics: Topic[]
@@ -29,7 +29,10 @@ export interface AppState {
 
   dictionary: DictEntry[]
   findEntry: (word: string) => DictEntry | undefined
-  recordLookup: (word: string, translation: string, source: TranslationSource) => DictEntry
+  /** Saves a clicked unit with its context; never overwrites the user's own translation. */
+  recordLookup: (resolution: Resolution) => DictEntry
+  /** The user's translation for one question (null removes it). */
+  setContextTranslation: (id: string, contextId: string, translation: string | null) => void
   addEntry: (word: string, translation: string, note?: string) => DictEntry
   updateEntry: (id: string, patch: Partial<DictEntry>) => void
   deleteEntries: (ids: string[]) => void

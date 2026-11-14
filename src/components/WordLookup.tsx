@@ -13,32 +13,66 @@ import { COMPACT_QUERY, useMediaQuery } from '../lib/hooks'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { normalizeWord } from '../lib/lemmatize'
-import { useDraggableSheet } from './useDraggableSheet'
-import { lookupBuiltin, lookupOnline, storageKeys } from '../lib/translate'
+import { analyzeText } from '../lib/text'
+import { lookupOnline, resolveTranslation, type ClickContext, type Resolution, type UserLexicon } from '../lib/translate'
 import { useApp } from '../store/context'
-import type { TranslationSource } from '../types'
+import type { Certainty, DictEntry, ResolutionSource } from '../types'
+import { useDraggableSheet } from './useDraggableSheet'
 import { IconClose } from './Icons'
 import { useToast } from './toastContext'
 import { KnownWordsContext, LookupContext } from './wordLookupContext'
 
 interface LookupState {
+  click: ClickContext
   surface: string
   anchor: HTMLElement
   status: 'loading' | 'ready'
+  /** Machine translation fetched for this click (used only when offline data has nothing). */
+  online?: string
   entryId?: string
-  lemma?: string
-  translation?: string
-  source?: TranslationSource
   isNew?: boolean
 }
 
-const SOURCE_LABEL: Record<TranslationSource, string> = {
-  builtin: 'Вбудований словник',
-  online: 'Онлайн-переклад',
-  manual: 'Ваш переклад',
+const SOURCE_LABEL: Record<ResolutionSource, string> = {
+  'user-context': 'Ваш переклад для цього питання',
+  user: 'Ваш переклад',
+  question: 'Перевірено для цього питання',
+  phrase: 'Медичний термін',
+  latin: 'Латинська анатомічна назва',
+  abbr: 'Абревіатура',
+  context: 'Значення за контекстом',
+  dictionary: 'Вбудований словник',
+  online: 'Машинний переклад (онлайн)',
   none: 'Переклад не знайдено',
+}
+
+const CERTAINTY_LABEL: Record<Certainty, string> = {
+  verified: 'перевірено',
+  likely: 'ймовірно',
+  uncertain: 'неточно',
+  unknown: 'невідомо',
+}
+
+function lexiconOf(dictionary: DictEntry[]): UserLexicon {
+  const byKey = new Map(dictionary.map((e) => [e.word.toLowerCase(), e]))
+  return (key) => byKey.get(key.toLowerCase())
+}
+
+/** A machine translation is the very last resort, and is always marked as unchecked. */
+function withOnline(r: Resolution, online: string | undefined, cached: DictEntry | undefined): Resolution {
+  if (r.certainty !== 'unknown') return r
+  const text = online ?? (cached?.source === 'online' ? cached.translation : undefined)
+  if (!text) return r
+  return {
+    ...r,
+    translation: text,
+    source: 'online',
+    certainty: 'uncertain',
+    hint: 'Машинний переклад без урахування медичного контексту — перевірте його.',
+  }
 }
 
 export function WordLookupProvider({ children, inTest = false }: { children: ReactNode; inTest?: boolean }) {
@@ -48,7 +82,7 @@ export function WordLookupProvider({ children, inTest = false }: { children: Rea
   const requestRef = useRef(0)
   const compact = useMediaQuery(COMPACT_QUERY)
 
-  const known = useMemo(() => new Set(dictionary.map((e) => e.word)), [dictionary])
+  const known = useMemo(() => new Set(dictionary.map((e) => e.word.toLowerCase())), [dictionary])
 
   // Latest store values for the async lookup without re-creating `open`.
   const latest = useRef({ dictionary, recordLookup, settings })
@@ -56,43 +90,29 @@ export function WordLookupProvider({ children, inTest = false }: { children: Rea
     latest.current = { dictionary, recordLookup, settings }
   })
 
-  const open = useCallback(async (surface: string, anchor: HTMLElement) => {
+  const open = useCallback(async (click: ClickContext, anchor: HTMLElement) => {
     const req = ++requestRef.current
     const { dictionary: dict, recordLookup: record, settings: cfg } = latest.current
-    const keys = storageKeys(surface)
-    const existing = dict.find((e) => keys.includes(e.word))
-    const builtin = lookupBuiltin(surface)
-    const lemma = existing?.word ?? builtin?.lemma ?? normalizeWord(surface)
+    const lexicon = lexiconOf(dict)
+    const surface = analyzeText(click.text).tokens[click.index]?.text ?? ''
+    let resolution = resolveTranslation(click, lexicon)
+    const cached = lexicon(resolution.key)
 
-    const finish = (translation: string, source: TranslationSource) => {
-      if (req !== requestRef.current) return
-      const entry = record(lemma, translation, source)
-      if (!existing) setJustAdded(entry.word)
-      setState({
-        surface,
-        anchor,
-        status: 'ready',
-        entryId: entry.id,
-        lemma: entry.word,
-        translation: entry.translation,
-        source: entry.source,
-        isNew: !existing,
-      })
-    }
-
-    if (existing?.translation) return finish(existing.translation, existing.source)
-    if (builtin) return finish(builtin.translation, 'builtin')
-
-    if (cfg.onlineTranslate && navigator.onLine) {
-      setState({ surface, anchor, status: 'loading', lemma })
+    let online: string | undefined
+    const hasCachedOnline = cached?.source === 'online' && !!cached.translation
+    if (resolution.certainty === 'unknown' && resolution.kind !== 'latin' && !hasCachedOnline && cfg.onlineTranslate && navigator.onLine) {
+      setState({ click, surface, anchor, status: 'loading' })
       try {
-        const online = await lookupOnline(lemma)
-        if (online) return finish(online, 'online')
+        online = (await lookupOnline(resolution.kind === 'phrase' ? resolution.unitText : resolution.lemma)) ?? undefined
       } catch {
-        // network error — fall through to "not found"
+        // network error — the result stays "unknown"
       }
     }
-    finish('', 'none')
+    if (req !== requestRef.current) return
+    resolution = withOnline(resolution, online, cached)
+    const entry = record(resolution)
+    if (!cached) setJustAdded(entry.word)
+    setState({ click, surface, anchor, status: 'ready', online, entryId: entry.id, isNew: !cached })
   }, [])
 
   const close = useCallback(() => {
@@ -117,26 +137,60 @@ export function WordLookupProvider({ children, inTest = false }: { children: Rea
   )
 }
 
+/** The sentence with the translated unit emphasised. */
+function ContextLine({ r }: { r: Resolution }) {
+  const s = r.sentence
+  if (!s || s === r.unitText) return null
+  const at = s.toLowerCase().indexOf(r.unitText.toLowerCase())
+  const long = s.length > 180
+  if (at < 0) return <div className="wp-context">{long ? s.slice(0, 177) + '…' : s}</div>
+  const from = long ? Math.max(0, at - 70) : 0
+  const to = long ? Math.min(s.length, at + r.unitText.length + 70) : s.length
+  return (
+    <div className="wp-context">
+      {from > 0 && '…'}
+      {s.slice(from, at)}
+      <b>{s.slice(at, at + r.unitText.length)}</b>
+      {s.slice(at + r.unitText.length, to)}
+      {to < s.length && '…'}
+    </div>
+  )
+}
+
 /** Shared content of the popover and the sheet. */
 function WordCard({ state, onClose }: { state: LookupState; onClose: () => void }) {
-  const { dictionary, updateEntry, deleteEntries, restoreEntries } = useApp()
+  const { dictionary, updateEntry, deleteEntries, restoreEntries, setContextTranslation } = useApp()
   const toast = useToast()
   const entry = state.entryId ? dictionary.find((e) => e.id === state.entryId) : undefined
+  const contextId = state.click.contextId
   const [editing, setEditing] = useState(false)
-  const [draft, setDraft] = useState({ translation: '', note: '' })
+  const [draft, setDraft] = useState({ translation: '', note: '', onlyHere: false })
+
+  // re-resolved from the live dictionary, so an edit shows up at once
+  const r = useMemo(
+    () => withOnline(resolveTranslation(state.click, lexiconOf(dictionary)), state.online, entry),
+    [state.click, state.online, dictionary, entry],
+  )
+  const ownHere = !!(contextId && entry?.contextual?.[contextId])
 
   const startEdit = () => {
-    setDraft({ translation: entry?.translation ?? '', note: entry?.note ?? '' })
+    setDraft({ translation: r.translation || entry?.translation || '', note: entry?.note ?? '', onlyHere: ownHere })
     setEditing(true)
   }
 
   const save = () => {
-    if (entry) {
-      const translation = draft.translation.trim()
+    if (!entry) return setEditing(false)
+    const translation = draft.translation.trim()
+    if (draft.onlyHere && contextId) {
+      setContextTranslation(entry.id, contextId, translation || null)
+      updateEntry(entry.id, { note: draft.note.trim() })
+    } else {
+      if (ownHere && contextId) setContextTranslation(entry.id, contextId, null)
+      const changed = translation !== entry.translation
       updateEntry(entry.id, {
         translation,
         note: draft.note.trim(),
-        source: translation !== entry.translation ? 'manual' : entry.source,
+        ...(changed ? { source: 'manual' as const, origin: 'user' as const, certainty: 'verified' as const } : {}),
       })
     }
     setEditing(false)
@@ -149,10 +203,8 @@ function WordCard({ state, onClose }: { state: LookupState; onClose: () => void 
     onClose()
   }
 
-  const lemma = entry?.word ?? state.lemma
-  const showLemma = lemma && lemma !== normalizeWord(state.surface)
-  const translation = entry?.translation ?? state.translation
-  const source = entry?.source ?? state.source
+  const showLemma = r.kind === 'word' && !!r.lemma && r.lemma !== normalizeWord(state.surface)
+  const isUnit = r.kind !== 'word' && normalizeWord(r.unitText) !== normalizeWord(state.surface)
 
   return (
     <>
@@ -161,7 +213,8 @@ function WordCard({ state, onClose }: { state: LookupState; onClose: () => void 
           <span className="wp-word">
             <mark>{state.surface}</mark>
           </span>
-          {showLemma && <span className="wp-lemma">→ {lemma}</span>}
+          {showLemma && <span className="wp-lemma">→ {r.lemma}</span>}
+          {isUnit && <div className="wp-unit">у складі «{r.unitText}»</div>}
         </div>
         <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Закрити">
           <IconClose size={16} />
@@ -173,7 +226,7 @@ function WordCard({ state, onClose }: { state: LookupState; onClose: () => void 
       ) : editing ? (
         <div className="wp-edit">
           <div className="grid gap-1.5">
-            <Label htmlFor="wp-translation">Переклад</Label>
+            <Label htmlFor="wp-translation">Переклад «{r.kind === 'word' ? r.lemma : r.unitText}»</Label>
             <Input
               id="wp-translation"
               autoFocus
@@ -182,6 +235,18 @@ function WordCard({ state, onClose }: { state: LookupState; onClose: () => void 
               onKeyDown={(e) => e.key === 'Enter' && save()}
             />
           </div>
+          {contextId && (
+            <div className="flex items-center justify-between gap-3">
+              <Label htmlFor="wp-only-here" className="font-normal text-muted-foreground">
+                Лише для цього питання
+              </Label>
+              <Switch
+                id="wp-only-here"
+                checked={draft.onlyHere}
+                onCheckedChange={(v) => setDraft((d) => ({ ...d, onlyHere: v }))}
+              />
+            </div>
+          )}
           <div className="grid gap-1.5">
             <Label htmlFor="wp-note">Примітка</Label>
             <Textarea
@@ -203,18 +268,32 @@ function WordCard({ state, onClose }: { state: LookupState; onClose: () => void 
         </div>
       ) : (
         <>
-          <div className={`wp-translation${translation ? '' : ' muted'}`}>
-            {translation || 'Перекладу немає — додайте свій.'}
+          <div className={`wp-translation${r.translation ? '' : ' muted'}`}>
+            {r.translation || 'Перекладу немає у вбудованому словнику — додайте свій.'}
           </div>
+          {r.wordMeaning && isUnit && (
+            <div className="wp-word-meaning">
+              {state.surface} тут — <b>{r.wordMeaning}</b>
+            </div>
+          )}
+          {r.alternatives.length > 0 && <div className="wp-alternatives">Інші значення: {r.alternatives.join('; ')}</div>}
+          {r.hint && <div className="wp-hint">{r.hint}</div>}
           {entry?.note && <div className="wp-note">{entry.note}</div>}
+          <ContextLine r={r} />
           <div className="wp-meta">
-            {source && <span>{SOURCE_LABEL[source]}</span>}
+            <span className={`wp-certainty ${r.certainty}`}>{CERTAINTY_LABEL[r.certainty]}</span>
+            <span>{SOURCE_LABEL[r.source]}</span>
             <span className="wp-saved">{state.isNew ? 'Додано до словника' : 'Уже у словнику'}</span>
           </div>
           <div className="row">
             <Button size="sm" variant="outline" onClick={startEdit}>
-              Редагувати
+              {r.translation ? 'Виправити' : 'Додати переклад'}
             </Button>
+            {ownHere && contextId && entry && (
+              <Button size="sm" variant="ghost" onClick={() => setContextTranslation(entry.id, contextId, null)}>
+                Скинути для питання
+              </Button>
+            )}
             <Button size="sm" variant="destructive" onClick={remove}>
               Прибрати
             </Button>

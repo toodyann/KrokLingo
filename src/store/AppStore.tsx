@@ -2,6 +2,7 @@ import { use, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState
 import { BUILTIN_BANK } from '../data/bank'
 import { STORAGE_KEYS, loadJSON, saveJSON } from '../lib/storage'
 import { uid } from '../lib/util'
+import { refreshedTranslation, storedText, type Resolution } from '../lib/translate'
 import type { ActiveSession, AttemptRecord, CustomBank, DictEntry, Settings, TranslationSource } from '../types'
 import { AppContext, type AppState, type Bank } from './context'
 import { DEFAULT_SETTINGS } from './defaults'
@@ -80,17 +81,44 @@ export function AppProvider({ children }: { children: ReactNode }) {
     sessionIdRef.current = session?.id
   }, [session?.id])
 
+  // Built-in data may have changed since entries were saved: refresh automatic translations once per
+  // load. The user's own ('manual') translations and per-question overrides are never touched.
+  useEffect(() => {
+    setDictionary((prev) => {
+      let changed = false
+      const next = prev.map((e) => {
+        const fresh = refreshedTranslation(e)
+        if (!fresh || fresh.translation === e.translation) return e
+        changed = true
+        return { ...e, translation: fresh.translation, certainty: fresh.certainty, origin: fresh.origin, source: 'builtin' as const }
+      })
+      return changed ? next : prev
+    })
+  }, [setDictionary])
+
   const recordLookup = useCallback(
-    (word: string, translation: string, source: TranslationSource): DictEntry => {
-      const key = word.toLowerCase()
+    (res: Resolution): DictEntry => {
+      const key = res.key.toLowerCase()
       const now = Date.now()
+      const source: TranslationSource = res.source === 'online' ? 'online' : res.translation ? 'builtin' : 'none'
       const existing = dictionary.find((e) => e.word.toLowerCase() === key)
       if (existing) {
+        // Keep the entry stable: an automatic translation is replaced only by a translation for the
+        // same context (e.g. after a data update) or when it had none. The user's own text stays.
+        const auto = existing.source !== 'manual'
+        const sameContext = existing.contextId === res.contextId
+        const replace =
+          auto && !!res.translation && res.source !== 'user' && res.source !== 'user-context' && (!existing.translation || sameContext)
         const updated: DictEntry = {
           ...existing,
           lookups: existing.lookups + 1,
-          // fill a missing translation, but never overwrite the user's own edits
-          ...(existing.translation ? {} : translation ? { translation, source, updatedAt: now } : {}),
+          surface: existing.surface ?? res.clicked,
+          context: existing.context ?? res.sentence,
+          contextId: existing.contextId ?? res.contextId,
+          kind: existing.kind ?? res.kind,
+          ...(replace
+            ? { translation: storedText(res), source, origin: res.source, certainty: res.certainty, updatedAt: now }
+            : {}),
         }
         setDictionary((prev) => prev.map((e) => (e.id === existing.id ? updated : e)))
         return updated
@@ -98,7 +126,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const entry: DictEntry = {
         id: uid('w'),
         word: key,
-        translation,
+        translation: storedText(res),
         note: '',
         source,
         addedAt: now,
@@ -107,11 +135,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
         lookups: 1,
         learned: false,
         box: 0,
+        surface: res.clicked,
+        context: res.sentence,
+        contextId: res.contextId,
+        kind: res.kind,
+        origin: res.source,
+        certainty: res.certainty,
       }
       setDictionary((prev) => [entry, ...prev])
       return entry
     },
     [dictionary, setDictionary],
+  )
+
+  const setContextTranslation = useCallback(
+    (id: string, contextId: string, translation: string | null) =>
+      setDictionary((prev) =>
+        prev.map((e) => {
+          if (e.id !== id) return e
+          const contextual = { ...e.contextual }
+          if (translation) contextual[contextId] = translation
+          else delete contextual[contextId]
+          return { ...e, contextual: Object.keys(contextual).length ? contextual : undefined, updatedAt: Date.now() }
+        }),
+      ),
+    [setDictionary],
   )
 
   const addEntry = useCallback(
@@ -175,6 +223,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     dictionary,
     findEntry,
     recordLookup,
+    setContextTranslation,
     addEntry,
     updateEntry,
     deleteEntries,

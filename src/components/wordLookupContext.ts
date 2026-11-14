@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react'
+import type { ClickContext } from '../lib/translate'
 
-export type LookupFn = (word: string, anchor: HTMLElement) => void
+export type LookupFn = (click: ClickContext, anchor: HTMLElement) => void
 
 export const LookupContext = createContext<LookupFn>(() => {})
 
@@ -9,9 +10,9 @@ export function useWordLookup(): LookupFn {
 }
 
 export interface KnownWords {
-  /** Dictionary words (lowercase base forms). */
+  /** Dictionary keys (lowercase base forms and phrases). */
   known: ReadonlySet<string>
-  /** Word added most recently — gets the marker swipe animation. */
+  /** Key added most recently — gets the marker swipe animation. */
   justAdded: string | null
 }
 
