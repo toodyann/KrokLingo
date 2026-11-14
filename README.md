@@ -86,11 +86,11 @@
 
 ## Стек
 
-React 19, TypeScript, Vite, Tailwind CSS v4, shadcn/ui (Radix), Recharts, Oxlint, шрифт Geist (локально, з кирилицею). Кожна сторінка вантажиться окремим чанком. Пружинна анімація власна, `.docx` збирається власним ZIP-записувачем.
+React 19, TypeScript, Vite, Fastify, Drizzle, PostgreSQL (Supabase), Tailwind CSS v4, shadcn/ui (Radix), Recharts, Oxlint, шрифт Geist (локально, з кирилицею). Кожна сторінка вантажиться окремим чанком. Пружинна анімація власна, `.docx` збирається власним ZIP-записувачем.
 
 ## Розробка
 
-Потрібен Node.js 22.12+ (версія закріплена в `.nvmrc`).
+Монорепозиторій на npm workspaces. Потрібен Node.js 22.12+ (версія закріплена в `.nvmrc`).
 
 ```bash
 nvm use
@@ -100,28 +100,71 @@ npm run dev
 
 | Команда | Що робить |
 | --- | --- |
-| `npm run dev` | Дев-сервер з гарячим перезавантаженням |
-| `npm run build` | Перевірка типів і продакшн-збірка в `dist/` |
-| `npm run preview` | Локальний перегляд продакшн-збірки |
+| `npm run dev` | Фронтенд з гарячим перезавантаженням |
+| `npm run dev:api` | API з перезапуском при змінах (потрібен `apps/api/.env`) |
+| `npm run build` | Перевірка типів і продакшн-збірка фронтенду в `apps/web/dist/` |
 | `npm run lint` / `lint:fix` | Перевірка коду Oxlint |
-| `npm run typecheck` | Лише перевірка типів |
+| `npm run typecheck` | Перевірка типів у всіх пакетах |
+| `npm test` | Тести всіх пакетів (API — на PGlite у пам'яті, без Docker) |
 
 ## Структура
 
 ```
-src/
-├── data/            оригінальні питання (questions/), буклети (booklets/), теми, словник (glossary.ts)
-├── lib/             лематизатор, переклад, сесії тесту, статистика, експорт .txt/.docx, імпорт, сховище
-├── store/           глобальний стан і збереження в localStorage
-├── styles/          токени, база, layout і стилі розділів (шари CSS під Tailwind)
-├── components/
-│   ├── ui/          компоненти shadcn/ui
-│   └── …            клікабельний текст, переклад, питання, графіки, порожні стани
-└── pages/           огляд, тести, іспит, тренування, тест, результати, історія, словник, картки, налаштування
+apps/
+├── web/                фронтенд (React, Vite) — деплоїться на GitHub Pages
+│   └── src/
+│       ├── data/       оригінальні питання, буклети, теми, словник
+│       ├── lib/        переклад, сесії тесту, статистика, імпорт/експорт, роутер; cloud/ — синхронізація
+│       ├── store/      глобальний стан: localStorage і синхронізація з обліковим записом
+│       ├── components/ ui/ (shadcn) і власні компоненти
+│       └── pages/
+└── api/                бекенд (Fastify, Drizzle, PostgreSQL)
+    ├── src/            сервер, перевірка токенів Supabase, маршрути, схема БД
+    └── drizzle/        SQL-міграції
+packages/
+└── shared/             спільні типи даних і контракт API
 ```
+
+## Обліковий запис і бекенд
+
+Без налаштування все працює як раніше: дані живуть у браузері. Коли задано змінні для синхронізації, у **Налаштуваннях** з'являється «Увійти через Google»:
+
+- Після входу історія, словник, налаштування, незавершений тест і імпортовані збірники зберігаються в обліковому записі.
+- Під час першого входу дані, зібрані в браузері до того, переносяться в обліковий запис.
+- Далі кожна зміна відправляється на сервер. Без мережі зміни чекають і відправляються, щойно з'явиться зв'язок.
+- Після виходу дані залишаються в обліковому записі, а з браузера прибираються.
+
+Банк питань лишається у фронтенді: він однаковий для всіх і працює офлайн.
+
+**Як це влаштовано:**
+
+- **Вхід:** Supabase Auth через Google.
+- **API:** Fastify перевіряє токен Supabase (через JWKS проєкту) і зберігає дані користувача в PostgreSQL Supabase через Drizzle.
+- **Захист:** на всіх таблицях увімкнено Row Level Security без політик, тож доступ до даних можливий лише через API.
+
+### Налаштування (один раз)
+
+1. **Проєкт Supabase.** Створіть проєкт на [supabase.com](https://supabase.com). Знадобляться:
+   - **Project URL** і **publishable (anon) key** — з *Project Settings → API*;
+   - рядок підключення до бази — з *Connect → Connection string*.
+2. **Вхід через Google.**
+   - У [Google Cloud Console](https://console.cloud.google.com/apis/credentials) створіть OAuth Client ID (*Web application*). Як *Authorized redirect URI* вкажіть `https://<project-ref>.supabase.co/auth/v1/callback`.
+   - У Supabase увімкніть *Authentication → Sign In / Providers → Google* і вставте Client ID та Secret.
+   - У *Authentication → URL Configuration* додайте до *Redirect URLs* `https://toodyann.github.io/KrokLingo/` і `http://localhost:5174/`.
+3. **База даних.** Створіть `apps/api/.env` за зразком `apps/api/.env.example` і застосуйте міграції:
+   ```bash
+   npm run db:migrate -w @kroklingo/api
+   ```
+4. **API.** Локальний запуск: `npm run dev:api` (порт 8787). Для продакшну API потрібен Node-хостинг, наприклад Render, Fly.io чи Railway:
+   - команда запуску: `npm start -w @kroklingo/api`;
+   - змінні середовища: ті самі, що в `.env`;
+   - `CORS_ORIGINS` має містити `https://toodyann.github.io`.
+5. **Фронтенд.**
+   - Для розробки: `apps/web/.env.local` за зразком `apps/web/.env.example`.
+   - Для GitHub Pages: змінні репозиторію `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_API_URL` (*Settings → Secrets and variables → Actions → Variables*). Наступний деплой увімкне вхід на сайті.
 
 ## Деплой
 
-Кожен пуш у `main` збирає застосунок і публікує його на GitHub Pages (`.github/workflows/deploy.yml`).
+Кожен пуш у `main` перевіряє код (lint, тести всіх пакетів), збирає фронтенд і публікує його на GitHub Pages (`.github/workflows/deploy.yml`). Щоб прямі посилання на розділи працювали на Pages, збірка копіює `index.html` у `404.html`.
 
 Перед першим деплоєм потрібно один раз увімкнути Pages: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
