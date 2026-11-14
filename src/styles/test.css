@@ -170,6 +170,10 @@
   border: 1px solid var(--border);
 }
 
+.passage > div {
+  white-space: pre-line;
+}
+
 .passage summary {
   display: flex;
   align-items: center;

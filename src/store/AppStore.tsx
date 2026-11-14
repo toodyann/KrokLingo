@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { use, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { BUILTIN_BANK } from '../data/bank'
 import { STORAGE_KEYS, loadJSON, saveJSON } from '../lib/storage'
 import { uid } from '../lib/util'
@@ -7,6 +7,9 @@ import { AppContext, type AppState, type Bank } from './context'
 import { DEFAULT_SETTINGS } from './defaults'
 
 const EMPTY_BANK: CustomBank = { collections: [], questions: [], passages: [] }
+
+// The booklet bank (~2,400 items) lives in its own chunk; loading starts as soon as the app boots.
+const bookletsPromise = import('../data/booklets').then((m) => m.loadBooklets())
 
 function usePersistent<T>(key: string, initial: T, onError: () => void) {
   const [value, setValue] = useState<T>(() => loadJSON<T>(key, initial))
@@ -32,6 +35,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [customBank, setCustomBank] = usePersistent<CustomBank>(STORAGE_KEYS.customBank, EMPTY_BANK, onError)
 
   const settings = useMemo(() => ({ ...DEFAULT_SETTINGS, ...storedSettings }), [storedSettings])
+  const booklets = use(bookletsPromise)
 
   const bank = useMemo<Bank>(() => {
     const topics = [...BUILTIN_BANK.topics]
@@ -42,9 +46,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         topics.push({ id: q.topic, name: q.topic })
       }
     }
-    const collections = [...BUILTIN_BANK.collections, ...customBank.collections]
-    const questions = [...BUILTIN_BANK.questions, ...customBank.questions]
-    const passages = [...BUILTIN_BANK.passages, ...customBank.passages]
+    const collections = [...BUILTIN_BANK.collections, ...booklets.collections, ...customBank.collections]
+    const questions = [...BUILTIN_BANK.questions, ...booklets.questions, ...customBank.questions]
+    const passages = [...BUILTIN_BANK.passages, ...booklets.passages, ...customBank.passages]
     const topicNames = new Map(topics.map((t) => [t.id, t.name]))
     return {
       topics,
@@ -55,7 +59,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       passageById: new Map(passages.map((p) => [p.id, p])),
       topicName: (id: string) => topicNames.get(id) ?? id,
     }
-  }, [customBank])
+  }, [booklets, customBank])
 
   const updateSettings = useCallback(
     (patch: Partial<Settings>) => setSettings((prev) => ({ ...DEFAULT_SETTINGS, ...prev, ...patch })),

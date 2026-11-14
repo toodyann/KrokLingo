@@ -3,6 +3,7 @@ import { anatomy, biochemistry, histology, microbiology, pathology, pharmacology
 import { passages, reading, terminology } from './questions/english'
 
 export const TOPICS: Topic[] = [
+  { id: 'biology', name: 'Медична біологія' },
   { id: 'anatomy', name: 'Анатомія' },
   { id: 'histology', name: 'Гістологія та ембріологія' },
   { id: 'physiology', name: 'Фізіологія' },

@@ -230,10 +230,13 @@ function Shell() {
 }
 
 function App() {
+  // AppProvider suspends until the booklet question bank chunk has loaded.
   return (
-    <AppProvider>
-      <Shell />
-    </AppProvider>
+    <Suspense fallback={null}>
+      <AppProvider>
+        <Shell />
+      </AppProvider>
+    </Suspense>
   )
 }
 
