@@ -61,18 +61,12 @@ function lexiconOf(dictionary: DictEntry[]): UserLexicon {
   return (key) => byKey.get(key.toLowerCase())
 }
 
-/** A machine translation is the very last resort, and is always marked as unchecked. */
+/** A machine translation is the very last resort, and is always marked as unchecked ("неточно"). */
 function withOnline(r: Resolution, online: string | undefined, cached: DictEntry | undefined): Resolution {
   if (r.certainty !== 'unknown') return r
   const text = online ?? (cached?.source === 'online' ? cached.translation : undefined)
   if (!text) return r
-  return {
-    ...r,
-    translation: text,
-    source: 'online',
-    certainty: 'uncertain',
-    hint: 'Машинний переклад без урахування медичного контексту — перевірте його.',
-  }
+  return { ...r, translation: text, source: 'online', certainty: 'uncertain', hint: undefined }
 }
 
 export function WordLookupProvider({ children, inTest = false }: { children: ReactNode; inTest?: boolean }) {
@@ -282,7 +276,7 @@ function WordCard({ state, onClose }: { state: LookupState; onClose: () => void 
           <ContextLine r={r} />
           <div className="wp-meta">
             <span className={`wp-certainty ${r.certainty}`}>{CERTAINTY_LABEL[r.certainty]}</span>
-            <span>{SOURCE_LABEL[r.source]}</span>
+            {r.source !== 'online' && <span>{SOURCE_LABEL[r.source]}</span>}
             <span className="wp-saved">{state.isNew ? 'Додано до словника' : 'Уже у словнику'}</span>
           </div>
           <div className="row">
