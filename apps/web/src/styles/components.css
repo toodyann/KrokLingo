@@ -516,3 +516,66 @@ body:has(.main-test) .toast-region {
     border-color: var(--border-strong);
   }
 }
+
+/* ---------- first load of the question bank ---------- */
+
+.bank-gate {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+  padding: var(--s-8) var(--s-5);
+  text-align: center;
+}
+
+.bank-gate h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+}
+
+.bank-gate p {
+  max-width: 46ch;
+  color: var(--text-2);
+}
+
+.bank-gate-detail {
+  font-size: var(--fs-sm);
+  color: var(--text-3) !important;
+}
+
+.bank-gate-mascot {
+  margin-bottom: var(--s-2);
+  animation: mascot-bob 2.4s ease-in-out infinite;
+}
+
+.bank-gate-spinner {
+  width: 28px;
+  height: 28px;
+  margin-top: var(--s-2);
+  border-radius: 50%;
+  border: 3px solid var(--border-strong);
+  border-top-color: var(--text);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes mascot-bob {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bank-gate-mascot,
+  .bank-gate-spinner {
+    animation: none;
+  }
+}

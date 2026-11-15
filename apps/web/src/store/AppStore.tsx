@@ -1,5 +1,7 @@
 import { use, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { BUILTIN_BANK } from '../data/bank'
+import { BankGate } from '../components/BankGate'
+import { TOPICS } from '../data/topics'
+import { decodeBank, fetchBank, readCachedBank, writeCachedBank, type ServerBank } from '../lib/bankSource'
 import { STORAGE_KEYS, loadJSON, saveJSON } from '../lib/storage'
 import { uid } from '../lib/util'
 import { refreshedTranslation, storedText, type Resolution } from '../lib/translate'
@@ -11,8 +13,9 @@ import { DEFAULT_SETTINGS } from './defaults'
 
 const EMPTY_BANK: CustomBank = { collections: [], questions: [], passages: [] }
 
-// The booklet bank (~2,400 items) lives in its own chunk; loading starts as soon as the app boots.
-const bookletsPromise = import('../data/booklets').then((m) => m.loadBooklets())
+// The question bank comes from the server. The copy cached in this browser (if any) is read at boot,
+// so returning visitors start at once; the server is then asked whether it changed.
+const cachedBankPromise: Promise<ServerBank | null> = readCachedBank().then((p) => (p ? decodeBank(p) : null))
 
 function usePersistent<T>(key: string, initial: T, onError: () => void) {
   const [value, setValue] = useState<T>(() => loadJSON<T>(key, initial))
@@ -41,10 +44,35 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const setCustomBank = useCallback((bank: CustomBank) => setStoredBank(bank), [setStoredBank])
 
   const settings = useMemo(() => ({ ...DEFAULT_SETTINGS, ...storedSettings }), [storedSettings])
-  const booklets = use(bookletsPromise)
+  const cachedBank = use(cachedBankPromise)
+  const [serverBank, setServerBank] = useState<ServerBank | null>(cachedBank)
+  const [bankError, setBankError] = useState<string | null>(null)
+  const [bankAttempt, setBankAttempt] = useState(0)
+  const bankVersion = useRef(cachedBank?.version)
+
+  useEffect(() => {
+    const ctrl = new AbortController()
+    fetchBank(bankVersion.current, ctrl.signal)
+      .then((payload) => {
+        if (payload) {
+          bankVersion.current = payload.version
+          setServerBank(decodeBank(payload))
+          void writeCachedBank(payload)
+        }
+        setBankError(null)
+      })
+      .catch((err: unknown) => {
+        if (!ctrl.signal.aborted) setBankError(err instanceof Error ? err.message : String(err))
+      })
+    return () => ctrl.abort()
+  }, [bankAttempt])
+  const retryBank = useCallback(() => {
+    setBankError(null)
+    setBankAttempt((n) => n + 1)
+  }, [])
 
   const bank = useMemo<Bank>(() => {
-    const topics = [...BUILTIN_BANK.topics]
+    const topics = [...TOPICS]
     const knownTopics = new Set(topics.map((t) => t.id))
     for (const q of customBank.questions) {
       if (!knownTopics.has(q.topic)) {
@@ -52,9 +80,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
         topics.push({ id: q.topic, name: q.topic })
       }
     }
-    const collections = [...BUILTIN_BANK.collections, ...booklets.collections, ...customBank.collections]
-    const questions = [...BUILTIN_BANK.questions, ...booklets.questions, ...customBank.questions]
-    const passages = [...BUILTIN_BANK.passages, ...booklets.passages, ...customBank.passages]
+    const server = serverBank ?? { collections: [], questions: [], passages: [] }
+    const collections = [...server.collections, ...customBank.collections]
+    const questions = [...server.questions, ...customBank.questions]
+    const passages = [...server.passages, ...customBank.passages]
     const topicNames = new Map(topics.map((t) => [t.id, t.name]))
     return {
       topics,
@@ -65,7 +94,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       passageById: new Map(passages.map((p) => [p.id, p])),
       topicName: (id: string) => topicNames.get(id) ?? id,
     }
-  }, [booklets, customBank])
+  }, [serverBank, customBank])
 
   const updateSettings = useCallback(
     (patch: Partial<Settings>) => setSettings((prev) => ({ ...DEFAULT_SETTINGS, ...prev, ...patch })),
@@ -265,6 +294,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     account,
     resetAll,
   }
+
+  // First visit: nothing to practise until the bank arrives (the free server may need a minute to wake).
+  if (!serverBank) return <BankGate error={bankError} onRetry={retryBank} />
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
 }

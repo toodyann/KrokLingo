@@ -1,5 +1,5 @@
-// Builds src/data/booklets/*.json (one file per collection) from the downloaded booklet sources.
-// Usage: node scripts/booklets/build.cjs <sources dir> src/data/booklets
+// Builds bank/*.json (one file per collection) from the downloaded booklet sources.
+// Usage: node scripts/booklets/build.cjs <sources dir> bank
 const fs = require('fs')
 const path = require('path')
 const { parseBookletText, parseMedicalClub, readText } = require('./parse.cjs')

@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { BUILTIN_BANK } from './bank'
 import { refineTopic, TOPICS } from './topics'
+
+// The bank files the API serves (apps/api/bank): [id, topic, …] rows or { id, topic, … } objects.
+const files = import.meta.glob<{ questions: unknown[] }>('../../../api/bank/*.json', { eager: true, import: 'default' })
+const bankQuestions = Object.values(files).flatMap((file) =>
+    file.questions.map((q) => {
+      const [id, topic, text, options] = Array.isArray(q)
+        ? (q as [string, string, string, string[]])
+        : [(q as { id: string }).id, (q as { topic: string }).topic, (q as { text: string }).text, (q as { options: string[] }).options]
+      return { id, topic: refineTopic(topic, text, options) }
+    }),
+)
 
 describe('detailed topics', () => {
   it('moves head, neck and dental anatomy out of general anatomy', () => {
@@ -28,8 +38,9 @@ describe('detailed topics', () => {
     expect(refineTopic('pharmacology', 'What drug blocks the sodium channels?', ['Lidocaine'])).toBe('pharmacology')
   })
 
-  it('every built-in question has a known topic', () => {
+  it('every question in the bank has a known topic', () => {
     const ids = new Set(TOPICS.map((t) => t.id))
-    for (const q of BUILTIN_BANK.questions) expect(ids.has(q.topic), q.id).toBe(true)
+    expect(bankQuestions.length).toBeGreaterThan(2000)
+    for (const q of bankQuestions) expect(ids.has(q.topic), q.id).toBe(true)
   })
 })
