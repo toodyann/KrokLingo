@@ -1,0 +1,16 @@
+# Generated or data files
+apps/api/bank/
+apps/api/drizzle/
+apps/api/scripts/booklets/txt/
+apps/api/scripts/booklets/html/
+package-lock.json
+# word lists kept compact on purpose (one sense per line)
+apps/web/src/data/translation/senses.ts
+
+# Build output and reports
+dist/
+dev-dist/
+coverage/
+
+# Local Claude Code config
+.claude/
