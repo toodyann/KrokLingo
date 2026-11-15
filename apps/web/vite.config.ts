@@ -44,6 +44,19 @@ const pwa = VitePWA({
     navigateFallback: 'index.html',
     cleanupOutdatedCaches: true,
     maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+    runtimeCaching: [
+      {
+        // the Google profile picture (sidebar, Profile tab): shown offline too, refreshed when online
+        urlPattern: /^https:\/\/lh3\.googleusercontent\.com\//,
+        handler: 'StaleWhileRevalidate',
+        options: {
+          cacheName: 'avatars',
+          expiration: { maxEntries: 4, maxAgeSeconds: 30 * 24 * 60 * 60 },
+          // a plain <img> from another origin gives an opaque response (status 0)
+          cacheableResponse: { statuses: [0, 200] },
+        },
+      },
+    ],
   },
 })
 

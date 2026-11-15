@@ -13,8 +13,8 @@
     "build": "npm run build -w @kroklingo/web",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "prettier --write . --cache --cache-location .cache/prettier --cache-strategy content",
+    "format:check": "prettier --check . --cache --cache-location .cache/prettier --cache-strategy content",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "test:coverage": "npm run test --workspaces --if-present -- --coverage --coverage.reporter=text-summary --coverage.reporter=html --coverage.reporter=json-summary"

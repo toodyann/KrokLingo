@@ -1,0 +1,25 @@
+name: Setup
+description: >
+  Node from .nvmrc and the installed dependencies. node_modules is restored from the cache while
+  package-lock.json and the Node version are unchanged, so npm ci runs only after a dependency change.
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v5
+      id: node
+      with:
+        node-version-file: .nvmrc
+
+    - uses: actions/cache@v4
+      id: modules
+      with:
+        path: |
+          node_modules
+          apps/*/node_modules
+          packages/*/node_modules
+        key: modules-${{ runner.os }}-node${{ steps.node.outputs.node-version }}-${{ hashFiles('package-lock.json') }}
+
+    - if: steps.modules.outputs.cache-hit != 'true'
+      run: npm ci
+      shell: bash

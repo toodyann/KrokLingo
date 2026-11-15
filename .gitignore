@@ -31,5 +31,6 @@ dist-ssr
 .env.*
 !.env.example
 
-# Test coverage reports
+# Test coverage reports and tool caches
 coverage
+.cache
