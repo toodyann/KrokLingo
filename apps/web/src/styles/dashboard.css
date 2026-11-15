@@ -1,4 +1,394 @@
-/* Dashboard & chart cards (Recharts chrome mapped to tokens). */
+/* Dashboard: bright stat cards, the mascot hero, actions and translucent chart cards. */
+
+.tone-lime {
+  --tone: var(--lime);
+}
+
+.tone-purple {
+  --tone: var(--purple);
+}
+
+.tone-sky {
+  --tone: var(--sky);
+}
+
+.tone-coral {
+  --tone: var(--coral);
+}
+
+.tone-muted {
+  --tone: var(--text-3);
+}
+
+/* ---------- mascot ---------- */
+
+.mascot {
+  display: block;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ---------- stat cards ---------- */
+
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gap);
+  margin-bottom: var(--gap);
+}
+
+@media (max-width: 1279px) {
+  .stat-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .stat-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .stat-card {
+    min-height: 0;
+  }
+}
+
+.stat-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  min-height: 176px;
+  padding: var(--s-5);
+  border-radius: var(--r-xl);
+  color: var(--ink);
+  background: linear-gradient(150deg, var(--tone) 0%, color-mix(in oklab, var(--tone) 84%, #0b1535) 100%);
+  box-shadow:
+    0 14px 34px -16px color-mix(in oklab, var(--tone) 70%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.35);
+  transition:
+    transform 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 22px 44px -16px color-mix(in oklab, var(--tone) 80%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.35);
+}
+
+/* light blob in the corner and a large faded copy of the icon */
+.stat-card::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: -56px;
+  right: -48px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.22);
+}
+
+.stat-card-deco {
+  position: absolute;
+  z-index: -1;
+  right: -12px;
+  bottom: -16px;
+  width: 112px;
+  height: 112px;
+  opacity: 0.13;
+  transform: rotate(-12deg);
+}
+
+.stat-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.stat-card-icon {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.5);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6);
+}
+
+.stat-card-label {
+  font-size: var(--fs-base);
+  font-weight: 650;
+}
+
+.stat-card-value {
+  margin-top: auto;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 1.35rem + 0.9vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.stat-card-unit {
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+.stat-card-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+
+.stat-card-delta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 6px;
+}
+
+.stat-card-delta b {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 8px;
+  border-radius: var(--r-full);
+  background: rgb(11 21 53 / 0.12);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* last seven days on the streak card */
+.week-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.week-dots span {
+  flex: 1;
+  padding: 3px 0;
+  border-radius: 7px;
+  background: rgb(11 21 53 / 0.1);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.week-dots span.on {
+  background: var(--ink);
+  color: var(--tone);
+}
+
+/* accuracy against the pass limit on the accuracy card */
+.mini-meter {
+  position: relative;
+  height: 6px;
+  border-radius: var(--r-full);
+  background: rgb(11 21 53 / 0.16);
+}
+
+.mini-meter-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--ink);
+}
+
+.mini-meter-limit {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  border-radius: 1px;
+  background: #ffffff;
+}
+
+/* ---------- hero: progress message with the mascot ---------- */
+
+.hero-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-6);
+  min-height: 260px;
+  padding: var(--s-8);
+  border-radius: var(--r-xl);
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 82% 40%, rgb(255 255 255 / 0.2), transparent 42%),
+    linear-gradient(135deg, #2f5cf0 0%, #5a4ff0 55%, #8a52e8 100%);
+  box-shadow:
+    var(--glow-brand),
+    inset 0 1px 0 rgb(255 255 255 / 0.2);
+}
+
+.hero-card::before,
+.hero-card::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.07);
+}
+
+.hero-card::before {
+  width: 320px;
+  height: 320px;
+  right: -90px;
+  bottom: -150px;
+}
+
+.hero-card::after {
+  width: 120px;
+  height: 120px;
+  left: 45%;
+  top: -60px;
+}
+
+.hero-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  max-width: 56ch;
+  min-width: 0;
+}
+
+.hero-eyebrow {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.9);
+}
+
+.hero-card h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 1.1rem + 0.9vw, 1.875rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.hero-card p {
+  color: rgb(255 255 255 / 0.92);
+  font-size: var(--fs-md);
+}
+
+.hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin: var(--s-1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero-chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--r-full);
+  background: rgb(255 255 255 / 0.14);
+  border: 1px solid rgb(255 255 255 / 0.2);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-top: var(--s-3);
+}
+
+.hero-mascot {
+  flex: none;
+  width: clamp(150px, 16vw, 240px);
+  filter: drop-shadow(0 18px 28px rgb(8 12 52 / 0.45));
+  animation: mascot-float 6s ease-in-out infinite;
+}
+
+@keyframes mascot-float {
+  50% {
+    transform: translateY(-8px) rotate(-2deg);
+  }
+}
+
+.onboarding {
+  min-height: 320px;
+}
+
+@media (max-width: 640px) {
+  .hero-card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--s-6) var(--s-5);
+  }
+
+  .hero-mascot {
+    order: -1;
+    align-self: center;
+    width: 150px;
+  }
+}
+
+/* ---------- translucent cards for charts and actions ---------- */
+
+.dash-card {
+  position: relative;
+  isolation: isolate;
+  transition: transform 0.2s var(--ease);
+}
+
+/* a delicate glow of the card's accent from the top corner */
+.dash-card::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: -80px;
+  right: -60px;
+  width: 220px;
+  height: 180px;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--tone, var(--brand)) 14%, transparent);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.dash-card .chart-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dash-card .chart-card-title::before {
+  content: '';
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--tone);
+  box-shadow: 0 0 12px color-mix(in oklab, var(--tone) 70%, transparent);
+}
 
 /* chart body inside a shadcn Card */
 .chart-card {
@@ -14,6 +404,7 @@
 
 .chart-card-value b {
   color: var(--text);
+  font-family: var(--font-display);
   font-size: var(--fs-lg);
   letter-spacing: -0.01em;
 }
@@ -21,13 +412,16 @@
 .chart-empty {
   flex: 1;
   min-height: 200px;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
   text-align: center;
   color: var(--text-3);
   font-size: var(--fs-base);
   border: 1px dashed var(--border-strong);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   margin-bottom: var(--s-2);
 }
 
@@ -54,7 +448,7 @@
   min-width: 150px;
   padding: var(--s-2) var(--s-3);
   border-radius: var(--r-md);
-  background: var(--surface-1);
+  background: var(--surface-2);
   border: 1px solid var(--border-strong);
   box-shadow: var(--shadow-md);
   font-size: var(--fs-sm);
@@ -82,10 +476,36 @@
 .chart-tooltip .tt-key {
   display: inline-block;
   width: 12px;
-  height: 2px;
-  border-radius: 1px;
+  height: 3px;
+  border-radius: 2px;
   background: var(--chart-series);
   align-self: center;
+}
+
+/* ---------- meters on the dashboard ---------- */
+
+.dashboard .meter {
+  background: rgb(255 255 255 / 0.08);
+}
+
+.meter-lime > .meter-fill {
+  background: var(--lime);
+}
+
+.meter-coral > .meter-fill {
+  background: var(--coral);
+}
+
+.topic-meters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-3) var(--s-10);
+}
+
+@media (max-width: 1023px) {
+  .topic-meters {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* overall accuracy (meter) */
@@ -98,10 +518,11 @@
 }
 
 .meter-hero .hero {
+  font-family: var(--font-display);
   font-size: clamp(2.25rem, 1.8rem + 1.4vw, 3rem);
   line-height: 1;
-  font-weight: 750;
-  letter-spacing: -0.035em;
+  font-weight: 700;
+  letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -122,10 +543,23 @@
 }
 
 .split-list div {
-  padding: var(--s-2) var(--s-3);
+  position: relative;
+  padding: var(--s-2) var(--s-3) var(--s-2) calc(var(--s-3) + 10px);
   border-radius: var(--r-md);
-  background: var(--surface-2);
+  background: rgb(255 255 255 / 0.04);
   border: 1px solid var(--border);
+}
+
+/* the colour key sits beside the number; the number keeps the text colour */
+.split-list div::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 14px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tone);
 }
 
 .split-list b {
@@ -139,7 +573,8 @@
   color: var(--text-3);
 }
 
-/* quick start actions */
+/* ---------- continue learning ---------- */
+
 .action-list {
   display: flex;
   flex-direction: column;
@@ -150,81 +585,84 @@
   display: flex;
   align-items: center;
   gap: var(--s-3);
-  padding: var(--s-3);
-  border-radius: var(--r-md);
+  padding: 10px var(--s-3) 10px 10px;
+  border-radius: var(--r-lg);
   border: 1px solid var(--border);
-  background: var(--surface-2);
+  background: rgb(255 255 255 / 0.03);
   color: var(--text);
   transition:
-    border-color 0.12s,
-    background 0.12s;
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.2s var(--ease);
 }
 
 .action:hover {
-  border-color: var(--border-strong);
-  background: var(--surface-3);
+  background: rgb(255 255 255 / 0.06);
+  border-color: color-mix(in oklab, var(--tone) 45%, transparent);
+  transform: translateX(2px);
 }
 
 .action-icon {
   flex: none;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--r-md);
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
-  background: var(--brand-soft);
-  color: var(--brand);
-}
-
-.action-icon svg {
-  width: 18px;
-  height: 18px;
+  border-radius: 14px;
+  background: var(--tone);
+  color: var(--ink);
+  box-shadow: 0 8px 18px -8px var(--tone);
 }
 
 .action-main {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .action-title {
-  font-weight: 600;
+  font-weight: 650;
 }
 
 .action-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: var(--fs-sm);
   color: var(--text-2);
 }
 
 .action .chev {
-  width: 16px;
-  height: 16px;
+  flex: none;
+  width: 18px;
+  height: 18px;
   color: var(--text-3);
+  transition:
+    transform 0.2s var(--ease),
+    color 0.15s;
 }
 
-.action.primary {
-  background: var(--brand-bg);
-  border-color: transparent;
-  color: var(--on-brand);
+.action:hover .chev {
+  transform: translateX(3px);
+  color: var(--text);
 }
 
-.action.primary:hover {
-  background: var(--brand-bg-hover);
-}
+@media (prefers-reduced-motion: reduce) {
+  .stat-card,
+  .action,
+  .action .chev,
+  .dash-card {
+    transition: none;
+  }
 
-.action.primary .action-icon {
-  background: rgb(255 255 255 / 0.16);
-  color: var(--on-brand);
-}
+  .stat-card:hover,
+  .action:hover,
+  .action:hover .chev {
+    transform: none;
+  }
 
-.action.primary .action-sub,
-.action.primary .chev {
-  color: rgb(255 255 255 / 0.85);
-}
-
-/* onboarding (no data yet) */
-.onboarding h2 {
-  font-size: var(--fs-2xl);
-  font-weight: 700;
-  letter-spacing: -0.015em;
-  text-wrap: balance;
+  .hero-mascot {
+    animation: none;
+  }
 }
