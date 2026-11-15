@@ -74,7 +74,10 @@ export function TestsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">Симуляція іспиту</CardTitle>
-            <CardDescription>Англійська мова професійного спрямування з таймером і підсумком «склав / не склав».</CardDescription>
+            <CardDescription>
+              {bank.lang === 'uk' ? 'Українська версія' : 'Англійська мова професійного спрямування'} з таймером і
+              підсумком «склав / не склав».
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mode-facts m-0">
