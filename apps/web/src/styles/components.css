@@ -120,8 +120,14 @@ label.list-row:hover {
   height: 22px;
 }
 
+.empty-mascot {
+  margin-bottom: var(--s-2);
+  filter: drop-shadow(0 12px 22px rgb(2 6 23 / 0.45));
+}
+
 .empty .t-title3,
 .empty-title {
+  font-family: var(--font-display);
   color: var(--text);
   font-size: var(--fs-lg);
   font-weight: 650;
