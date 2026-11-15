@@ -536,6 +536,20 @@ body:has(.main-test) {
   filter: drop-shadow(0 2px 8px rgb(255 255 255 / 0.35));
 }
 
+/* profile tab: the Google picture in place of an icon, ringed when the tab is open */
+.tab .avatar {
+  width: 24px;
+  height: 24px;
+  font-size: 11px;
+  box-shadow: 0 0 0 1.5px var(--border-strong);
+}
+
+.tab[aria-current='page'] .avatar {
+  box-shadow:
+    0 0 0 2px var(--bg),
+    0 0 0 3.5px var(--brand);
+}
+
 .tab .tab-badge {
   position: absolute;
   top: 5px;

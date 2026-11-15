@@ -1,7 +1,8 @@
 import { lazy, Suspense, useRef, useState, type ComponentType } from 'react'
-import { BookOpen, ClipboardCheck, History, House, Settings } from 'lucide-react'
+import { BookOpen, CircleUserRound, ClipboardCheck, History, House, Settings } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { Avatar } from './components/Avatar'
 import { BrandMark } from './components/BrandMark'
 import { ConfirmProvider } from './components/ConfirmDialog'
 import { PwaPrompt } from './components/PwaPrompt'
@@ -126,13 +127,30 @@ function TabBar({ route }: { route: Route }) {
             href={link(path)}
             aria-current={routes.includes(route.name) ? 'page' : undefined}
           >
-            <Icon strokeWidth={2} />
-            {label}
+            {path === 'settings' ? (
+              <ProfileTab />
+            ) : (
+              <>
+                <Icon strokeWidth={2} />
+                {label}
+              </>
+            )}
             {path === 'dictionary' && <DictionaryBadge />}
           </a>
         ))}
       </div>
     </nav>
+  )
+}
+
+/** On phones the settings tab is the profile: the Google picture once signed in. */
+function ProfileTab() {
+  const { account } = useApp()
+  return (
+    <>
+      {account.user ? <Avatar user={account.user} size={24} /> : <CircleUserRound strokeWidth={2} />}
+      Профіль
+    </>
   )
 }
 
