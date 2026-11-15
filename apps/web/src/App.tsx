@@ -1,8 +1,8 @@
 import { lazy, Suspense, useRef, useState, type ComponentType } from 'react'
+import { BookOpen, ClipboardCheck, History, House, Settings } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { BrandMark } from './components/BrandMark'
-import { IconBook, IconGear, IconHistory, IconHome, IconTests } from './components/Icons'
 import { ConfirmProvider } from './components/ConfirmDialog'
 import { SidebarAccount } from './components/SidebarAccount'
 import { ToastProvider } from './components/Toast'
@@ -26,17 +26,17 @@ const TrainingSetupPage = lazy(() => import('./pages/TrainingSetupPage').then((m
 interface Tab {
   path: string
   label: string
-  Icon: ComponentType<{ size?: number }>
+  Icon: ComponentType<{ size?: number; strokeWidth?: number }>
   routes: Route['name'][]
 }
 
 // Top-level sections, named for what they contain.
 const TABS: Tab[] = [
-  { path: '', label: 'Головна', Icon: IconHome, routes: ['home'] },
-  { path: 'tests', label: 'Тести', Icon: IconTests, routes: ['tests', 'exam', 'training', 'test'] },
-  { path: 'dictionary', label: 'Словник', Icon: IconBook, routes: ['dictionary', 'flashcards'] },
-  { path: 'history', label: 'Історія', Icon: IconHistory, routes: ['history', 'results'] },
-  { path: 'settings', label: 'Налаштування', Icon: IconGear, routes: ['settings'] },
+  { path: '', label: 'Головна', Icon: House, routes: ['home'] },
+  { path: 'tests', label: 'Тести', Icon: ClipboardCheck, routes: ['tests', 'exam', 'training', 'test'] },
+  { path: 'dictionary', label: 'Словник', Icon: BookOpen, routes: ['dictionary', 'flashcards'] },
+  { path: 'history', label: 'Історія', Icon: History, routes: ['history', 'results'] },
+  { path: 'settings', label: 'Налаштування', Icon: Settings, routes: ['settings'] },
 ]
 
 function DictionaryBadge() {
@@ -97,7 +97,7 @@ function Sidebar({ route }: { route: Route }) {
             href={link(path)}
             aria-current={routes.includes(route.name) ? 'page' : undefined}
           >
-            <Icon />
+            <Icon strokeWidth={2} />
             <span className="label fade">{label}</span>
             {path === 'dictionary' && <DictionaryBadge />}
           </a>
@@ -125,7 +125,7 @@ function TabBar({ route }: { route: Route }) {
             href={link(path)}
             aria-current={routes.includes(route.name) ? 'page' : undefined}
           >
-            <Icon />
+            <Icon strokeWidth={2} />
             {label}
             {path === 'dictionary' && <DictionaryBadge />}
           </a>
