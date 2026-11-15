@@ -332,14 +332,15 @@ body:has(.main-test) {
   background: var(--surface-3);
 }
 
-/* active section: blue gradient pill with a soft glow */
+/* active section: dark grey pill with a hairline edge */
 .side-item[aria-current='page'] {
   background: var(--brand-gradient);
-  color: var(--on-brand);
+  color: var(--text);
   font-weight: 600;
   box-shadow:
     var(--glow-brand),
-    inset 0 1px 0 rgb(255 255 255 / 0.18);
+    inset 0 0 0 1px rgb(255 255 255 / 0.1),
+    inset 0 1px 0 rgb(255 255 255 / 0.12);
 }
 
 .side-item[aria-current='page'] .tab-badge {
