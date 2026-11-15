@@ -11,7 +11,8 @@ services:
     buildCommand: npm ci --workspace @kroklingo/api --omit=dev
     startCommand: npm start --workspace @kroklingo/api
     healthCheckPath: /health
-    autoDeployTrigger: commit
+    # the API deploys only after the commit's GitHub checks (CI) pass
+    autoDeployTrigger: checksPass
     buildFilter:
       paths:
         - apps/api/**
