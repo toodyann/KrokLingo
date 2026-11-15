@@ -4,6 +4,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { BrandMark } from './components/BrandMark'
 import { ConfirmProvider } from './components/ConfirmDialog'
+import { PwaPrompt } from './components/PwaPrompt'
 import { SidebarAccount } from './components/SidebarAccount'
 import { ToastProvider } from './components/Toast'
 import { WordLookupProvider } from './components/WordLookup'
@@ -210,13 +211,17 @@ function Shell() {
 }
 
 function App() {
-  // AppProvider suspends until the booklet question bank chunk has loaded.
+  // AppProvider suspends until the cached question bank has been read; the service worker is
+  // registered beside it, so even a first visit that is still waiting for the bank gets offline files.
   return (
-    <Suspense fallback={null}>
-      <AppProvider>
-        <Shell />
-      </AppProvider>
-    </Suspense>
+    <>
+      <Suspense fallback={null}>
+        <AppProvider>
+          <Shell />
+        </AppProvider>
+      </Suspense>
+      <PwaPrompt />
+    </>
   )
 }
 

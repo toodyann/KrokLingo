@@ -2,6 +2,7 @@ import { useRef, useState, type ChangeEvent } from 'react'
 import { useConfirm } from '../components/confirmContext'
 import { IMPORT_TEMPLATE, parseImport } from '../lib/importQuestions'
 import { AccountCard } from '../components/AccountCard'
+import { InstallCard } from '../components/InstallCard'
 import { downloadFile, pluralUk } from '../lib/util'
 import { Alert, AlertAction, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -220,6 +221,8 @@ export function SettingsPage() {
               </div>
             </CardContent>
           </Card>
+
+          <InstallCard />
         </div>
 
         <div className="stack" style={{ gap: 'var(--gap)' }}>
