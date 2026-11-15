@@ -5,6 +5,7 @@ import type {
   Collection,
   CustomBank,
   DictEntry,
+  Lang,
   Passage,
   Question,
   Settings,
@@ -15,12 +16,19 @@ import type { Account } from './useCloudSync'
 
 export interface Bank {
   topics: Topic[]
+  /** Collections and questions in the chosen question language: what tests are drawn from. */
   collections: Collection[]
   questions: Question[]
   passages: Passage[]
+  /** Lookups cover every language, so history and results always resolve. */
   questionById: Map<string, Question>
   passageById: Map<string, Passage>
+  collectionById: Map<string, Collection>
   topicName: (id: string) => string
+  /** The question language in use and the languages the bank has, with question counts. */
+  lang: Lang
+  langs: { lang: Lang; count: number }[]
+  langOf: (q: Question) => Lang
 }
 
 export interface AppState {

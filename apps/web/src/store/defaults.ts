@@ -5,4 +5,5 @@ export const DEFAULT_SETTINGS: Settings = {
   examQuestions: 50,
   examMinutes: 100,
   onlineTranslate: true,
+  questionLang: 'en',
 }

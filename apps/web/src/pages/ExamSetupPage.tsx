@@ -41,7 +41,11 @@ export function ExamSetupPage() {
       <PageHeader
         back={{ href: link('tests'), label: 'Тести' }}
         title="Симуляція іспиту"
-        subtitle="Англійська мова професійного спрямування · «Крок 1. Стоматологія»"
+        subtitle={
+          bank.lang === 'uk'
+            ? 'Українська версія · «Крок 1. Стоматологія»'
+            : 'Англійська мова професійного спрямування · «Крок 1. Стоматологія»'
+        }
       />
 
       <div className="split">

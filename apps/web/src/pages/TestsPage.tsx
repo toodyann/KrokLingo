@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { IconGrid, IconHistory, IconTests } from '../components/Icons'
+import { LangSwitch } from '../components/LangSwitch'
 import { PageHeader } from '../components/PageHeader'
 import { discardSessionOptions, useConfirm } from '../components/confirmContext'
 import { navigate, link } from '../lib/router'
@@ -51,7 +52,7 @@ export function TestsPage() {
 
   return (
     <div className="page">
-      <PageHeader title="Тести" subtitle={`${bank.questions.length} питань · ${topics.length} тем`} />
+      <PageHeader title="Тести" subtitle={`${bank.questions.length} питань · ${topics.length} тем`} actions={<LangSwitch />} />
 
       {session && (
         <Alert className="mb-6">

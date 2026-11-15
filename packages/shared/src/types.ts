@@ -137,6 +137,8 @@ export interface Settings {
   examQuestions: number
   examMinutes: number
   onlineTranslate: boolean
+  /** Language of the questions used for tests, the exam and training. */
+  questionLang: Lang
 }
 
 export interface CustomBank {

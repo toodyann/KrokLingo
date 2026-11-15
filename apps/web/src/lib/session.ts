@@ -97,7 +97,8 @@ export function mistakeIds(history: AttemptRecord[], bank: Bank): Set<string> {
   for (const record of [...history].sort((a, b) => a.finishedAt - b.finishedAt)) {
     for (const item of record.items) {
       const q = bank.questionById.get(item.qid)
-      if (!q) continue
+      // mistakes are practised in the current question language
+      if (!q || bank.langOf(q) !== bank.lang) continue
       last.set(item.qid, item.chosen === q.correct)
     }
   }

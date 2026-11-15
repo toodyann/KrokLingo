@@ -6,7 +6,7 @@ import { STORAGE_KEYS, loadJSON, saveJSON } from '../lib/storage'
 import { uid } from '../lib/util'
 import { refreshedTranslation, storedText, type Resolution } from '../lib/translate'
 import { EMPTY_STATE, type UserState } from '@kroklingo/shared'
-import type { ActiveSession, AttemptRecord, CustomBank, DictEntry, Settings, TranslationSource } from '../types'
+import type { ActiveSession, AttemptRecord, CustomBank, DictEntry, Lang, Question, Settings, TranslationSource } from '../types'
 import { useCloudSync } from './useCloudSync'
 import { AppContext, type AppState, type Bank } from './context'
 import { DEFAULT_SETTINGS } from './defaults'
@@ -71,6 +71,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setBankAttempt((n) => n + 1)
   }, [])
 
+  const questionLang = settings.questionLang
   const bank = useMemo<Bank>(() => {
     const topics = [...TOPICS]
     const knownTopics = new Set(topics.map((t) => t.id))
@@ -81,20 +82,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
     }
     const server = serverBank ?? { collections: [], questions: [], passages: [] }
-    const collections = [...server.collections, ...customBank.collections]
-    const questions = [...server.questions, ...customBank.questions]
+    const allCollections = [...server.collections, ...customBank.collections]
+    const allQuestions = [...server.questions, ...customBank.questions]
     const passages = [...server.passages, ...customBank.passages]
     const topicNames = new Map(topics.map((t) => [t.id, t.name]))
+    const collectionById = new Map(allCollections.map((c) => [c.id, c]))
+    const langOf = (q: Question): Lang => collectionById.get(q.collection)?.lang ?? 'en'
+
+    const counts = new Map<Lang, number>()
+    for (const q of allQuestions) counts.set(langOf(q), (counts.get(langOf(q)) ?? 0) + 1)
+    const langs = (['en', 'uk'] as const).filter((l) => counts.has(l)).map((lang) => ({ lang, count: counts.get(lang)! }))
+    // the chosen language, or English when the bank has none in it (yet)
+    const lang: Lang = counts.has(questionLang) ? questionLang : 'en'
+
     return {
       topics,
-      collections,
-      questions,
+      collections: allCollections.filter((c) => (c.lang ?? 'en') === lang),
+      questions: allQuestions.filter((q) => langOf(q) === lang),
       passages,
-      questionById: new Map(questions.map((q) => [q.id, q])),
+      questionById: new Map(allQuestions.map((q) => [q.id, q])),
       passageById: new Map(passages.map((p) => [p.id, p])),
+      collectionById,
       topicName: (id: string) => topicNames.get(id) ?? id,
+      lang,
+      langs,
+      langOf,
     }
-  }, [serverBank, customBank])
+  }, [serverBank, customBank, questionLang])
 
   const updateSettings = useCallback(
     (patch: Partial<Settings>) => setSettings((prev) => ({ ...DEFAULT_SETTINGS, ...prev, ...patch })),
