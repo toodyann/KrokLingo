@@ -136,7 +136,8 @@ export function useCloudSync(state: UserState, apply: (next: UserState) => void)
   useEffect(() => {
     if (!cloudEnabled) return
     let unsubscribe = () => {}
-    let current: string | null = null
+    // undefined = not known yet, so the first "no session" also leaves the connecting state
+    let current: string | null | undefined = undefined
     void getSupabase().then((sb) => {
       const onSession = (session: { user: { id: string; email?: string; user_metadata?: Record<string, unknown> } } | null) => {
         const id = session?.user.id ?? null
