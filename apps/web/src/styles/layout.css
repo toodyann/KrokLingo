@@ -348,6 +348,100 @@ body:has(.main-test) {
   margin-left: auto;
 }
 
+/* account button at the bottom; its avatar sits on the same x = 36px axis as the icons */
+.side-account {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--text);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.side-account:hover,
+.side-account[data-state='open'] {
+  background: var(--surface-2);
+}
+
+.side-account:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.side-account-avatar {
+  position: relative;
+  flex: none;
+  display: block;
+}
+
+.side-account > .avatar {
+  width: 32px;
+  height: 32px;
+}
+
+.side-account-dot {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--sidebar-bg);
+}
+
+.side-account-dot.offline {
+  background: var(--warning);
+}
+
+.side-account-dot.error {
+  background: var(--danger);
+}
+
+.side-account-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.side-account-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--fs-base);
+  font-weight: 600;
+}
+
+.side-account-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+}
+
+.avatar {
+  flex: none;
+  display: block;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-initial {
+  display: grid;
+  place-items: center;
+  background: var(--surface-3);
+  color: var(--text-2);
+  font-weight: 600;
+}
+
 /*
  * Rail (collapsed) state and peek. No delays anywhere: the panel and its labels move together.
  * Peek (.peek, set from JS) opens on mouse hover or keyboard focus, not on touch or a mouse click,

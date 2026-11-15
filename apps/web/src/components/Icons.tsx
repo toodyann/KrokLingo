@@ -165,3 +165,29 @@ export function IconDownload(p: IconProps) {
     </Svg>
   )
 }
+
+export function IconLogout(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <path
+        d="M10 4H6.5A2.5 2.5 0 0 0 4 6.5v11A2.5 2.5 0 0 0 6.5 20H10m5-12 4 4-4 4m4-4H9"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </Svg>
+  )
+}
+
+export function IconUser(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <path
+        fill="currentColor"
+        d="M12 3.5a4.25 4.25 0 1 1 0 8.5 4.25 4.25 0 0 1 0-8.5ZM4.5 19.2c0-3.1 3.4-5.2 7.5-5.2s7.5 2.1 7.5 5.2c0 .7-.6 1.3-1.3 1.3H5.8c-.7 0-1.3-.6-1.3-1.3Z"
+      />
+    </Svg>
+  )
+}

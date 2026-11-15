@@ -4,6 +4,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { BrandMark } from './components/BrandMark'
 import { IconBook, IconGear, IconHistory, IconHome, IconTests } from './components/Icons'
 import { ConfirmProvider } from './components/ConfirmDialog'
+import { SidebarAccount } from './components/SidebarAccount'
 import { ToastProvider } from './components/Toast'
 import { WordLookupProvider } from './components/WordLookup'
 import { useRoute, type Route, link } from './lib/router'
@@ -53,10 +54,12 @@ function Sidebar({ route }: { route: Route }) {
   // After choosing a section the pointer is still over the panel; it must not peek straight back
   // open. Hover-peek re-arms once the pointer leaves.
   const suppressPeek = useRef(false)
+  // the account menu keeps the panel open while it is showing
+  const [menuOpen, setMenuOpen] = useState(false)
 
   return (
     <aside
-      className={`sidebar rail${peek ? ' peek' : ''}`}
+      className={`sidebar rail${peek || menuOpen ? ' peek' : ''}`}
       aria-label="Розділи"
       onPointerEnter={(e) => {
         // touch taps navigate directly; only a mouse or pen hover peeks
@@ -100,6 +103,13 @@ function Sidebar({ route }: { route: Route }) {
           </a>
         ))}
       </nav>
+      <SidebarAccount
+        onMenuOpenChange={(open) => {
+          setMenuOpen(open)
+          // closing the menu does not re-open the panel under a pointer that has already left it
+          if (!open) setPeek(false)
+        }}
+      />
     </aside>
   )
 }
