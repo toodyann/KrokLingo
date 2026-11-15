@@ -25,8 +25,8 @@ export function useChartTheme(): ChartTheme {
     () => ({
       series: read('--chart-series', '#78d9f5'),
       grid: read('--chart-grid', 'rgb(255 255 255 / 0.07)'),
-      label2: read('--text-2', '#b4bedb'),
-      surface: read('--surface-1', '#14234a'),
+      label2: read('--text-2', '#b5b5b5'),
+      surface: read('--surface-1', '#121212'),
       accent: {
         lime: read('--lime', '#b7f36b'),
         purple: read('--purple', '#a58bfa'),

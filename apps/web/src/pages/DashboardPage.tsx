@@ -128,7 +128,7 @@ export function DashboardPage() {
               тут з’явиться ваш прогрес.
             </p>
             <div className="hero-actions">
-              <Button asChild size="lg" className="hero-cta rounded-xl bg-white px-5 font-semibold text-[#1d2b6b] shadow-lg hover:bg-white/90">
+              <Button asChild size="lg" className="hero-cta rounded-xl bg-white px-5 font-semibold text-[var(--ink)] shadow-lg hover:bg-white/90">
                 <a href={link('exam')}>Почати іспит</a>
               </Button>
               <Button asChild size="lg" variant="outline" className="hero-ghost rounded-xl border-white/35 bg-white/10 px-5 text-white hover:bg-white/20 hover:text-white dark:border-white/35 dark:bg-white/10 dark:hover:bg-white/20">
@@ -446,7 +446,7 @@ function ProgressHero({
           </li>
         </ul>
         <div className="hero-actions">
-          <Button asChild size="lg" className="hero-cta rounded-xl bg-white px-5 font-semibold text-[#1d2b6b] shadow-lg hover:bg-white/90">
+          <Button asChild size="lg" className="hero-cta rounded-xl bg-white px-5 font-semibold text-[var(--ink)] shadow-lg hover:bg-white/90">
             <a href={link(resume ? 'test' : 'exam')}>{resume ? 'Продовжити тест' : 'Почати іспит'}</a>
           </Button>
         </div>

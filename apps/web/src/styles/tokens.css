@@ -1,6 +1,6 @@
 /*
  * KrokLingo design tokens — the single source for colour, type, space, radius and elevation.
- * One appearance: dark navy with layered translucent cards and a set of bright accents
+ * One appearance: black with layered neutral-grey cards and a set of bright accents
  * (lime, purple, sky, coral, yellow, pink) for the stat cards, actions and chart series.
  * Text/background pairs are WCAG AA (>= 4.5:1); ratios are noted next to the value.
  */
@@ -8,21 +8,21 @@
   color-scheme: dark;
 
   /* surfaces */
-  --bg: #080f2b;
-  --bg-2: #101b40; /* secondary background: wells, tracks */
-  --surface-1: #14234a; /* cards, panels */
-  --surface-2: #1b2c58; /* inputs, hover rows, nested blocks */
-  --surface-3: #243868; /* pressed / selected */
-  --card-glass: rgb(20 35 74 / 0.72); /* chart cards over the glow */
-  --sidebar-bg: #0b1535;
+  --bg: #000000;
+  --bg-2: #0a0a0a; /* secondary background: wells, tracks */
+  --surface-1: #121212; /* cards, panels */
+  --surface-2: #1c1c1c; /* inputs, hover rows, nested blocks */
+  --surface-3: #262626; /* pressed / selected */
+  --card-glass: rgb(18 18 18 / 0.78); /* chart cards */
+  --sidebar-bg: #0a0a0a;
   --border: rgb(255 255 255 / 0.08);
   --border-strong: rgb(255 255 255 / 0.14);
 
   /* text */
-  --text: #f1f4ff; /* 14.0:1 on surface-1 */
-  --text-2: #b4bedb; /* 8.3:1 */
-  --text-3: #8f9bc2; /* 5.6:1 */
-  --ink: #0b1535; /* text on the bright accent cards (>= 6.5:1 on all six) */
+  --text: #f5f5f5; /* 17.2:1 on surface-1 */
+  --text-2: #b5b5b5; /* 9.1:1 */
+  --text-3: #999999; /* 6.6:1 */
+  --ink: #0a0a0a; /* text on the bright accent cards (>= 7.2:1 on all six) */
 
   /* accents */
   --lime: #b7f36b;
@@ -33,21 +33,21 @@
   --pink: #f4a8ce;
 
   /* brand blue */
-  --brand: #f1f4ff; /* white accent: 14.0:1 as text on surface-1 */
+  --brand: #f5f5f5; /* white accent: 17.2:1 as text on surface-1 */
   --brand-strong: #ffffff;
   --brand-bg: #3461e8; /* primary buttons, white text 5.2:1 */
   --brand-bg-hover: #4170f2;
   --brand-gradient: linear-gradient(135deg, #2f5cf0 0%, #6a4ff0 100%);
   --on-brand: #ffffff;
-  --brand-soft: rgb(241 244 255 / 0.1);
-  --brand-ring: rgb(241 244 255 / 0.6);
+  --brand-soft: rgb(245 245 245 / 0.1);
+  --brand-ring: rgb(245 245 245 / 0.6);
 
   /* status */
-  --success: #8fe36b; /* 9.8:1 */
+  --success: #8fe36b; /* 11.9:1 */
   --success-soft: rgb(143 227 107 / 0.14);
-  --danger: #ff8f8f; /* 7.0:1 */
+  --danger: #ff8f8f; /* 8.5:1 */
   --danger-soft: rgb(255 143 143 / 0.14);
-  --warning: #ffd36d; /* 10.8:1 */
+  --warning: #ffd36d; /* 13.2:1 */
   --warning-soft: rgb(255 211 109 / 0.14);
 
   /* highlighter marker — the product signature (words already in the dictionary) */
@@ -56,16 +56,16 @@
 
   /* charts */
   --chart-series: #78d9f5;
-  --chart-track: #0f1c42;
+  --chart-track: #1a1a1a;
   --chart-grid: rgb(255 255 255 / 0.07);
 
   /* elevation */
-  --shadow-sm: 0 1px 2px rgb(2 6 23 / 0.45);
-  --shadow-md: 0 10px 30px rgb(2 6 23 / 0.45), 0 1px 2px rgb(2 6 23 / 0.4);
-  --shadow-lg: 0 24px 64px rgb(2 6 23 / 0.6), 0 2px 8px rgb(2 6 23 / 0.5);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.45);
+  --shadow-md: 0 10px 30px rgb(0 0 0 / 0.45), 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 24px 64px rgb(0 0 0 / 0.6), 0 2px 8px rgb(0 0 0 / 0.5);
   --glow-brand: 0 8px 28px rgb(61 107 255 / 0.35);
-  --overlay-bg: rgb(20 35 74 / 0.9);
-  --scrim: rgb(2 6 23 / 0.6);
+  --overlay-bg: rgb(18 18 18 / 0.9);
+  --scrim: rgb(0 0 0 / 0.6);
 
   /* radius */
   --r-xs: 4px;
