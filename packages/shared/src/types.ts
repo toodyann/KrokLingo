@@ -23,10 +23,15 @@ export interface Topic {
   name: string
 }
 
+/** Language of a collection's questions. */
+export type Lang = 'en' | 'uk'
+
 export interface Collection {
   id: string
   name: string
   description?: string
+  /** 'en' when absent. */
+  lang?: Lang
   custom?: boolean
 }
 

@@ -94,7 +94,21 @@ describe('server.ts over the postgres.js driver', () => {
     expect(await (await fetch(`${base}/health`)).json()).toEqual({ ok: true })
     expect(await (await fetch(`${base}/ready`)).json()).toEqual({ ok: true, db: true })
     const tables = await pg.query<{ tablename: string }>("select tablename from pg_tables where schemaname = 'public' order by 1")
-    expect(tables.rows.map((r) => r.tablename)).toEqual(['active_sessions', 'attempts', 'custom_banks', 'dictionary_entries', 'user_settings'])
+    expect(tables.rows.map((r) => r.tablename)).toEqual([
+      'active_sessions',
+      'attempts',
+      'bank_collections',
+      'bank_meta',
+      'bank_passages',
+      'bank_questions',
+      'custom_banks',
+      'dictionary_entries',
+      'user_settings',
+    ])
+    expect(output).toMatch(/question bank [0-9a-f]{16}: \d+ questions \(seeded\)/)
+    const bank = await fetch(`${base}/api/bank`)
+    expect(bank.status).toBe(200)
+    expect(((await bank.json()) as { questions: unknown[] }).questions.length).toBeGreaterThan(2000)
   })
 
   it('stores and reads user data end to end', async () => {

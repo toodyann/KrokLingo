@@ -4,6 +4,7 @@ import { and, asc, eq, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import type { UserState } from '@kroklingo/shared'
 import type { AuthUser, Verify } from './auth.ts'
+import { bankCache } from './bank.ts'
 import type { Db } from './db/client.ts'
 import { activeSessions, attempts, customBanks, dictionaryEntries, userSettings } from './db/schema.ts'
 
@@ -81,7 +82,8 @@ export async function buildApp(opts: AppOptions): Promise<FastifyInstance> {
   await app.register(cors, {
     origin: opts.corsOrigins,
     methods: ['GET', 'PUT', 'DELETE'],
-    allowedHeaders: ['Authorization', 'Content-Type'],
+    allowedHeaders: ['Authorization', 'Content-Type', 'If-None-Match'],
+    exposedHeaders: ['ETag'],
     maxAge: 600,
   })
 
@@ -103,9 +105,25 @@ export async function buildApp(opts: AppOptions): Promise<FastifyInstance> {
     }
   })
 
-  // every /api route needs a valid Supabase access token
+  // The question bank is public: the app works without an account. One document, cached per version,
+  // sent pre-compressed and revalidated with ETag / If-None-Match.
+  const bank = bankCache(db)
+  app.get('/api/bank', async (req, reply) => {
+    const doc = await bank()
+    const etag = `"${doc.version}"`
+    reply.header('ETag', etag).header('Cache-Control', 'public, max-age=300').header('Vary', 'Accept-Encoding')
+    if (req.headers['if-none-match'] === etag) return reply.code(304).send()
+    const accept = String(req.headers['accept-encoding'] ?? '')
+    reply.type('application/json; charset=utf-8')
+    if (/\bbr\b/.test(accept)) return reply.header('Content-Encoding', 'br').send(doc.brotli)
+    if (/\bgzip\b/.test(accept)) return reply.header('Content-Encoding', 'gzip').send(doc.gzip)
+    return reply.send(doc.json)
+  })
+
+  // every other /api route needs a valid Supabase access token
   app.addHook('onRequest', async (req: FastifyRequest, reply: FastifyReply) => {
     if (!req.url.startsWith('/api/') || req.method === 'OPTIONS') return
+    if (req.method === 'GET' && (req.url === '/api/bank' || req.url.startsWith('/api/bank?'))) return
     const header = req.headers.authorization ?? ''
     const token = header.startsWith('Bearer ') ? header.slice(7) : ''
     if (!token) return reply.code(401).send({ error: 'sign-in required' })

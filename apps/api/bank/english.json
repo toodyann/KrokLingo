@@ -1,0 +1,450 @@
+{
+ "collection": {
+  "id": "english",
+  "name": "Професійна англійська",
+  "description": "Терміни, граматика та тексти для читання",
+  "lang": "en"
+ },
+ "passages": [
+  {
+   "id": "p-caries",
+   "title": "Dental caries",
+   "text": "Dental caries is one of the most common chronic diseases in the world. It develops when bacteria in dental plaque ferment sugars from the diet and produce acids. These acids lower the pH at the tooth surface, and when the pH falls below a critical level, minerals begin to dissolve from the enamel. This process is called demineralization. Saliva can neutralize the acids and supply calcium and phosphate ions, so the early lesion may be repaired. This process is called remineralization. If demineralization happens more often than remineralization, a white spot lesion appears, and later a cavity forms. The frequency of sugar intake is therefore more important than the total amount of sugar eaten. Regular brushing with fluoride toothpaste, a healthy diet and regular dental check-ups can prevent most carious lesions."
+  },
+  {
+   "id": "p-periodontal",
+   "title": "Periodontal disease",
+   "text": "Periodontal disease is a chronic inflammatory condition that affects the tissues supporting the teeth. It usually begins as gingivitis, an inflammation of the gums caused by the accumulation of bacterial plaque along the gingival margin. Gingivitis is reversible: when plaque is removed by effective oral hygiene, the gums return to health. If the inflammation is not treated, it may spread to the periodontal ligament and the alveolar bone. This stage is called periodontitis. In periodontitis, periodontal pockets form, bone is gradually destroyed, and the teeth may become loose and eventually be lost. Smoking and poorly controlled diabetes are important risk factors. Treatment includes professional removal of plaque and calculus, instruction in oral hygiene and, in advanced cases, surgery."
+  },
+  {
+   "id": "p-fluoride",
+   "title": "Fluoride in dentistry",
+   "text": "Fluoride is widely used to prevent dental caries. It works mainly at the surface of the teeth after they have erupted. Fluoride reduces demineralization, promotes remineralization of early lesions and makes the enamel more resistant to acid by forming fluorapatite. It can also inhibit the metabolism of bacteria in dental plaque. Fluoride is delivered through toothpaste, mouth rinses, varnishes applied by the dentist and, in some countries, fluoridated drinking water. However, too much fluoride during the period of tooth development can cause dental fluorosis, which appears as white or brown spots on the enamel. For this reason, parents are advised to use only a small amount of toothpaste for young children and to supervise brushing."
+  },
+  {
+   "id": "p-infection",
+   "title": "Infection control in the dental office",
+   "text": "Dental treatment often produces blood, saliva and aerosols, so infection control is essential to protect both patients and staff. Standard precautions are based on the idea that every patient may be infectious. Dental staff must wash their hands before and after each patient and wear gloves, masks and protective eyewear. Reusable instruments are first cleaned to remove organic debris and then sterilized, usually in an autoclave. Disposable items, such as needles and saliva ejectors, must never be reused. Used needles and other sharp items are placed in special puncture-resistant containers. All members of the dental team should also be vaccinated against hepatitis B."
+  }
+ ],
+ "questions": [
+  {
+   "id": "term-01",
+   "topic": "terminology",
+   "text": "Which term describes the surface of a tooth that faces the tongue?",
+   "options": [
+    "Lingual",
+    "Buccal",
+    "Labial",
+    "Mesial",
+    "Occlusal"
+   ],
+   "correct": 0,
+   "explanation": "Lingual means \"facing the tongue\"; buccal faces the cheek and labial faces the lips."
+  },
+  {
+   "id": "term-02",
+   "topic": "terminology",
+   "text": "Which term describes the surface of a tooth that faces toward the midline of the dental arch?",
+   "options": [
+    "Mesial",
+    "Distal",
+    "Palatal",
+    "Incisal",
+    "Cervical"
+   ],
+   "correct": 0,
+   "explanation": "Mesial is toward the midline of the arch; distal is away from it."
+  },
+  {
+   "id": "term-03",
+   "topic": "terminology",
+   "text": "What does the term \"odontalgia\" mean?",
+   "options": [
+    "Toothache",
+    "Tooth decay",
+    "Bleeding gums",
+    "Bad breath",
+    "Missing teeth"
+   ],
+   "correct": 0,
+   "explanation": "Odont- means tooth and -algia means pain."
+  },
+  {
+   "id": "term-04",
+   "topic": "terminology",
+   "text": "Gingivitis is inflammation of which structure?",
+   "options": [
+    "The gums",
+    "The tongue",
+    "The lips",
+    "The dental pulp",
+    "The salivary glands"
+   ],
+   "correct": 0,
+   "explanation": "Gingiva means gum, and the suffix -itis means inflammation."
+  },
+  {
+   "id": "term-05",
+   "topic": "terminology",
+   "text": "What does the prefix \"hypo-\" mean in words such as \"hypoplasia\" and \"hyposalivation\"?",
+   "options": [
+    "Below normal, deficient",
+    "Above normal, excessive",
+    "Around",
+    "Between",
+    "Without"
+   ],
+   "correct": 0,
+   "explanation": "Hypo- means under or deficient; hyper- means over or excessive."
+  },
+  {
+   "id": "term-06",
+   "topic": "terminology",
+   "text": "A patient complains of xerostomia. What is the patient's complaint?",
+   "options": [
+    "Dry mouth",
+    "Bad breath",
+    "Burning tongue",
+    "Difficulty opening the mouth",
+    "Excessive salivation"
+   ],
+   "correct": 0,
+   "explanation": "Xero- means dry and stoma means mouth."
+  },
+  {
+   "id": "term-07",
+   "topic": "terminology",
+   "text": "What is the correct plural form of the anatomical term \"foramen\"?",
+   "options": [
+    "Foramina",
+    "Foramens",
+    "Foramenes",
+    "Forami",
+    "Foraminae"
+   ],
+   "correct": 0,
+   "explanation": "Latin neuter nouns ending in -men form the plural with -mina: foramen → foramina."
+  },
+  {
+   "id": "term-08",
+   "topic": "terminology",
+   "text": "What does the adjective \"edentulous\" mean?",
+   "options": [
+    "Having no teeth",
+    "Having extra teeth",
+    "Having decayed teeth",
+    "Having crooked teeth",
+    "Having sensitive teeth"
+   ],
+   "correct": 0,
+   "explanation": "E- means without and dens (dent-) means tooth."
+  },
+  {
+   "id": "term-09",
+   "topic": "terminology",
+   "text": "Choose the word that best completes the sentence: \"The general practitioner ___ the patient to a dental surgeon for extraction of the impacted tooth.\"",
+   "options": [
+    "referred",
+    "consisted",
+    "complained",
+    "attended",
+    "suffered"
+   ],
+   "correct": 0,
+   "explanation": "To refer a patient means to send him or her to another specialist."
+  },
+  {
+   "id": "term-10",
+   "topic": "terminology",
+   "text": "Choose the correct form: \"If the patient ___ the dentist earlier, he would not have lost the tooth.\"",
+   "options": [
+    "had visited",
+    "visited",
+    "would visit",
+    "has visited",
+    "visits"
+   ],
+   "correct": 0,
+   "explanation": "The third conditional uses \"if + past perfect\" and \"would have + past participle\"."
+  },
+  {
+   "id": "term-11",
+   "topic": "terminology",
+   "text": "Choose the correct passive form: \"The impression ___ with alginate during yesterday's appointment.\"",
+   "options": [
+    "was taken",
+    "took",
+    "is taking",
+    "has took",
+    "was taking"
+   ],
+   "correct": 0,
+   "explanation": "Past simple passive: was/were + past participle."
+  },
+  {
+   "id": "term-12",
+   "topic": "terminology",
+   "text": "What does the term \"malocclusion\" mean?",
+   "options": [
+    "An abnormal relationship between the teeth of the upper and lower jaws",
+    "Inflammation of the gums",
+    "A missing tooth",
+    "A fracture of the jaw",
+    "Decay on the biting surface"
+   ],
+   "correct": 0,
+   "explanation": "Occlusion is the contact of the upper and lower teeth; mal- means bad or abnormal."
+  },
+  {
+   "id": "term-13",
+   "topic": "terminology",
+   "text": "Which word is a synonym of \"haemorrhage\"?",
+   "options": [
+    "Bleeding",
+    "Swelling",
+    "Fever",
+    "Infection",
+    "Itching"
+   ],
+   "correct": 0,
+   "explanation": "Haemorrhage means an escape of blood, that is, bleeding."
+  },
+  {
+   "id": "term-14",
+   "topic": "terminology",
+   "text": "Choose the correct preposition: \"The patient complains ___ severe pain in the lower jaw.\"",
+   "options": [
+    "of",
+    "at",
+    "in",
+    "for",
+    "with"
+   ],
+   "correct": 0,
+   "explanation": "In medical English, \"to complain of\" is used to describe symptoms."
+  },
+  {
+   "id": "term-15",
+   "topic": "terminology",
+   "text": "What does the term \"periapical\" mean?",
+   "options": [
+    "Around the apex of the tooth root",
+    "Inside the pulp chamber",
+    "Under the tongue",
+    "Between two teeth",
+    "On the biting surface"
+   ],
+   "correct": 0,
+   "explanation": "Peri- means around, and the apex is the tip of the root."
+  },
+  {
+   "id": "term-16",
+   "topic": "terminology",
+   "text": "A patient with dysphagia has difficulty with which function?",
+   "options": [
+    "Swallowing",
+    "Speaking",
+    "Breathing",
+    "Chewing",
+    "Hearing"
+   ],
+   "correct": 0,
+   "explanation": "Dys- means difficult and -phagia refers to swallowing or eating."
+  },
+  {
+   "id": "term-17",
+   "topic": "terminology",
+   "text": "What does the abbreviation \"CBCT\" stand for in dental radiology?",
+   "options": [
+    "Cone-beam computed tomography",
+    "Central bone calcium test",
+    "Complete blood cell test",
+    "Cervical bite correction technique",
+    "Coronal bitewing contrast technique"
+   ],
+   "correct": 0,
+   "explanation": "Cone-beam computed tomography gives three-dimensional images of the teeth and jaws."
+  },
+  {
+   "id": "read-01",
+   "topic": "reading",
+   "text": "According to the text, what happens when the pH at the tooth surface falls below a critical level?",
+   "options": [
+    "Minerals begin to dissolve from the enamel",
+    "Saliva production stops",
+    "Bacteria stop producing acids",
+    "Fluorapatite is formed",
+    "A cavity is immediately repaired"
+   ],
+   "correct": 0,
+   "explanation": "The text says that below a critical pH \"minerals begin to dissolve from the enamel\".",
+   "passageId": "p-caries"
+  },
+  {
+   "id": "read-02",
+   "topic": "reading",
+   "text": "According to the text, which factor is more important in the development of caries than the total amount of sugar eaten?",
+   "options": [
+    "The frequency of sugar intake",
+    "The type of toothbrush",
+    "The age of the patient",
+    "The colour of the enamel",
+    "The number of teeth"
+   ],
+   "correct": 0,
+   "explanation": "The text states that \"the frequency of sugar intake is therefore more important than the total amount\".",
+   "passageId": "p-caries"
+  },
+  {
+   "id": "read-03",
+   "topic": "reading",
+   "text": "In the text, the word \"repaired\" in \"the early lesion may be repaired\" is closest in meaning to:",
+   "options": [
+    "restored",
+    "removed",
+    "infected",
+    "enlarged",
+    "detected"
+   ],
+   "correct": 0,
+   "explanation": "Here, repaired means restored to a healthy state through remineralization.",
+   "passageId": "p-caries"
+  },
+  {
+   "id": "read-04",
+   "topic": "reading",
+   "text": "According to the text, why is gingivitis described as reversible?",
+   "options": [
+    "The gums return to health when plaque is removed",
+    "It always develops into periodontitis",
+    "It affects only the alveolar bone",
+    "It can be treated only by surgery",
+    "It is not caused by bacteria"
+   ],
+   "correct": 0,
+   "explanation": "The text explains that removal of plaque allows the gums to return to health.",
+   "passageId": "p-periodontal"
+  },
+  {
+   "id": "read-05",
+   "topic": "reading",
+   "text": "Which of the following is mentioned in the text as a risk factor for periodontal disease?",
+   "options": [
+    "Smoking",
+    "Drinking milk",
+    "Using fluoride toothpaste",
+    "Regular dental visits",
+    "Chewing sugar-free gum"
+   ],
+   "correct": 0,
+   "explanation": "The text names smoking and poorly controlled diabetes as important risk factors.",
+   "passageId": "p-periodontal"
+  },
+  {
+   "id": "read-06",
+   "topic": "reading",
+   "text": "According to the text, which change is typical of periodontitis but not of gingivitis?",
+   "options": [
+    "Gradual destruction of the alveolar bone",
+    "Accumulation of plaque at the gingival margin",
+    "Inflammation of the gums",
+    "Bleeding during brushing",
+    "Presence of bacteria"
+   ],
+   "correct": 0,
+   "explanation": "Periodontitis involves pocket formation and gradual bone destruction.",
+   "passageId": "p-periodontal"
+  },
+  {
+   "id": "read-07",
+   "topic": "reading",
+   "text": "According to the text, where does fluoride mainly work?",
+   "options": [
+    "At the surface of erupted teeth",
+    "Inside the dental pulp",
+    "In the salivary glands",
+    "In the alveolar bone",
+    "In the periodontal ligament"
+   ],
+   "correct": 0,
+   "explanation": "The text says that fluoride \"works mainly at the surface of the teeth after they have erupted\".",
+   "passageId": "p-fluoride"
+  },
+  {
+   "id": "read-08",
+   "topic": "reading",
+   "text": "According to the text, what can excessive fluoride intake during tooth development cause?",
+   "options": [
+    "Dental fluorosis",
+    "Periodontitis",
+    "Gingival bleeding",
+    "Root fractures",
+    "Tooth sensitivity"
+   ],
+   "correct": 0,
+   "explanation": "The text explains that too much fluoride during tooth development causes dental fluorosis.",
+   "passageId": "p-fluoride"
+  },
+  {
+   "id": "read-09",
+   "topic": "reading",
+   "text": "Why does the text advise parents to supervise young children's brushing?",
+   "options": [
+    "To prevent swallowing too much fluoride toothpaste",
+    "To make brushing faster",
+    "To choose the colour of the toothbrush",
+    "To avoid using water",
+    "To remove the need for dental check-ups"
+   ],
+   "correct": 0,
+   "explanation": "Supervision and a small amount of toothpaste reduce the risk of fluorosis in young children.",
+   "passageId": "p-fluoride"
+  },
+  {
+   "id": "read-10",
+   "topic": "reading",
+   "text": "What is the main idea of standard precautions according to the text?",
+   "options": [
+    "Every patient may be infectious",
+    "Only patients with known infections are dangerous",
+    "Gloves are not needed for short procedures",
+    "Instruments should be sterilized once a week",
+    "Only dentists need protection"
+   ],
+   "correct": 0,
+   "explanation": "Standard precautions treat every patient as potentially infectious.",
+   "passageId": "p-infection"
+  },
+  {
+   "id": "read-11",
+   "topic": "reading",
+   "text": "According to the text, what must be done with reusable instruments before sterilization?",
+   "options": [
+    "They must be cleaned to remove organic debris",
+    "They must be thrown away",
+    "They must be stored in a sharps container",
+    "They must be coated with fluoride",
+    "They must be heated in water for one minute"
+   ],
+   "correct": 0,
+   "explanation": "Instruments are first cleaned to remove organic debris and then sterilized.",
+   "passageId": "p-infection"
+  },
+  {
+   "id": "read-12",
+   "topic": "reading",
+   "text": "In the text, the word \"puncture-resistant\" describes containers that:",
+   "options": [
+    "cannot easily be pierced by sharp objects",
+    "can be opened very easily",
+    "are made of paper",
+    "are used for saliva samples",
+    "must be reused many times"
+   ],
+   "correct": 0,
+   "explanation": "A puncture-resistant container cannot easily be pierced, so used needles do not injure staff.",
+   "passageId": "p-infection"
+  }
+ ]
+}
