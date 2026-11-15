@@ -1,6 +1,6 @@
 name: CI
 
-# Lint, types, build and every workspace's tests. Runs on pull requests and on pushes to other
+# Formatting, lint, types, build and every workspace's tests. Runs on pull requests and on pushes to other
 # branches; on main the deploy workflow calls it first, so nothing is published until it passes.
 on:
   pull_request:
@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   static:
-    name: Lint, types, build
+    name: Format, lint, types, build
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -27,6 +27,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - run: npm run format:check
       - run: npm run lint
       - run: npm run typecheck
       # the web app builds without the sync variables (local-only mode)

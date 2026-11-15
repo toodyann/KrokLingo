@@ -94,7 +94,7 @@ KrokLingo встановлюється як застосунок: кнопка �
 
 ## Стек
 
-React 19, TypeScript, Vite, Fastify, Drizzle, PostgreSQL (Supabase), Tailwind CSS v4, shadcn/ui (Radix), Recharts, Oxlint, шрифт Geist (локально, з кирилицею). Кожна сторінка вантажиться окремим чанком. Пружинна анімація власна, `.docx` збирається власним ZIP-записувачем.
+React 19, TypeScript, Vite, Fastify, Drizzle, PostgreSQL (Supabase), Tailwind CSS v4, shadcn/ui (Radix), Recharts, Oxlint, Prettier, Vitest, шрифт Geist (локально, з кирилицею). Кожна сторінка вантажиться окремим чанком. Пружинна анімація власна, `.docx` збирається власним ZIP-записувачем.
 
 ## Розробка
 
@@ -106,15 +106,16 @@ npm install
 npm run dev
 ```
 
-| Команда                     | Що робить                                                           |
-| --------------------------- | ------------------------------------------------------------------- |
-| `npm run dev`               | Фронтенд з гарячим перезавантаженням                                |
-| `npm run dev:api`           | API з перезапуском при змінах (потрібен `apps/api/.env`)            |
-| `npm run build`             | Перевірка типів і продакшн-збірка фронтенду в `apps/web/dist/`      |
-| `npm run lint` / `lint:fix` | Перевірка коду Oxlint                                               |
-| `npm run typecheck`         | Перевірка типів у всіх пакетах                                      |
-| `npm test`                  | Тести всіх пакетів (API — на PGlite у пам'яті, без Docker)          |
-| `npm run test:coverage`     | Те саме зі звітом покриття (`coverage/index.html` у кожному пакеті) |
+| Команда                           | Що робить                                                           |
+| --------------------------------- | ------------------------------------------------------------------- |
+| `npm run dev`                     | Фронтенд з гарячим перезавантаженням                                |
+| `npm run dev:api`                 | API з перезапуском при змінах (потрібен `apps/api/.env`)            |
+| `npm run build`                   | Перевірка типів і продакшн-збірка фронтенду в `apps/web/dist/`      |
+| `npm run lint` / `lint:fix`       | Перевірка коду Oxlint                                               |
+| `npm run format` / `format:check` | Форматування Prettier / перевірка без змін                          |
+| `npm run typecheck`               | Перевірка типів у всіх пакетах                                      |
+| `npm test`                        | Тести всіх пакетів (API — на PGlite у пам'яті, без Docker)          |
+| `npm run test:coverage`           | Те саме зі звітом покриття (`coverage/index.html` у кожному пакеті) |
 
 ### Тести
 
@@ -198,7 +199,7 @@ packages/
 
 ## Деплой
 
-**CI** (`.github/workflows/ci.yml`) запускається на кожен pull request і пуш у будь-яку гілку: дві паралельні задачі — «Lint, types, build» (Oxlint, `tsc` у всіх пакетах, збірка фронтенду) і «Tests» (тести всіх пакетів з покриттям; таблиця покриття — у підсумку запуску, HTML-звіти — в артефакті `coverage`).
+**CI** (`.github/workflows/ci.yml`) запускається на кожен pull request і пуш у будь-яку гілку: дві паралельні задачі — «Format, lint, types, build» (Prettier, Oxlint, `tsc` у всіх пакетах, збірка фронтенду) і «Tests» (тести всіх пакетів з покриттям; таблиця покриття — у підсумку запуску, HTML-звіти — в артефакті `coverage`).
 
 Пуш у `main` запускає `.github/workflows/deploy.yml`: спершу той самий CI, і лише якщо він пройшов — збірка й публікація фронтенду на GitHub Pages. API на Render теж деплоїться тільки після успішних перевірок коміту (`autoDeployTrigger: checksPass` у `render.yaml`). Щоб прямі посилання на розділи працювали на Pages, збірка копіює `index.html` у `404.html`.
 
