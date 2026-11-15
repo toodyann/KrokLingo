@@ -19,7 +19,7 @@ const pwa = VitePWA({
   injectRegister: false,
   includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
   manifest: {
-    name: 'KrokLingo — Крок 1. Стоматологія',
+    name: 'KrokLingo',
     short_name: 'KrokLingo',
     description: DESCRIPTION,
     lang: 'uk',
