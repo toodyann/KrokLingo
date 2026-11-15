@@ -35,7 +35,8 @@ export function isAbbreviation(word: string): boolean {
 }
 
 // Periods after these do not end a sentence ("n. facialis", "e.g. the", "Dr. Smith", initials).
-const NO_BREAK = /(?:^|[\s(])(?:[A-Za-z]|aa|nn|mm|vv|rr|lig|ligg|art|for|proc|gl|gll|sp|spp|ssp|var|cf|vs|etc|e\.g|i\.e|dr|mr|mrs|ms|st|fig|approx|no|vol)\.$/i
+const NO_BREAK =
+  /(?:^|[\s(])(?:[A-Za-z]|aa|nn|mm|vv|rr|lig|ligg|art|for|proc|gl|gll|sp|spp|ssp|var|cf|vs|etc|e\.g|i\.e|dr|mr|mrs|ms|st|fig|approx|no|vol)\.$/i
 
 function splitSentences(text: string): [number, number][] {
   const out: [number, number][] = []
@@ -67,7 +68,13 @@ export function analyzeText(text: string): AnalyzedText {
   for (const m of text.matchAll(WORD_RE)) {
     const start = m.index
     while (s < sentences.length - 1 && start >= sentences[s][1]) s++
-    tokens.push({ text: m[0], start, end: start + m[0].length, kind: isAbbreviation(m[0]) ? 'abbr' : 'word', sentence: s })
+    tokens.push({
+      text: m[0],
+      start,
+      end: start + m[0].length,
+      kind: isAbbreviation(m[0]) ? 'abbr' : 'word',
+      sentence: s,
+    })
   }
   const result = { text, tokens, sentences }
   if (cache.size > 2000) cache.clear()

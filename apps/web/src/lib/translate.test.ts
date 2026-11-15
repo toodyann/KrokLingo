@@ -4,7 +4,11 @@ import { analyzeText } from './text'
 import { refreshedTranslation, resolveTranslation, storedText, type UserLexicon } from './translate'
 
 /** Resolve the n-th occurrence of `word` in `text`. */
-function at(text: string, word: string, opts: { contextId?: string; related?: string; user?: UserLexicon; nth?: number } = {}) {
+function at(
+  text: string,
+  word: string,
+  opts: { contextId?: string; related?: string; user?: UserLexicon; nth?: number } = {},
+) {
   const tokens = analyzeText(text).tokens
   const hits = tokens.map((t, i) => (t.text === word ? i : -1)).filter((i) => i >= 0)
   const index = hits[opts.nth ?? 0]
@@ -13,15 +17,36 @@ function at(text: string, word: string, opts: { contextId?: string; related?: st
 }
 
 function entry(word: string, patch: Partial<DictEntry> = {}): DictEntry {
-  return { id: 'e-' + word, word, translation: '', note: '', source: 'builtin', addedAt: 0, updatedAt: 0, lookups: 1, learned: false, box: 0, ...patch }
+  return {
+    id: 'e-' + word,
+    word,
+    translation: '',
+    note: '',
+    source: 'builtin',
+    addedAt: 0,
+    updatedAt: 0,
+    lookups: 1,
+    learned: false,
+    box: 0,
+    ...patch,
+  }
 }
-const lexicon = (...entries: DictEntry[]): UserLexicon => (k) => entries.find((e) => e.word === k.toLowerCase())
+const lexicon =
+  (...entries: DictEntry[]): UserLexicon =>
+  (k) =>
+    entries.find((e) => e.word === k.toLowerCase())
 
 describe('medical phrases', () => {
   it.each([
     ['Anaesthesia of the mental nerve was performed.', 'mental', 'mental nerve', 'підборідний нерв', 'підборідний'],
     ['Anaesthesia of the mental nerve was performed.', 'nerve', 'mental nerve', 'підборідний нерв', undefined],
-    ['The root canals were obturated.', 'canals', 'root canal', 'кореневий канал', 'канал'.length ? undefined : undefined],
+    [
+      'The root canals were obturated.',
+      'canals',
+      'root canal',
+      'кореневий канал',
+      'канал'.length ? undefined : undefined,
+    ],
     ['Dental plaque accumulates near the gingiva.', 'plaque', 'dental plaque', 'зубний наліт', 'наліт'],
     ['The oral cavity is lined with mucosa.', 'cavity', 'oral cavity', 'порожнина рота', 'порожнина'],
     ['Tooth decay is common in children.', 'decay', 'tooth decay', 'карієс зубів', 'карієс (руйнування)'],
@@ -49,7 +74,9 @@ describe('medical phrases', () => {
 
 describe('ambiguous words follow the sentence', () => {
   it('process: projection of a bone vs course of a disease', () => {
-    expect(at('A fracture of the coronoid process of the mandible was found.', 'process').translation).toBe('вінцевий відросток')
+    expect(at('A fracture of the coronoid process of the mandible was found.', 'process').translation).toBe(
+      'вінцевий відросток',
+    )
     expect(at('The process of the maxilla was fractured.', 'process').translation).toBe('відросток')
     expect(at('This inflammatory process involves the pulp.', 'process').translation).toBe('запальний процес')
     const r = at('The process spread to the surrounding tissues during the chronic stage.', 'process')
@@ -127,7 +154,13 @@ describe('priority of sources', () => {
   const text = 'The process of the maxilla was fractured.'
 
   it('the user’s translation for this question beats everything', () => {
-    const user = lexicon(entry('process', { source: 'manual', translation: 'процес (мій)', contextual: { 'q-1': 'відросток верхньої щелепи' } }))
+    const user = lexicon(
+      entry('process', {
+        source: 'manual',
+        translation: 'процес (мій)',
+        contextual: { 'q-1': 'відросток верхньої щелепи' },
+      }),
+    )
     const r = at(text, 'process', { contextId: 'q-1', user })
     expect(r.translation).toBe('відросток верхньої щелепи')
     expect(r.source).toBe('user-context')
@@ -161,12 +194,21 @@ describe('priority of sources', () => {
 
 describe('stored entries and dictionary updates', () => {
   it('re-resolves automatic entries from their saved context', () => {
-    const e = entry('process', { translation: 'процес; відросток', surface: 'process', context: 'The process of the maxilla was fractured.' })
+    const e = entry('process', {
+      translation: 'процес; відросток',
+      surface: 'process',
+      context: 'The process of the maxilla was fractured.',
+    })
     expect(refreshedTranslation(e)?.translation).toBe('відросток')
   })
 
   it('never overwrites the user’s own translation', () => {
-    const e = entry('process', { source: 'manual', translation: 'моє', context: 'The process of the maxilla was fractured.', surface: 'process' })
+    const e = entry('process', {
+      source: 'manual',
+      translation: 'моє',
+      context: 'The process of the maxilla was fractured.',
+      surface: 'process',
+    })
     expect(refreshedTranslation(e)).toBeNull()
   })
 

@@ -28,7 +28,11 @@ describe('diffState', () => {
 
   it('sends only the changed, new and removed records', () => {
     const changed = { ...a, translation: 'зуб' }
-    const next: UserState = { ...base, dictionary: [changed, entry('c', 'gum')], history: [...base.history, attempt('h2')] }
+    const next: UserState = {
+      ...base,
+      dictionary: [changed, entry('c', 'gum')],
+      history: [...base.history, attempt('h2')],
+    }
     expect(diffState(base, next)).toEqual([
       { kind: 'entry', entry: changed },
       { kind: 'entry', entry: next.dictionary[1] },
@@ -39,7 +43,12 @@ describe('diffState', () => {
 
   it('sends settings, the unfinished test and imported collections when replaced', () => {
     const session = { id: 's1' } as UserState['session']
-    const next: UserState = { ...base, settings: { threshold: 50 }, session, customBank: { collections: [], questions: [], passages: [] } }
+    const next: UserState = {
+      ...base,
+      settings: { threshold: 50 },
+      session,
+      customBank: { collections: [], questions: [], passages: [] },
+    }
     expect(diffState(base, next).map((o) => o.kind)).toEqual(['settings', 'session', 'custom-bank'])
     expect(diffState(next, { ...next, session: null })).toEqual([{ kind: 'session', session: null }])
   })
@@ -69,7 +78,10 @@ describe('createApi', () => {
   })
 
   it('fails without a session and on HTTP errors', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => new Response('{}', { status: 500 })))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('{}', { status: 500 })),
+    )
     await expect(createApi('https://api.example', async () => null).getState()).rejects.toBeInstanceOf(SyncError)
     await expect(createApi('https://api.example', async () => 'tok').getState()).rejects.toMatchObject({ status: 500 })
   })

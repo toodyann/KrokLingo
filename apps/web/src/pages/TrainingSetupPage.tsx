@@ -82,9 +82,16 @@ export function TrainingSetupPage() {
                 aria-label="Збірники"
               >
                 {bank.collections.map((c) => (
-                  <ToggleGroupItem key={c.id} value={c.id} title={c.description} className="data-[state=on]:border-transparent data-[state=on]:bg-brand data-[state=on]:text-[var(--ink)] data-[state=on]:hover:bg-brand/90 data-[state=on]:hover:text-[var(--ink)]">
+                  <ToggleGroupItem
+                    key={c.id}
+                    value={c.id}
+                    title={c.description}
+                    className="data-[state=on]:border-transparent data-[state=on]:bg-brand data-[state=on]:text-[var(--ink)] data-[state=on]:hover:bg-brand/90 data-[state=on]:hover:text-[var(--ink)]"
+                  >
                     {c.name}
-                    <span className="text-xs text-muted-foreground in-data-[state=on]:text-[var(--ink)]/70">{bank.questions.filter((q) => q.collection === c.id).length}</span>
+                    <span className="text-xs text-muted-foreground in-data-[state=on]:text-[var(--ink)]/70">
+                      {bank.questions.filter((q) => q.collection === c.id).length}
+                    </span>
                   </ToggleGroupItem>
                 ))}
               </ToggleGroup>
@@ -116,9 +123,15 @@ export function TrainingSetupPage() {
                 {bank.topics
                   .filter((t) => topicCounts.has(t.id))
                   .map((t) => (
-                    <ToggleGroupItem key={t.id} value={t.id} className="data-[state=on]:border-transparent data-[state=on]:bg-brand data-[state=on]:text-[var(--ink)] data-[state=on]:hover:bg-brand/90 data-[state=on]:hover:text-[var(--ink)]">
+                    <ToggleGroupItem
+                      key={t.id}
+                      value={t.id}
+                      className="data-[state=on]:border-transparent data-[state=on]:bg-brand data-[state=on]:text-[var(--ink)] data-[state=on]:hover:bg-brand/90 data-[state=on]:hover:text-[var(--ink)]"
+                    >
                       {t.name}
-                      <span className="text-xs text-muted-foreground in-data-[state=on]:text-[var(--ink)]/70">{topicCounts.get(t.id)}</span>
+                      <span className="text-xs text-muted-foreground in-data-[state=on]:text-[var(--ink)]/70">
+                        {topicCounts.get(t.id)}
+                      </span>
                     </ToggleGroupItem>
                   ))}
               </ToggleGroup>

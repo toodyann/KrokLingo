@@ -72,7 +72,8 @@ export function SidebarAccount({ onMenuOpenChange }: { onMenuOpenChange: (open: 
           closedByKeyboard.current = true
         }}
         onKeyDown={(e) => {
-          if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ' || e.key === 'Tab') closedByKeyboard.current = true
+          if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ' || e.key === 'Tab')
+            closedByKeyboard.current = true
         }}
         onCloseAutoFocus={(e) => {
           if (!closedByKeyboard.current) e.preventDefault()

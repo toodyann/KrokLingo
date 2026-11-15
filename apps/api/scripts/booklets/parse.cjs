@@ -88,7 +88,11 @@ function parseMedicalClub(html) {
         if (!q.library.startsWith('H5P.MultiChoice')) continue
         const answers = q.params.answers.map((a) => ({ t: htmlToText(a.text).trim(), c: !!a.correct }))
         if (answers.filter((a) => a.c).length !== 1 || answers.some((a) => !a.t)) continue
-        items.push({ text: clean(htmlToText(q.params.question)), options: answers.map((a) => clean(a.t)), correct: answers.findIndex((a) => a.c) })
+        items.push({
+          text: clean(htmlToText(q.params.question)),
+          options: answers.map((a) => clean(a.t)),
+          correct: answers.findIndex((a) => a.c),
+        })
       }
     } else if (j.choices) {
       // H5P.SingleChoiceSet: the first answer is the correct one
@@ -127,7 +131,8 @@ function parseMedicalClub(html) {
 function recoverLeakedAnswer(text, options) {
   const words = (s) => new Set(s.toLowerCase().match(/[a-z]+/g) || [])
   const jaccard = (a, b) => {
-    const A = words(a), B = words(b)
+    const A = words(a),
+      B = words(b)
     const inter = [...A].filter((w) => B.has(w)).length
     return inter / (A.size + B.size - inter || 1)
   }
@@ -141,7 +146,12 @@ function recoverLeakedAnswer(text, options) {
   }
   if (best && best.score >= 0.4 && !options.includes(best.tail)) {
     const stem = text.slice(0, best.at).trim()
-    return { text: /[.?:]$/.test(stem) ? stem : stem + '?', options: [best.tail, ...options], correct: 0, recovered: true }
+    return {
+      text: /[.?:]$/.test(stem) ? stem : stem + '?',
+      options: [best.tail, ...options],
+      correct: 0,
+      recovered: true,
+    }
   }
   return { text, options, correct: 0 }
 }

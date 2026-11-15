@@ -40,16 +40,7 @@ export type TranslationSource = 'builtin' | 'online' | 'manual' | 'none'
 
 /** Where a translation shown for a click came from, highest priority first. */
 export type ResolutionSource =
-  | 'user-context'
-  | 'user'
-  | 'question'
-  | 'phrase'
-  | 'latin'
-  | 'abbr'
-  | 'context'
-  | 'dictionary'
-  | 'online'
-  | 'none'
+  'user-context' | 'user' | 'question' | 'phrase' | 'latin' | 'abbr' | 'context' | 'dictionary' | 'online' | 'none'
 
 /** verified: confirmed data; likely: chosen from context or a single-sense entry; uncertain: a best guess. */
 export type Certainty = 'verified' | 'likely' | 'uncertain' | 'unknown'

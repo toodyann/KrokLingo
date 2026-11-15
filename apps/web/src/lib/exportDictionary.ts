@@ -25,8 +25,7 @@ export function exportTxt(entries: DictEntry[]): void {
   downloadFile(`kroklingo-slovnyk-${stamp()}.txt`, '﻿' + lines.join('\r\n'), 'text/plain;charset=utf-8')
 }
 
-const esc = (s: string) =>
-  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
 function run(text: string, opts: { bold?: boolean; size?: number; color?: string } = {}): string {
   const props = [
@@ -74,10 +73,13 @@ export function buildDocx(entries: DictEntry[]): Uint8Array<ArrayBuffer> {
   const body = [
     para(run('Словник невідомих слів', { bold: true, size: 36 }), { spacingAfter: 60 }),
     para(
-      run(`KrokLingo · ${new Date().toLocaleDateString('uk-UA')} · ${entries.length} ${pluralUk(entries.length, 'слово', 'слова', 'слів')}`, {
-        size: 20,
-        color: '6D6A76',
-      }),
+      run(
+        `KrokLingo · ${new Date().toLocaleDateString('uk-UA')} · ${entries.length} ${pluralUk(entries.length, 'слово', 'слова', 'слів')}`,
+        {
+          size: 20,
+          color: '6D6A76',
+        },
+      ),
       { spacingAfter: 240 },
     ),
     `<w:tbl><w:tblPr><w:tblW w:w="${widths.reduce((a, b) => a + b, 0)}" w:type="dxa"/><w:tblBorders>${borders}</w:tblBorders><w:tblCellMar><w:top w:w="60" w:type="dxa"/><w:left w:w="100" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="100" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${widths.map((w) => `<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid>${rows.join('')}</w:tbl>`,

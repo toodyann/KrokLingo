@@ -23,7 +23,9 @@ const ResultsPage = lazy(() => import('./pages/ResultsPage').then((m) => ({ defa
 const SettingsPage = lazy(() => import('./pages/SettingsPage').then((m) => ({ default: m.SettingsPage })))
 const TestPage = lazy(() => import('./pages/TestPage').then((m) => ({ default: m.TestPage })))
 const TestsPage = lazy(() => import('./pages/TestsPage').then((m) => ({ default: m.TestsPage })))
-const TrainingSetupPage = lazy(() => import('./pages/TrainingSetupPage').then((m) => ({ default: m.TrainingSetupPage })))
+const TrainingSetupPage = lazy(() =>
+  import('./pages/TrainingSetupPage').then((m) => ({ default: m.TrainingSetupPage })),
+)
 
 interface Tab {
   path: string
@@ -200,30 +202,30 @@ function Shell() {
   const inTest = route.name === 'test'
   return (
     <TooltipProvider delayDuration={300}>
-    <ToastProvider>
-    <ConfirmProvider>
-      <WordLookupProvider inTest={inTest}>
-        {!inTest && (
-          <div className="regular-only">
-            <Sidebar route={route} />
-          </div>
-        )}
-        <div className={inTest ? undefined : 'with-sidebar'}>
-          <StorageWarning />
-          <main className={inTest ? 'main-test' : undefined}>
-            <Suspense fallback={null}>
-              <Page route={route} />
-            </Suspense>
-          </main>
-        </div>
-        {!inTest && (
-          <div className="compact-only">
-            <TabBar route={route} />
-          </div>
-        )}
-      </WordLookupProvider>
-    </ConfirmProvider>
-    </ToastProvider>
+      <ToastProvider>
+        <ConfirmProvider>
+          <WordLookupProvider inTest={inTest}>
+            {!inTest && (
+              <div className="regular-only">
+                <Sidebar route={route} />
+              </div>
+            )}
+            <div className={inTest ? undefined : 'with-sidebar'}>
+              <StorageWarning />
+              <main className={inTest ? 'main-test' : undefined}>
+                <Suspense fallback={null}>
+                  <Page route={route} />
+                </Suspense>
+              </main>
+            </div>
+            {!inTest && (
+              <div className="compact-only">
+                <TabBar route={route} />
+              </div>
+            )}
+          </WordLookupProvider>
+        </ConfirmProvider>
+      </ToastProvider>
     </TooltipProvider>
   )
 }

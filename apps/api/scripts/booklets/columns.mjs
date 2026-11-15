@@ -34,7 +34,12 @@ for (let i = 0; i < doc.countPages(); i++) {
   const merged = []
   for (const l of ordered) {
     const prev = merged[merged.length - 1]
-    if (prev && Math.abs(prev.y - l.y) < 2 && l.x0 >= prev.x1 - 2 && (isTwo ? (prev.x0 > mid - 10) === (l.x0 > mid - 10) : true)) {
+    if (
+      prev &&
+      Math.abs(prev.y - l.y) < 2 &&
+      l.x0 >= prev.x1 - 2 &&
+      (isTwo ? prev.x0 > mid - 10 === l.x0 > mid - 10 : true)
+    ) {
       prev.t += (l.x0 - prev.x1 > 1.5 ? ' ' : '') + l.t
       prev.x1 = l.x1
     } else merged.push({ ...l })

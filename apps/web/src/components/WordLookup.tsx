@@ -17,7 +17,13 @@ import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { normalizeWord } from '../lib/lemmatize'
 import { analyzeText } from '../lib/text'
-import { lookupOnline, resolveTranslation, type ClickContext, type Resolution, type UserLexicon } from '../lib/translate'
+import {
+  lookupOnline,
+  resolveTranslation,
+  type ClickContext,
+  type Resolution,
+  type UserLexicon,
+} from '../lib/translate'
 import { useApp } from '../store/context'
 import type { Certainty, DictEntry, ResolutionSource } from '../types'
 import { useDraggableSheet } from './useDraggableSheet'
@@ -94,10 +100,17 @@ export function WordLookupProvider({ children, inTest = false }: { children: Rea
 
     let online: string | undefined
     const hasCachedOnline = cached?.source === 'online' && !!cached.translation
-    if (resolution.certainty === 'unknown' && resolution.kind !== 'latin' && !hasCachedOnline && cfg.onlineTranslate && navigator.onLine) {
+    if (
+      resolution.certainty === 'unknown' &&
+      resolution.kind !== 'latin' &&
+      !hasCachedOnline &&
+      cfg.onlineTranslate &&
+      navigator.onLine
+    ) {
       setState({ click, surface, anchor, status: 'loading' })
       try {
-        online = (await lookupOnline(resolution.kind === 'phrase' ? resolution.unitText : resolution.lemma)) ?? undefined
+        online =
+          (await lookupOnline(resolution.kind === 'phrase' ? resolution.unitText : resolution.lemma)) ?? undefined
       } catch {
         // network error — the result stays "unknown"
       }
@@ -270,7 +283,9 @@ function WordCard({ state, onClose }: { state: LookupState; onClose: () => void 
               {state.surface} тут — <b>{r.wordMeaning}</b>
             </div>
           )}
-          {r.alternatives.length > 0 && <div className="wp-alternatives">Інші значення: {r.alternatives.join('; ')}</div>}
+          {r.alternatives.length > 0 && (
+            <div className="wp-alternatives">Інші значення: {r.alternatives.join('; ')}</div>
+          )}
           {r.hint && <div className="wp-hint">{r.hint}</div>}
           {entry?.note && <div className="wp-note">{entry.note}</div>}
           <ContextLine r={r} />

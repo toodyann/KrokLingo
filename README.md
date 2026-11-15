@@ -22,13 +22,13 @@
 
 Близько 5500 питань двома мовами: 3193 англійською (117 оригінальних і понад 3000 з реальних буклетів 2006–2024) і 2268 українською (буклети 2010–2026). Мову питань для тестів, іспиту й тренування вибирають перемикачем на сторінці «Тести»; історія й результати показують обидві. Переклад слів по кліку працює для англійських питань. Банк зберігається на сервері (`apps/api/bank/*.json` → таблиці `bank_*`), застосунок отримує його через `GET /api/bank` і тримає копію в IndexedDB: повторні запуски миттєві й працюють офлайн, а зміни підтягуються у фоні.
 
-| Збірник | Що всередині |
-| --- | --- |
-| Базові медичні дисципліни (88) | оригінальні ситуаційні задачі з поясненнями |
-| Професійна англійська (29) | оригінальні: термінологія, граматика, читання (4 тексти) |
-| Буклет 2006 … Буклет 2022 | офіційні англомовні буклети ЦТ «Крок 1. Стоматологія» (2006, 2019, 2021, 2022 і доповнення інших років — з посібника БДМУ) |
-| Англійська 2022, 2023, 2024 (97–117) | іспит з англійської мови професійного спрямування: тексти для читання і клінічні питання |
-| Буклет 2010 … 2026 (укр.) | україномовні буклети ЦТ: ЄМУ (2010–2024) і medical-club (2020–2026) |
+| Збірник                              | Що всередині                                                                                                               |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| Базові медичні дисципліни (88)       | оригінальні ситуаційні задачі з поясненнями                                                                                |
+| Професійна англійська (29)           | оригінальні: термінологія, граматика, читання (4 тексти)                                                                   |
+| Буклет 2006 … Буклет 2022            | офіційні англомовні буклети ЦТ «Крок 1. Стоматологія» (2006, 2019, 2021, 2022 і доповнення інших років — з посібника БДМУ) |
+| Англійська 2022, 2023, 2024 (97–117) | іспит з англійської мови професійного спрямування: тексти для читання і клінічні питання                                   |
+| Буклет 2010 … 2026 (укр.)            | україномовні буклети ЦТ: ЄМУ (2010–2024) і medical-club (2020–2026)                                                        |
 
 Питання з буклетів, що повторюються в різні роки, лишаються лише в найновішому. Теми для них визначено автоматично за ключовими словами, тож де-не-де тема може бути неточною.
 
@@ -106,15 +106,15 @@ npm install
 npm run dev
 ```
 
-| Команда | Що робить |
-| --- | --- |
-| `npm run dev` | Фронтенд з гарячим перезавантаженням |
-| `npm run dev:api` | API з перезапуском при змінах (потрібен `apps/api/.env`) |
-| `npm run build` | Перевірка типів і продакшн-збірка фронтенду в `apps/web/dist/` |
-| `npm run lint` / `lint:fix` | Перевірка коду Oxlint |
-| `npm run typecheck` | Перевірка типів у всіх пакетах |
-| `npm test` | Тести всіх пакетів (API — на PGlite у пам'яті, без Docker) |
-| `npm run test:coverage` | Те саме зі звітом покриття (`coverage/index.html` у кожному пакеті) |
+| Команда                     | Що робить                                                           |
+| --------------------------- | ------------------------------------------------------------------- |
+| `npm run dev`               | Фронтенд з гарячим перезавантаженням                                |
+| `npm run dev:api`           | API з перезапуском при змінах (потрібен `apps/api/.env`)            |
+| `npm run build`             | Перевірка типів і продакшн-збірка фронтенду в `apps/web/dist/`      |
+| `npm run lint` / `lint:fix` | Перевірка коду Oxlint                                               |
+| `npm run typecheck`         | Перевірка типів у всіх пакетах                                      |
+| `npm test`                  | Тести всіх пакетів (API — на PGlite у пам'яті, без Docker)          |
+| `npm run test:coverage`     | Те саме зі звітом покриття (`coverage/index.html` у кожному пакеті) |
 
 ### Тести
 
@@ -166,12 +166,12 @@ packages/
 ### Налаштування (один раз)
 
 1. **Проєкт Supabase.** Створіть проєкт на [supabase.com](https://supabase.com). Знадобляться:
-   - **Project URL** і **publishable (anon) key** — з *Project Settings → API*;
-   - рядок підключення до бази — з *Connect → Connection string*.
+   - **Project URL** і **publishable (anon) key** — з _Project Settings → API_;
+   - рядок підключення до бази — з _Connect → Connection string_.
 2. **Вхід через Google.**
-   - У [Google Cloud Console](https://console.cloud.google.com/apis/credentials) створіть OAuth Client ID (*Web application*). Як *Authorized redirect URI* вкажіть `https://<project-ref>.supabase.co/auth/v1/callback`.
-   - У Supabase увімкніть *Authentication → Sign In / Providers → Google* і вставте Client ID та Secret.
-   - У *Authentication → URL Configuration* додайте до *Redirect URLs* `https://toodyann.github.io/KrokLingo/` і `http://localhost:5173/`.
+   - У [Google Cloud Console](https://console.cloud.google.com/apis/credentials) створіть OAuth Client ID (_Web application_). Як _Authorized redirect URI_ вкажіть `https://<project-ref>.supabase.co/auth/v1/callback`.
+   - У Supabase увімкніть _Authentication → Sign In / Providers → Google_ і вставте Client ID та Secret.
+   - У _Authentication → URL Configuration_ додайте до _Redirect URLs_ `https://toodyann.github.io/KrokLingo/` і `http://localhost:5173/`.
 3. **База даних.** Створіть `apps/api/.env` за зразком `apps/api/.env.example` і застосуйте міграції:
    ```bash
    npm run db:migrate -w @kroklingo/api
@@ -179,7 +179,7 @@ packages/
 4. **API.** Локальний запуск: `npm run dev:api` (порт 8787).
 
    **Продакшн на Render** (безкоштовний план) уже описано в [`render.yaml`](render.yaml):
-   - *Render → New → Blueprint* → виберіть цей репозиторій.
+   - _Render → New → Blueprint_ → виберіть цей репозиторій.
    - Заповніть `DATABASE_URL` і `SUPABASE_URL`, решта змінних уже задана.
    - Міграції застосовуються під час старту (`MIGRATE_ON_START=true`). Нові пуші в `main`, що змінюють API, деплояться автоматично.
    - Адреса сервісу (`https://kroklingo-api.onrender.com` або схожа) — це і є `VITE_API_URL`.
@@ -191,9 +191,10 @@ packages/
    - `GET /health` відповідає `{"ok":true}`;
    - `GET /ready` додатково перевіряє з'єднання з базою;
    - `CORS_ORIGINS` має містити `https://toodyann.github.io`.
+
 5. **Фронтенд.**
    - Для розробки: `apps/web/.env.local` за зразком `apps/web/.env.example`.
-   - Для GitHub Pages: змінні репозиторію `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_API_URL` (*Settings → Secrets and variables → Actions → Variables*). Наступний деплой увімкне вхід на сайті.
+   - Для GitHub Pages: змінні репозиторію `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_API_URL` (_Settings → Secrets and variables → Actions → Variables_). Наступний деплой увімкне вхід на сайті.
 
 ## Деплой
 

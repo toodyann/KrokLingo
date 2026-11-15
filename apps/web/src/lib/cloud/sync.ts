@@ -14,7 +14,12 @@ export type SyncOp =
   | { kind: 'session'; session: UserState['session'] }
   | { kind: 'custom-bank'; customBank: NonNullable<UserState['customBank']> }
 
-function diffList<T extends { id: string }>(prev: T[], next: T[], put: (x: T) => SyncOp, del: (id: string) => SyncOp): SyncOp[] {
+function diffList<T extends { id: string }>(
+  prev: T[],
+  next: T[],
+  put: (x: T) => SyncOp,
+  del: (id: string) => SyncOp,
+): SyncOp[] {
   const before = new Map(prev.map((x) => [x.id, x]))
   const ops: SyncOp[] = []
   for (const x of next) {
@@ -46,7 +51,8 @@ export function diffState(prev: UserState, next: UserState, maxOps = 60): SyncOp
     ),
   )
   if (next.session !== prev.session) ops.push({ kind: 'session', session: next.session })
-  if (next.customBank && next.customBank !== prev.customBank) ops.push({ kind: 'custom-bank', customBank: next.customBank })
+  if (next.customBank && next.customBank !== prev.customBank)
+    ops.push({ kind: 'custom-bank', customBank: next.customBank })
   if (ops.length > maxOps || (!next.settings && prev.settings)) return [{ kind: 'state', state: next }]
   return ops
 }

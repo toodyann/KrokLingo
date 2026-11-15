@@ -54,7 +54,16 @@ const K = {
   ],
 }
 
-const ORDER = ['biology', 'anatomy', 'histology', 'physiology', 'biochemistry', 'microbiology', 'pathology', 'pharmacology']
+const ORDER = [
+  'biology',
+  'anatomy',
+  'histology',
+  'physiology',
+  'biochemistry',
+  'microbiology',
+  'pathology',
+  'pharmacology',
+]
 
 function scores(item) {
   const text = item.text + ' || ' + item.options.join(' | ')
@@ -70,40 +79,128 @@ function scores(item) {
   }
   // the stem's final question is a strong hint ("What drug...", "What enzyme...")
   const tail = item.text.slice(-160)
-  if (/what (drug|medicine|preparation|agent|medication)|which (drug|medicine|preparation)|drug of choice|mechanism of action|pharmacological|antidote/i.test(tail)) s.pharmacology += 4
-  if (/what (enzyme|vitamin|coenzyme|amino acid|substance|compound|metabolite)|which (enzyme|vitamin)/i.test(tail)) s.biochemistry += 3
-  if (/causative agent|what (microorganism|bacteri|virus|pathogen)|what (method|reaction|test) .*diagnos|what (medium|culture medium|stain)|immunity|vaccin/i.test(tail)) s.microbiology += 4
-  if (/what (helminth|parasite|protozoa|organism)|helminthiasis|mode of inheritance|type of inheritance|probability|karyotype|chromosom/i.test(tail)) s.biology += 4
-  if (/what (nerve|artery|vein|muscle|bone|ligament|foramen|lymph node|structure|part|organ)|which (nerve|artery|vein|muscle|bone)|is (most likely )?(damaged|injured|affected)/i.test(tail)) s.anatomy += 3
-  if (/what (cells?|tissue|structure|organ) (is|are|was|were)? ?(shown|presented|visualized|observed|in the specimen)|name (the|these) cells|what cells|what tissue|what (stage|period) of (embryo|develop)|provisory organ|germ layer/i.test(tail)) s.histology += 3
-  if (/what (process|pathological process|disease|condition|type of|complication|mechanism)|pathogenesis|what is the (most likely )?(diagnosis|cause)/i.test(tail)) s.pathology += 2
-  if (/what (changes|reflex|receptor)|what will (happen|change|increase|decrease)|how will .* change|what (hormone|mechanism of regulation)/i.test(tail)) s.physiology += 2
+  if (
+    /what (drug|medicine|preparation|agent|medication)|which (drug|medicine|preparation)|drug of choice|mechanism of action|pharmacological|antidote/i.test(
+      tail,
+    )
+  )
+    s.pharmacology += 4
+  if (/what (enzyme|vitamin|coenzyme|amino acid|substance|compound|metabolite)|which (enzyme|vitamin)/i.test(tail))
+    s.biochemistry += 3
+  if (
+    /causative agent|what (microorganism|bacteri|virus|pathogen)|what (method|reaction|test) .*diagnos|what (medium|culture medium|stain)|immunity|vaccin/i.test(
+      tail,
+    )
+  )
+    s.microbiology += 4
+  if (
+    /what (helminth|parasite|protozoa|organism)|helminthiasis|mode of inheritance|type of inheritance|probability|karyotype|chromosom/i.test(
+      tail,
+    )
+  )
+    s.biology += 4
+  if (
+    /what (nerve|artery|vein|muscle|bone|ligament|foramen|lymph node|structure|part|organ)|which (nerve|artery|vein|muscle|bone)|is (most likely )?(damaged|injured|affected)/i.test(
+      tail,
+    )
+  )
+    s.anatomy += 3
+  if (
+    /what (cells?|tissue|structure|organ) (is|are|was|were)? ?(shown|presented|visualized|observed|in the specimen)|name (the|these) cells|what cells|what tissue|what (stage|period) of (embryo|develop)|provisory organ|germ layer/i.test(
+      tail,
+    )
+  )
+    s.histology += 3
+  if (
+    /what (process|pathological process|disease|condition|type of|complication|mechanism)|pathogenesis|what is the (most likely )?(diagnosis|cause)/i.test(
+      tail,
+    )
+  )
+    s.pathology += 2
+  if (
+    /what (changes|reflex|receptor)|what will (happen|change|increase|decrease)|how will .* change|what (hormone|mechanism of regulation)/i.test(
+      tail,
+    )
+  )
+    s.physiology += 2
 
   // --- what is being asked (the last sentence) ---
   const ask = item.text.split(/(?<=[.?!:])\s+/).pop() || tail
   const bump = (topic, re, w) => {
     if (re.test(ask)) s[topic] += w
   }
-  bump('physiology', /receptors? (?:initiate|of)|initiate (?:this|the) reflex|what (?:kind|type) of (?:inhibition|muscle contraction|contraction|reflex)|inhibition caused|(?:localized|located) in(?: the)?:?$|what (?:part|structure) of the (?:brain|cns|central nervous)|analy[sz]er|what (?:process|processes) (?:of|in) (?:the )?(?:heart|kidney|nephron)|basal metabolism|respiratory (?:quotient|coefficient)/i, 4)
-  bump('pathology', /(?:hypoxia|jaundice|an(?:a)?emia|leukocytosis|arrhythmia|shock|fever) type|what (?:type|kind|form) of (?:hypoxia|jaundice|an(?:a)?emia|leukocytosis|arrhythmia|shock|o?edema|fever|hypersensitivity|allergic reaction|inflammation|necrosis|dystrophy|atrophy)|mechanism (?:has caused|underlies|of (?:its|their|the) development|is the leading)|leading (?:link|mechanism)|what disorder|what (?:is the )?(?:most likely )?diagnosis|what (?:pathological )?process/i, 4)
+  bump(
+    'physiology',
+    /receptors? (?:initiate|of)|initiate (?:this|the) reflex|what (?:kind|type) of (?:inhibition|muscle contraction|contraction|reflex)|inhibition caused|(?:localized|located) in(?: the)?:?$|what (?:part|structure) of the (?:brain|cns|central nervous)|analy[sz]er|what (?:process|processes) (?:of|in) (?:the )?(?:heart|kidney|nephron)|basal metabolism|respiratory (?:quotient|coefficient)/i,
+    4,
+  )
+  bump(
+    'pathology',
+    /(?:hypoxia|jaundice|an(?:a)?emia|leukocytosis|arrhythmia|shock|fever) type|what (?:type|kind|form) of (?:hypoxia|jaundice|an(?:a)?emia|leukocytosis|arrhythmia|shock|o?edema|fever|hypersensitivity|allergic reaction|inflammation|necrosis|dystrophy|atrophy)|mechanism (?:has caused|underlies|of (?:its|their|the) development|is the leading)|leading (?:link|mechanism)|what disorder|what (?:is the )?(?:most likely )?diagnosis|what (?:pathological )?process/i,
+    4,
+  )
   bump('pathology', /most likely cause/i, 2)
-  if (/histolog\w* (?:specimen|preparation|slide)|microspecimen|microslide|electron micro\w*|microphotogra\w*/i.test(item.text)) s.histology += 4
-  bump('histology', /name (?:this|the) tissue|what tissue|what epithelium|epithelium lines|what cells (?:are|is|form)|specify (?:these|this) cells|cells? (?:of|in) (?:the )?(?:specimen|preparation)|what (?:structure|organ) is (?:shown|presented)|microslide|microspecimen/i, 4)
-  bump('pharmacology', /specify (?:this|the) (?:drug|agent|preparation|medicine|antiseptic)|name (?:this|the) (?:drug|preparation)|what (?:drug|agent) (?:should|can|is)/i, 4)
-  bump('pathology', /gland'?s? function (?:was|is) (?:disturbed|impaired|affected)|function of (?:what|which) gland|what gland'?s?/i, 3)
-  bump('microbiology', /causative agent|what (?:microorganisms?|bacteria|viruses?|fungi)|what (?:method|reaction|test) (?:should|can|allows|is used)|nutrient medium|what (?:stain|staining)|isolated (?:pure )?culture/i, 3)
-  if (/bacteriolog\w*|bacterioscop\w*|virolog\w*|gram'?s? (?:method|stain)|stained (?:by|with|according to) (?:gram|ziehl|neisser|burri|ginss)|inoculat\w*|colonies|pure culture/i.test(item.text)) s.microbiology += 3
+  if (
+    /histolog\w* (?:specimen|preparation|slide)|microspecimen|microslide|electron micro\w*|microphotogra\w*/i.test(
+      item.text,
+    )
+  )
+    s.histology += 4
+  bump(
+    'histology',
+    /name (?:this|the) tissue|what tissue|what epithelium|epithelium lines|what cells (?:are|is|form)|specify (?:these|this) cells|cells? (?:of|in) (?:the )?(?:specimen|preparation)|what (?:structure|organ) is (?:shown|presented)|microslide|microspecimen/i,
+    4,
+  )
+  bump(
+    'pharmacology',
+    /specify (?:this|the) (?:drug|agent|preparation|medicine|antiseptic)|name (?:this|the) (?:drug|preparation)|what (?:drug|agent) (?:should|can|is)/i,
+    4,
+  )
+  bump(
+    'pathology',
+    /gland'?s? function (?:was|is) (?:disturbed|impaired|affected)|function of (?:what|which) gland|what gland'?s?/i,
+    3,
+  )
+  bump(
+    'microbiology',
+    /causative agent|what (?:microorganisms?|bacteria|viruses?|fungi)|what (?:method|reaction|test) (?:should|can|allows|is used)|nutrient medium|what (?:stain|staining)|isolated (?:pure )?culture/i,
+    3,
+  )
+  if (
+    /bacteriolog\w*|bacterioscop\w*|virolog\w*|gram'?s? (?:method|stain)|stained (?:by|with|according to) (?:gram|ziehl|neisser|burri|ginss)|inoculat\w*|colonies|pure culture/i.test(
+      item.text,
+    )
+  )
+    s.microbiology += 3
 
   // --- what kind of answers are offered (how many options are of one type) ---
   const opts = item.options
   const share = (re) => opts.filter((o) => re.test(o)).length
   const byType = [
-    ['anatomy', /\b(?:nerves?|arter(?:y|ies)|veins?|muscles?|m\.|n\.|a\.|v\.|bones?|foramen|canal|fossa|ganglion|ligament|joint|nucleus of|branch(?:es)? of|lymph nodes?|sinus|duct)\b/i],
-    ['pathology', /(?:itis|osis|oma|emia|aemia|uria|pathy|plasia|trophy)\b|\b(?:an(?:a)?emia|leuk(?:a)?emia|insufficiency|failure|hypofunction|hyperfunction|hyper\w+ism|hypo\w+ism|jaundice|hypoxia|shock|edema|oedema|thrombosis|embolism|infarction|necrosis|inflammation|cachexia|syndrome|disease)\b/i],
-    ['microbiology', /\b(?:[a-z]+cocc(?:us|i)|bacill\w*|clostridi\w*|mycobacteri\w*|corynebacteri\w*|salmonell\w*|shigell\w*|escherichia|neisseri\w*|treponem\w*|candida|actinomyc\w*|virus\w*|vibrio|bordetell\w*|klebsiell\w*|pseudomonas|proteus|yersini\w*|rickett\w*|chlamyd\w*|mycoplasm\w*|spirochet\w*|leptospir\w*|borreli\w*)\b/i],
-    ['pharmacology', /(?:cillin|mycin|cyclin|floxacin|azole|olol|pril|sartan|dipine|statin|prazole|tidine|caine|azepam|barbital|profen|fenac|metacin)\b|\b(?:drugs?|blockers?|agonists?|antagonists?|inhibitors? of|analgesics?|anesthetics?|anaesthetics?|antibiotics?|diuretics?)\b/i],
-    ['biochemistry', /(?:ase|ases)\b|\b(?:acid|vitamin|coenzyme|nad|fad|atp|glucose|glycogen|cholesterol|lipoprotein|urea|ammonia|bilirubin|hemoglobin|haemoglobin|amino|phosphate|lactate|pyruvate|ketone)\b/i],
-    ['histology', /(?<!lympho|mono)(?:cytes?|blasts?|clasts?)\b|\b(?:epitheli\w*|tissue|cells?|fibers|fibres|lamina|layer|membrane|granules|organelles?|mitochondria|ribosomes?|lysosomes?)\b/i],
+    [
+      'anatomy',
+      /\b(?:nerves?|arter(?:y|ies)|veins?|muscles?|m\.|n\.|a\.|v\.|bones?|foramen|canal|fossa|ganglion|ligament|joint|nucleus of|branch(?:es)? of|lymph nodes?|sinus|duct)\b/i,
+    ],
+    [
+      'pathology',
+      /(?:itis|osis|oma|emia|aemia|uria|pathy|plasia|trophy)\b|\b(?:an(?:a)?emia|leuk(?:a)?emia|insufficiency|failure|hypofunction|hyperfunction|hyper\w+ism|hypo\w+ism|jaundice|hypoxia|shock|edema|oedema|thrombosis|embolism|infarction|necrosis|inflammation|cachexia|syndrome|disease)\b/i,
+    ],
+    [
+      'microbiology',
+      /\b(?:[a-z]+cocc(?:us|i)|bacill\w*|clostridi\w*|mycobacteri\w*|corynebacteri\w*|salmonell\w*|shigell\w*|escherichia|neisseri\w*|treponem\w*|candida|actinomyc\w*|virus\w*|vibrio|bordetell\w*|klebsiell\w*|pseudomonas|proteus|yersini\w*|rickett\w*|chlamyd\w*|mycoplasm\w*|spirochet\w*|leptospir\w*|borreli\w*)\b/i,
+    ],
+    [
+      'pharmacology',
+      /(?:cillin|mycin|cyclin|floxacin|azole|olol|pril|sartan|dipine|statin|prazole|tidine|caine|azepam|barbital|profen|fenac|metacin)\b|\b(?:drugs?|blockers?|agonists?|antagonists?|inhibitors? of|analgesics?|anesthetics?|anaesthetics?|antibiotics?|diuretics?)\b/i,
+    ],
+    [
+      'biochemistry',
+      /(?:ase|ases)\b|\b(?:acid|vitamin|coenzyme|nad|fad|atp|glucose|glycogen|cholesterol|lipoprotein|urea|ammonia|bilirubin|hemoglobin|haemoglobin|amino|phosphate|lactate|pyruvate|ketone)\b/i,
+    ],
+    [
+      'histology',
+      /(?<!lympho|mono)(?:cytes?|blasts?|clasts?)\b|\b(?:epitheli\w*|tissue|cells?|fibers|fibres|lamina|layer|membrane|granules|organelles?|mitochondria|ribosomes?|lysosomes?)\b/i,
+    ],
   ]
   for (const [topic, re] of byType) {
     const n = share(re)
@@ -154,7 +251,10 @@ function segmentWith(order, S) {
 }
 
 // Booklets of different years put microbiology before or after pathology; try both orders.
-const ORDERS = [ORDER, ['biology', 'anatomy', 'histology', 'physiology', 'biochemistry', 'pathology', 'microbiology', 'pharmacology']]
+const ORDERS = [
+  ORDER,
+  ['biology', 'anatomy', 'histology', 'physiology', 'biochemistry', 'pathology', 'microbiology', 'pharmacology'],
+]
 
 function segment(items, score = scores) {
   const S = items.map(score)

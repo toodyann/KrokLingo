@@ -48,7 +48,9 @@ export function TestPage() {
 
   const go = useCallback(
     (index: number) =>
-      setSession((prev) => (prev ? { ...prev, current: Math.max(0, Math.min(index, prev.questions.length - 1)) } : prev)),
+      setSession((prev) =>
+        prev ? { ...prev, current: Math.max(0, Math.min(index, prev.questions.length - 1)) } : prev,
+      ),
     [setSession],
   )
 
@@ -244,7 +246,13 @@ export function TestPage() {
       </div>
 
       <div className="bottom-toolbar material">
-        <Button variant="ghost" size="icon" onClick={() => go(session.current - 1)} disabled={isFirst} aria-label="Попереднє питання">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => go(session.current - 1)}
+          disabled={isFirst}
+          aria-label="Попереднє питання"
+        >
           <IconChevronLeft />
         </Button>
         <Button variant="outline" className="flex-1" onClick={() => setPaletteOpen(true)} aria-label="Усі питання">

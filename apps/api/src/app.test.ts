@@ -41,7 +41,14 @@ const entry = (id: string, word: string, updatedAt = 1): DictEntry => ({
 })
 
 const attempt = (id: string, finishedAt: number) =>
-  ({ id, mode: 'training', title: 'Тренування', startedAt: finishedAt - 1000, finishedAt, items: [] }) as unknown as AttemptRecord
+  ({
+    id,
+    mode: 'training',
+    title: 'Тренування',
+    startedAt: finishedAt - 1000,
+    finishedAt,
+    items: [],
+  }) as unknown as AttemptRecord
 
 let pg: PGlite
 let app: FastifyInstance
@@ -76,15 +83,25 @@ describe('auth', () => {
 
   it('rejects requests without a token, with a wrong signature, audience or an expired token', async () => {
     expect((await call('GET', '/api/state')).statusCode).toBe(401)
-    expect((await call('GET', '/api/state', await token(ALICE, { secret: 'another-secret-another-secret-123' }))).statusCode).toBe(401)
+    expect(
+      (await call('GET', '/api/state', await token(ALICE, { secret: 'another-secret-another-secret-123' }))).statusCode,
+    ).toBe(401)
     expect((await call('GET', '/api/state', await token(ALICE, { aud: 'anon' }))).statusCode).toBe(401)
     expect((await call('GET', '/api/state', await token(ALICE, { exp: '-1m' }))).statusCode).toBe(401)
   })
 
   it('answers CORS preflight only for allowed origins', async () => {
-    const ok = await app.inject({ method: 'OPTIONS', url: '/api/state', headers: { origin: 'https://toodyann.github.io', 'access-control-request-method': 'PUT' } })
+    const ok = await app.inject({
+      method: 'OPTIONS',
+      url: '/api/state',
+      headers: { origin: 'https://toodyann.github.io', 'access-control-request-method': 'PUT' },
+    })
     expect(ok.headers['access-control-allow-origin']).toBe('https://toodyann.github.io')
-    const bad = await app.inject({ method: 'OPTIONS', url: '/api/state', headers: { origin: 'https://evil.example', 'access-control-request-method': 'PUT' } })
+    const bad = await app.inject({
+      method: 'OPTIONS',
+      url: '/api/state',
+      headers: { origin: 'https://evil.example', 'access-control-request-method': 'PUT' },
+    })
     expect(bad.headers['access-control-allow-origin']).toBeUndefined()
   })
 })
@@ -102,7 +119,10 @@ describe('user data', () => {
     expect((await call('PUT', '/api/dictionary/w2', alice, { entry: entry('w2', 'pulp', 2) })).statusCode).toBe(200)
     expect((await call('PUT', '/api/history/a1', alice, { record: attempt('a1', 5000) })).statusCode).toBe(200)
     expect((await call('PUT', '/api/session', alice, { session: { id: 's1', questions: [] } })).statusCode).toBe(200)
-    expect((await call('PUT', '/api/custom-bank', alice, { customBank: { collections: [], questions: [], passages: [] } })).statusCode).toBe(200)
+    expect(
+      (await call('PUT', '/api/custom-bank', alice, { customBank: { collections: [], questions: [], passages: [] } }))
+        .statusCode,
+    ).toBe(200)
 
     const s = (await call('GET', '/api/state', alice)).json() as UserState
     expect(s.settings).toEqual({ threshold: 60 })

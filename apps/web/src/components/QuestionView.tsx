@@ -14,7 +14,8 @@ interface TextProps {
 }
 
 function Text({ as = 'span', className, text, contextId, related, clickable }: TextProps) {
-  if (clickable) return <ClickableText as={as} className={className} text={text} contextId={contextId} related={related} />
+  if (clickable)
+    return <ClickableText as={as} className={className} text={text} contextId={contextId} related={related} />
   return as === 'div' ? <div className={className}>{text}</div> : <span className={className}>{text}</span>
 }
 

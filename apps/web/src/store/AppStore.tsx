@@ -72,7 +72,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const questionLang = settings.questionLang
-  const bank = useMemo<Bank>(() => buildBank(serverBank, customBank, questionLang), [serverBank, customBank, questionLang])
+  const bank = useMemo<Bank>(
+    () => buildBank(serverBank, customBank, questionLang),
+    [serverBank, customBank, questionLang],
+  )
 
   const updateSettings = useCallback(
     (patch: Partial<Settings>) => setSettings((prev) => ({ ...DEFAULT_SETTINGS, ...prev, ...patch })),
@@ -121,7 +124,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const fresh = refreshedTranslation(e)
         if (!fresh || fresh.translation === e.translation) return e
         changed = true
-        return { ...e, translation: fresh.translation, certainty: fresh.certainty, origin: fresh.origin, source: 'builtin' as const }
+        return {
+          ...e,
+          translation: fresh.translation,
+          certainty: fresh.certainty,
+          origin: fresh.origin,
+          source: 'builtin' as const,
+        }
       })
       return changed ? next : prev
     })
@@ -139,7 +148,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const auto = existing.source !== 'manual'
         const sameContext = existing.contextId === res.contextId
         const replace =
-          auto && !!res.translation && res.source !== 'user' && res.source !== 'user-context' && (!existing.translation || sameContext)
+          auto &&
+          !!res.translation &&
+          res.source !== 'user' &&
+          res.source !== 'user-context' &&
+          (!existing.translation || sameContext)
         const updated: DictEntry = {
           ...existing,
           lookups: existing.lookups + 1,
@@ -237,15 +250,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [setDictionary],
   )
 
-  const addAttempt = useCallback(
-    (record: AttemptRecord) => setHistory((prev) => [...prev, record]),
-    [setHistory],
-  )
+  const addAttempt = useCallback((record: AttemptRecord) => setHistory((prev) => [...prev, record]), [setHistory])
 
-  const deleteAttempt = useCallback(
-    (id: string) => setHistory((prev) => prev.filter((r) => r.id !== id)),
-    [setHistory],
-  )
+  const deleteAttempt = useCallback((id: string) => setHistory((prev) => prev.filter((r) => r.id !== id)), [setHistory])
 
   const value: AppState = {
     bank,

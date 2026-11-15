@@ -139,7 +139,9 @@ export function useCloudSync(state: UserState, apply: (next: UserState) => void)
     // undefined = not known yet, so the first "no session" also leaves the connecting state
     let current: string | null | undefined = undefined
     void getSupabase().then((sb) => {
-      const onSession = (session: { user: { id: string; email?: string; user_metadata?: Record<string, unknown> } } | null) => {
+      const onSession = (
+        session: { user: { id: string; email?: string; user_metadata?: Record<string, unknown> } } | null,
+      ) => {
         const id = session?.user.id ?? null
         if (id === current) return
         current = id

@@ -114,9 +114,13 @@ export async function seedBank(db: Db, source: BankSource): Promise<boolean> {
       )
     }
     for (let i = 0; i < source.passages.length; i += 500) {
-      await tx.insert(bankPassages).values(
-        source.passages.slice(i, i + 500).map((p) => ({ id: p.id, collectionId: p.collection, title: p.title, text: p.text })),
-      )
+      await tx
+        .insert(bankPassages)
+        .values(
+          source.passages
+            .slice(i, i + 500)
+            .map((p) => ({ id: p.id, collectionId: p.collection, title: p.title, text: p.text })),
+        )
     }
     for (let i = 0; i < source.questions.length; i += 500) {
       await tx.insert(bankQuestions).values(

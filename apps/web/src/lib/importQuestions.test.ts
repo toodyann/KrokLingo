@@ -42,8 +42,16 @@ describe('parseImport', () => {
       ],
       'f',
     )
-    expect(r.errors.map((e) => e.split(':')[0])).toEqual(['Питання 1', 'Питання 2', 'Питання 3', 'Питання 4', 'Питання 5'])
-    expect(r.questions).toEqual([expect.objectContaining({ text: 'Good', options: ['x', 'y'], correct: 1, explanation: 'why' })])
+    expect(r.errors.map((e) => e.split(':')[0])).toEqual([
+      'Питання 1',
+      'Питання 2',
+      'Питання 3',
+      'Питання 4',
+      'Питання 5',
+    ])
+    expect(r.questions).toEqual([
+      expect.objectContaining({ text: 'Good', options: ['x', 'y'], correct: 1, explanation: 'why' }),
+    ])
   })
 
   it('shares one passage between questions with the same text', () => {

@@ -26,11 +26,14 @@ export function ResultsPage({ id }: { id: string }) {
     return (
       <div className="page">
         <PageHeader back={{ href: link('history'), label: 'Історія' }} title="Результати" />
-        <EmptyState title="Результат не знайдено" actions={
+        <EmptyState
+          title="Результат не знайдено"
+          actions={
             <Button asChild variant="outline">
               <a href={link('history')}>До історії</a>
             </Button>
-          } />
+          }
+        />
       </div>
     )
   }
@@ -125,42 +128,47 @@ export function ResultsPage({ id }: { id: string }) {
       </div>
 
       <div className="split">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Детальний розбір</CardTitle>
-          <CardAction>
-            <Segmented value={filter} onChange={setFilter} options={filters} label="Фільтр питань" />
-          </CardAction>
-        </CardHeader>
-        <CardContent>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Детальний розбір</CardTitle>
+            <CardAction>
+              <Segmented value={filter} onChange={setFilter} options={filters} label="Фільтр питань" />
+            </CardAction>
+          </CardHeader>
+          <CardContent>
+            {items.length === 0 && <EmptyState bare title="Немає питань у цій категорії" />}
 
-        {items.length === 0 && <EmptyState bare title="Немає питань у цій категорії" />}
-
-        {items.map(({ item, index, question }) => {
-          const ok = question && item.chosen === question.correct
-          return (
-            <article className="review-item" key={item.qid + index}>
-              <div className="review-head">
-                <b className="tnum">Питання {index + 1}</b>
-                {question && <Badge variant="secondary">{bank.topicName(question.topic)}</Badge>}
-                {item.chosen == null ? (
-                  <Badge variant="warning">без відповіді</Badge>
-                ) : ok ? (
-                  <Badge variant="success">✓ правильно</Badge>
-                ) : (
-                  <Badge variant="destructive">✗ неправильно</Badge>
-                )}
-              </div>
-              {question ? (
-                <QuestionView question={question} order={item.order} chosen={item.chosen} reveal passageOpen={false} />
-              ) : (
-                <p className="secondary">Питання видалене з бази.</p>
-              )}
-            </article>
-          )
-        })}
-        </CardContent>
-      </Card>
+            {items.map(({ item, index, question }) => {
+              const ok = question && item.chosen === question.correct
+              return (
+                <article className="review-item" key={item.qid + index}>
+                  <div className="review-head">
+                    <b className="tnum">Питання {index + 1}</b>
+                    {question && <Badge variant="secondary">{bank.topicName(question.topic)}</Badge>}
+                    {item.chosen == null ? (
+                      <Badge variant="warning">без відповіді</Badge>
+                    ) : ok ? (
+                      <Badge variant="success">✓ правильно</Badge>
+                    ) : (
+                      <Badge variant="destructive">✗ неправильно</Badge>
+                    )}
+                  </div>
+                  {question ? (
+                    <QuestionView
+                      question={question}
+                      order={item.order}
+                      chosen={item.chosen}
+                      reveal
+                      passageOpen={false}
+                    />
+                  ) : (
+                    <p className="secondary">Питання видалене з бази.</p>
+                  )}
+                </article>
+              )
+            })}
+          </CardContent>
+        </Card>
 
         <aside className="split-aside">
           <Card>
@@ -181,28 +189,28 @@ export function ResultsPage({ id }: { id: string }) {
               </CardAction>
             </CardHeader>
             <CardContent>
-          {record.newWords.length === 0 ? (
-            <p className="text-muted-foreground">Нових слів немає</p>
-          ) : (
-            <>
-              <div className="word-list">
-                {record.newWords.map((w) => (
-                  <div className="word-chip" key={w.word}>
-                    <b>{w.word}</b>
-                    <span>{w.translation || 'без перекладу'}</span>
+              {record.newWords.length === 0 ? (
+                <p className="text-muted-foreground">Нових слів немає</p>
+              ) : (
+                <>
+                  <div className="word-list">
+                    {record.newWords.map((w) => (
+                      <div className="word-chip" key={w.word}>
+                        <b>{w.word}</b>
+                        <span>{w.translation || 'без перекладу'}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <div className="row" style={{ marginTop: 16 }}>
-                <Button asChild size="sm" variant="secondary">
-                  <a href={link('flashcards')}>Повторити картками</a>
-                </Button>
-                <Button asChild size="sm" variant="ghost">
-                  <a href={link('dictionary')}>Відкрити словник</a>
-                </Button>
-              </div>
-            </>
-          )}
+                  <div className="row" style={{ marginTop: 16 }}>
+                    <Button asChild size="sm" variant="secondary">
+                      <a href={link('flashcards')}>Повторити картками</a>
+                    </Button>
+                    <Button asChild size="sm" variant="ghost">
+                      <a href={link('dictionary')}>Відкрити словник</a>
+                    </Button>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </aside>

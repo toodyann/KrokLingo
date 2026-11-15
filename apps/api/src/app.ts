@@ -24,11 +24,19 @@ export interface AppOptions {
 
 // Bodies are validated for the fields the API relies on; the rest of each record is the web app's own
 // shape and is stored as is.
-const Entry = z.looseObject({ id: z.string().min(1).max(100), word: z.string().min(1).max(300), updatedAt: z.number().optional() })
+const Entry = z.looseObject({
+  id: z.string().min(1).max(100),
+  word: z.string().min(1).max(300),
+  updatedAt: z.number().optional(),
+})
 const Attempt = z.looseObject({ id: z.string().min(1).max(100), finishedAt: z.number() })
 const Settings = z.looseObject({})
 const Session = z.looseObject({ id: z.string().min(1).max(100) })
-const Bank = z.looseObject({ collections: z.array(z.unknown()), questions: z.array(z.unknown()), passages: z.array(z.unknown()) })
+const Bank = z.looseObject({
+  collections: z.array(z.unknown()),
+  questions: z.array(z.unknown()),
+  passages: z.array(z.unknown()),
+})
 const State = z.object({
   settings: Settings.nullable(),
   dictionary: z.array(Entry).max(50_000),
@@ -43,7 +51,11 @@ async function readState(db: Db, userId: string): Promise<UserState> {
   const [settings, dictionary, history, session, bank] = await Promise.all([
     db.select({ data: userSettings.data }).from(userSettings).where(eq(userSettings.userId, userId)),
     db.select({ data: dictionaryEntries.data }).from(dictionaryEntries).where(eq(dictionaryEntries.userId, userId)),
-    db.select({ data: attempts.data }).from(attempts).where(eq(attempts.userId, userId)).orderBy(asc(attempts.finishedAt)),
+    db
+      .select({ data: attempts.data })
+      .from(attempts)
+      .where(eq(attempts.userId, userId))
+      .orderBy(asc(attempts.finishedAt)),
     db.select({ data: activeSessions.data }).from(activeSessions).where(eq(activeSessions.userId, userId)),
     db.select({ data: customBanks.data }).from(customBanks).where(eq(customBanks.userId, userId)),
   ])
@@ -88,7 +100,8 @@ export async function buildApp(opts: AppOptions): Promise<FastifyInstance> {
   })
 
   app.setErrorHandler((err, _req, reply) => {
-    if (err instanceof z.ZodError) return reply.code(400).send({ error: 'invalid body', issues: err.issues.slice(0, 5) })
+    if (err instanceof z.ZodError)
+      return reply.code(400).send({ error: 'invalid body', issues: err.issues.slice(0, 5) })
     const status = (err as { statusCode?: number }).statusCode ?? 500
     if (status >= 500) app.log.error(err)
     return reply.code(status).send({ error: status >= 500 ? 'internal error' : (err as Error).message })
@@ -167,7 +180,9 @@ export async function buildApp(opts: AppOptions): Promise<FastifyInstance> {
 
   app.delete('/api/dictionary/:id', async (req) => {
     const { id } = req.params as { id: string }
-    await db.delete(dictionaryEntries).where(and(eq(dictionaryEntries.userId, req.user.id), eq(dictionaryEntries.id, id)))
+    await db
+      .delete(dictionaryEntries)
+      .where(and(eq(dictionaryEntries.userId, req.user.id), eq(dictionaryEntries.id, id)))
     return { ok: true }
   })
 

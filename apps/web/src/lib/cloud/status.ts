@@ -1,6 +1,9 @@
 import type { SyncStatus } from '../../store/useCloudSync'
 
-export const SYNC_STATUS: Record<SyncStatus, { label: string; variant: 'success' | 'secondary' | 'warning' | 'destructive' }> = {
+export const SYNC_STATUS: Record<
+  SyncStatus,
+  { label: string; variant: 'success' | 'secondary' | 'warning' | 'destructive' }
+> = {
   off: { label: 'Вимкнено', variant: 'secondary' },
   'signed-out': { label: 'Не виконано вхід', variant: 'secondary' },
   connecting: { label: 'Підключення…', variant: 'secondary' },

@@ -132,7 +132,10 @@ export function SettingsPage() {
     })
     if (!ok) return
     app.resetAll()
-    setMessage({ kind: 'ok', text: account.user ? 'Усі дані видалено з цього браузера й облікового запису.' : 'Усі дані видалено.' })
+    setMessage({
+      kind: 'ok',
+      text: account.user ? 'Усі дані видалено з цього браузера й облікового запису.' : 'Усі дані видалено.',
+    })
   }
 
   const { account } = app
@@ -142,7 +145,11 @@ export function SettingsPage() {
       <PageHeader title="Налаштування" />
 
       {message && (
-        <Alert variant={message.kind === 'bad' ? 'destructive' : 'default'} className="mb-6 max-w-[1240px]" role="status">
+        <Alert
+          variant={message.kind === 'bad' ? 'destructive' : 'default'}
+          className="mb-6 max-w-[1240px]"
+          role="status"
+        >
           <AlertDescription>{message.text}</AlertDescription>
           <AlertAction>
             <Button variant="ghost" size="icon-sm" onClick={() => setMessage(null)} aria-label="Закрити повідомлення">
@@ -255,7 +262,9 @@ export function SettingsPage() {
               <Button onClick={() => importRef.current?.click()}>Імпортувати JSON</Button>
               <Button
                 variant="outline"
-                onClick={() => downloadFile('kroklingo-shablon.json', JSON.stringify(IMPORT_TEMPLATE, null, 2), 'application/json')}
+                onClick={() =>
+                  downloadFile('kroklingo-shablon.json', JSON.stringify(IMPORT_TEMPLATE, null, 2), 'application/json')
+                }
               >
                 Завантажити шаблон
               </Button>

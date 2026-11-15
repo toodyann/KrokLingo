@@ -17,11 +17,7 @@ export function InstallCard() {
       <CardContent className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
         {state === 'installed' && <Badge variant="success">Встановлено</Badge>}
         {state === 'available' && <Button onClick={() => void install()}>Встановити</Button>}
-        {state === 'ios' && (
-          <p>
-            У Safari натисніть «Поділитися», потім «На початковий екран».
-          </p>
-        )}
+        {state === 'ios' && <p>У Safari натисніть «Поділитися», потім «На початковий екран».</p>}
         {state === 'unsupported' && (
           <p>Відкрийте меню браузера й виберіть «Встановити застосунок» або «Додати на головний екран».</p>
         )}

@@ -10,7 +10,14 @@ describe('tokenizer', () => {
   })
 
   it('keeps apostrophes inside words', () => {
-    expect(words("Wharton's duct and the patient’s tongue")).toEqual(["Wharton's", 'duct', 'and', 'the', 'patient’s', 'tongue'])
+    expect(words("Wharton's duct and the patient’s tongue")).toEqual([
+      "Wharton's",
+      'duct',
+      'and',
+      'the',
+      'patient’s',
+      'tongue',
+    ])
   })
 
   it('keeps abbreviations with digits and mixed case whole', () => {

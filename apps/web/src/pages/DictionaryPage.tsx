@@ -100,14 +100,14 @@ export function DictionaryPage() {
             <CardTitle className="text-base">Нове слово</CardTitle>
           </CardHeader>
           <CardContent>
-          <EntryForm
-            submitLabel="Додати слово"
-            onCancel={() => setAdding(false)}
-            onSubmit={(v) => {
-              addEntry(v.word, v.translation, v.note)
-              setAdding(false)
-            }}
-          />
+            <EntryForm
+              submitLabel="Додати слово"
+              onCancel={() => setAdding(false)}
+              onSubmit={(v) => {
+                addEntry(v.word, v.translation, v.note)
+                setAdding(false)
+              }}
+            />
           </CardContent>
         </Card>
       )}
@@ -220,7 +220,10 @@ export function DictionaryPage() {
                 <Button
                   variant="destructive"
                   onClick={() =>
-                    remove(learned, `Видалено ${learned.length} ${pluralUk(learned.length, 'вивчене слово', 'вивчені слова', 'вивчених слів')}`)
+                    remove(
+                      learned,
+                      `Видалено ${learned.length} ${pluralUk(learned.length, 'вивчене слово', 'вивчені слова', 'вивчених слів')}`,
+                    )
                   }
                 >
                   Видалити вивчені
@@ -373,7 +376,14 @@ function IconAction({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon" onClick={onClick} aria-label={ariaLabel} aria-pressed={pressed} className={className}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClick}
+          aria-label={ariaLabel}
+          aria-pressed={pressed}
+          className={className}
+        >
           {children}
         </Button>
       </TooltipTrigger>

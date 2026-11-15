@@ -22,7 +22,12 @@ const MODES: [Mode | 'all', string][] = [
 
 const dayFmt = new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
 const timeFmt = new Intl.DateTimeFormat('uk-UA', { hour: '2-digit', minute: '2-digit' })
-const shortFmt = new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+const shortFmt = new Intl.DateTimeFormat('uk-UA', {
+  day: 'numeric',
+  month: 'short',
+  hour: '2-digit',
+  minute: '2-digit',
+})
 
 function dayTitle(day: number): string {
   const today = startOfDay(Date.now())
@@ -77,11 +82,7 @@ export function HistoryPage() {
     <div className="page">
       <PageHeader
         title="Історія"
-        actions={
-          history.length > 0 && (
-            <Segmented value={mode} onChange={setMode} options={MODES} label="Режим" />
-          )
-        }
+        actions={history.length > 0 && <Segmented value={mode} onChange={setMode} options={MODES} label="Режим" />}
       />
 
       {history.length === 0 ? (
@@ -124,7 +125,9 @@ export function HistoryPage() {
                             className={`history-row-delta ${dir}`}
                             title="Порівняно з попередньою спробою цього режиму"
                           >
-                            {d == null ? '' : `${dir === 'up' ? '▲ +' : dir === 'down' ? '▼ −' : ''}${formatPercent(Math.abs(d)).replace('%', '')} п.п.`}
+                            {d == null
+                              ? ''
+                              : `${dir === 'up' ? '▲ +' : dir === 'down' ? '▼ −' : ''}${formatPercent(Math.abs(d)).replace('%', '')} п.п.`}
                           </span>
                           <Badge variant={r.passed ? 'success' : 'destructive'} className="tnum">
                             {r.passed ? '✓' : '✗'} {formatPercent(r.percent)}
@@ -146,37 +149,37 @@ export function HistoryPage() {
                 <CardAction className="text-sm text-muted-foreground">останні {trend.length}</CardAction>
               </CardHeader>
               <CardContent>
-              {trend.length < 2 ? (
-                <div className="chart-empty" style={{ minHeight: 140 }}>
-                  Потрібно щонайменше 2 спроби
+                {trend.length < 2 ? (
+                  <div className="chart-empty" style={{ minHeight: 140 }}>
+                    Потрібно щонайменше 2 спроби
+                  </div>
+                ) : (
+                  <div className="chart-card" style={{ border: 'none', boxShadow: 'none', padding: 0 }}>
+                    <Suspense fallback={<div style={{ height: 180 }} />}>
+                      <ScoreTrend points={trend} threshold={settings.threshold} />
+                    </Suspense>
+                  </div>
+                )}
+                <div className="summary-rows" style={{ marginTop: 'var(--s-4)' }}>
+                  <div>
+                    <span>Спроб</span>
+                    <b>{filtered.length}</b>
+                  </div>
+                  <div>
+                    <span>Середній результат</span>
+                    <b>{filtered.length ? formatPercent(avg) : '—'}</b>
+                  </div>
+                  <div>
+                    <span>Найкращий</span>
+                    <b>{filtered.length ? formatPercent(best) : '—'}</b>
+                  </div>
+                  <div>
+                    <span>Іспитів складено</span>
+                    <b>
+                      {exams.filter((r) => r.passed).length} з {exams.length}
+                    </b>
+                  </div>
                 </div>
-              ) : (
-                <div className="chart-card" style={{ border: 'none', boxShadow: 'none', padding: 0 }}>
-                  <Suspense fallback={<div style={{ height: 180 }} />}>
-                    <ScoreTrend points={trend} threshold={settings.threshold} />
-                  </Suspense>
-                </div>
-              )}
-              <div className="summary-rows" style={{ marginTop: 'var(--s-4)' }}>
-                <div>
-                  <span>Спроб</span>
-                  <b>{filtered.length}</b>
-                </div>
-                <div>
-                  <span>Середній результат</span>
-                  <b>{filtered.length ? formatPercent(avg) : '—'}</b>
-                </div>
-                <div>
-                  <span>Найкращий</span>
-                  <b>{filtered.length ? formatPercent(best) : '—'}</b>
-                </div>
-                <div>
-                  <span>Іспитів складено</span>
-                  <b>
-                    {exams.filter((r) => r.passed).length} з {exams.length}
-                  </b>
-                </div>
-              </div>
               </CardContent>
             </Card>
           </aside>

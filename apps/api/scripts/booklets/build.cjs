@@ -31,7 +31,14 @@ for (const y of YEARS) {
   const cid = `krok-${y}`
   collections.push({ id: cid, name: `Буклет ${y}`, description: `Крок 1. Стоматологія, буклет ${y} року` })
   items.forEach((it, k) =>
-    questions.push({ id: `k${y}-${it.n}`, topic: topics[k], collection: cid, text: it.text, options: it.options, src: 'booklet' }),
+    questions.push({
+      id: `k${y}-${it.n}`,
+      topic: topics[k],
+      collection: cid,
+      text: it.text,
+      options: it.options,
+      src: 'booklet',
+    }),
   )
   report.push(`${y}: ${items.length} items (source ${rawOk ? 'raw' : 'cols'}), ordered head ${headEnd}`)
 }
@@ -43,19 +50,45 @@ const latin = (s) => {
 }
 const MC = [
   { file: 'mc-2018-sub', year: 2018, cid: 'krok-2018', note: 'English subtest' },
-  { file: 'mc-2020', year: 2020, cid: 'krok-2020', name: 'Буклет 2020', description: 'Крок 1. Стоматологія, англомовний варіант 2020 року (вибірка)' },
-  { file: 'mc-2022-eng', year: 2022, cid: 'english-2022', name: 'Англійська 2022', description: 'Іспит з англійської мови професійного спрямування, 2022' },
-  { file: 'mc-2023-eng', year: 2023, cid: 'english-2023', name: 'Англійська 2023', description: 'Іспит з англійської мови професійного спрямування, 2023' },
-  { file: 'mc-2024-eng', year: 2024, cid: 'english-2024', name: 'Англійська 2024', description: 'Іспит з англійської мови професійного спрямування, 2024' },
+  {
+    file: 'mc-2020',
+    year: 2020,
+    cid: 'krok-2020',
+    name: 'Буклет 2020',
+    description: 'Крок 1. Стоматологія, англомовний варіант 2020 року (вибірка)',
+  },
+  {
+    file: 'mc-2022-eng',
+    year: 2022,
+    cid: 'english-2022',
+    name: 'Англійська 2022',
+    description: 'Іспит з англійської мови професійного спрямування, 2022',
+  },
+  {
+    file: 'mc-2023-eng',
+    year: 2023,
+    cid: 'english-2023',
+    name: 'Англійська 2023',
+    description: 'Іспит з англійської мови професійного спрямування, 2023',
+  },
+  {
+    file: 'mc-2024-eng',
+    year: 2024,
+    cid: 'english-2024',
+    name: 'Англійська 2024',
+    description: 'Іспит з англійської мови професійного спрямування, 2024',
+  },
 ]
 // document frequency over booklet stems: words common in medical questions are not passage-specific
 const df = new Map()
-for (const q of questions) for (const w of new Set(q.text.toLowerCase().match(/[a-z]{5,}/g) || [])) df.set(w, (df.get(w) || 0) + 1)
+for (const q of questions)
+  for (const w of new Set(q.text.toLowerCase().match(/[a-z]{5,}/g) || [])) df.set(w, (df.get(w) || 0) + 1)
 const PASSAGE_TITLE_FIX = { 3099: 'Pandemics' } // the page repeats the previous heading for this set
 
 for (const src of MC) {
   const sets = parseMedicalClub(readText(path.join(dir, `html/${src.file}.html`)))
-  if (src.name && !collections.some((c) => c.id === src.cid)) collections.push({ id: src.cid, name: src.name, description: src.description })
+  if (src.name && !collections.some((c) => c.id === src.cid))
+    collections.push({ id: src.cid, name: src.name, description: src.description })
   let added = 0
   for (const set of sets) {
     let passageId
@@ -64,7 +97,12 @@ for (const src of MC) {
       passageId = `p-${src.year}-${set.id}`
       const title = PASSAGE_TITLE_FIX[set.id] ?? set.passage.title
       passages.push({ id: passageId, title, text: set.passage.paragraphs.join('\n\n') })
-      words = new Set(set.passage.paragraphs.join(' ').toLowerCase().match(/[a-z]{5,}/g) || [])
+      words = new Set(
+        set.passage.paragraphs
+          .join(' ')
+          .toLowerCase()
+          .match(/[a-z]{5,}/g) || [],
+      )
     }
     set.items.forEach((it, k) => {
       if (latin(it.text + it.options.join(' ')) < 0.9) return // Ukrainian part of the 2018 page
@@ -79,7 +117,9 @@ for (const src of MC) {
         const qWords = new Set((it.text + ' ' + it.options.join(' ')).toLowerCase().match(/[a-z]{5,}/g) || [])
         const specific = [...qWords].filter((w) => words.has(w) && (df.get(w) || 0) < 15).length
         const statement = options.length <= 3 || /^choose the correct statement/i.test(it.text)
-        const clinical = it.text.length > 220 || /^(an?|the)\s+(\d+[- ]|patient|man|woman|child|girl|boy|newborn|previously|liquidator)/i.test(it.text)
+        const clinical =
+          it.text.length > 220 ||
+          /^(an?|the)\s+(\d+[- ]|patient|man|woman|child|girl|boy|newborn|previously|liquidator)/i.test(it.text)
         if (statement || (!clinical && specific >= 3)) {
           topic = 'reading'
           pid = passageId
@@ -89,11 +129,21 @@ for (const src of MC) {
         const s = scores({ text: it.text, options })
         topic = s[argmax(s)] > 0 ? argmax(s) : 'pathology'
       }
-      questions.push({ id: `mc${src.year}-${set.id}-${k + 1}`, topic, collection: src.cid, text: it.text, options, passageId: pid, src: 'mc' })
+      questions.push({
+        id: `mc${src.year}-${set.id}-${k + 1}`,
+        topic,
+        collection: src.cid,
+        text: it.text,
+        options,
+        passageId: pid,
+        src: 'mc',
+      })
       added++
     })
   }
-  report.push(`${src.file}: ${added} English items from ${sets.length} set(s)${sets.some((s) => s.passage) ? ', passages ' + sets.filter((s) => s.passage).length : ''}`)
+  report.push(
+    `${src.file}: ${added} English items from ${sets.length} set(s)${sets.some((s) => s.passage) ? ', passages ' + sets.filter((s) => s.passage).length : ''}`,
+  )
 }
 
 // ---- 3. Drop items damaged by extraction, then deduplicate (same stem + same answer -> newest copy) ----
@@ -106,12 +156,19 @@ const byKey = new Map()
 for (const q of kept) {
   const key = norm(q.text) + '|' + norm(q.options[0])
   const prev = byKey.get(key)
-  if (!prev || prev.collection.localeCompare(q.collection, 'en', { numeric: true }) < 0 || (q.passageId && !prev.passageId)) byKey.set(key, q)
+  if (
+    !prev ||
+    prev.collection.localeCompare(q.collection, 'en', { numeric: true }) < 0 ||
+    (q.passageId && !prev.passageId)
+  )
+    byKey.set(key, q)
 }
 const unique = [...byKey.values()]
 // keep collections that still have questions
 const used = new Set(unique.map((q) => q.collection))
-const outCollections = collections.filter((c) => used.has(c.id)).sort((a, b) => a.id.localeCompare(b.id, 'en', { numeric: true }))
+const outCollections = collections
+  .filter((c) => used.has(c.id))
+  .sort((a, b) => a.id.localeCompare(b.id, 'en', { numeric: true }))
 const usedPassages = new Set(unique.map((q) => q.passageId).filter(Boolean))
 
 const topicCount = {}
@@ -130,7 +187,9 @@ for (const c of outCollections) {
     collection: c,
     passages: passages.filter((p) => pids.has(p.id) && usedPassages.has(p.id)),
     // compact rows: [id, topic, text, options (correct first), passageId?]
-    questions: qs.map((q) => (q.passageId ? [q.id, q.topic, q.text, q.options, q.passageId] : [q.id, q.topic, q.text, q.options])),
+    questions: qs.map((q) =>
+      q.passageId ? [q.id, q.topic, q.text, q.options, q.passageId] : [q.id, q.topic, q.text, q.options],
+    ),
   }
   const file = path.join(outFile, `${c.id}.json`)
   fs.writeFileSync(file, JSON.stringify(out))
@@ -142,4 +201,3 @@ report.push('topics ' + JSON.stringify(topicCount))
 report.push('collections ' + JSON.stringify(perCollection))
 report.push('bytes ' + bytes)
 console.log(report.join('\n'))
-

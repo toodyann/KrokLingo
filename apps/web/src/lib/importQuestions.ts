@@ -76,9 +76,11 @@ export function parseImport(json: unknown, fallbackName: string): ImportResult {
     if (!options || options.length < 2 || !options.every((o) => typeof o === 'string' && o.trim())) {
       return errors.push(`Питання ${n}: потрібно щонайменше 2 текстові варіанти ("options").`)
     }
-    if (options.length > LETTERS.length) return errors.push(`Питання ${n}: забагато варіантів (максимум ${LETTERS.length}).`)
+    if (options.length > LETTERS.length)
+      return errors.push(`Питання ${n}: забагато варіантів (максимум ${LETTERS.length}).`)
     const correct = resolveCorrect(raw.correct ?? raw.answer, options.length)
-    if (correct === null) return errors.push(`Питання ${n}: некоректна правильна відповідь ("correct": індекс від 0 або літера A–E).`)
+    if (correct === null)
+      return errors.push(`Питання ${n}: некоректна правильна відповідь ("correct": індекс від 0 або літера A–E).`)
 
     let passageId: string | undefined
     if (typeof raw.passage === 'string' && raw.passage.trim()) {

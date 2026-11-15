@@ -9,7 +9,14 @@ const HIGHLIGHT =
 export function BrandMark({ size = 32 }: { size?: number }) {
   const id = useId()
   return (
-    <svg width={size} height={size} viewBox="150 170 954 954" aria-hidden="true" focusable="false" className="brand-mark">
+    <svg
+      width={size}
+      height={size}
+      viewBox="150 170 954 954"
+      aria-hidden="true"
+      focusable="false"
+      className="brand-mark"
+    >
       <defs>
         <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#0473D6" />

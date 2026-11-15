@@ -32,7 +32,10 @@ export function FlashcardsPage() {
     const pool = dictionary.filter((e) => e.translation && (includeLearned || !e.learned))
     const byBox = new Map<number, typeof pool>()
     for (const e of pool) byBox.set(e.box, [...(byBox.get(e.box) ?? []), e])
-    return [...byBox.keys()].sort((a, b) => a - b).flatMap((box) => shuffle(byBox.get(box)!)).map((e) => e.id)
+    return [...byBox.keys()]
+      .sort((a, b) => a - b)
+      .flatMap((box) => shuffle(byBox.get(box)!))
+      .map((e) => e.id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [round, includeLearned])
 

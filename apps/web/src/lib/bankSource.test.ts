@@ -45,13 +45,19 @@ describe('fetchBank', () => {
   it('asks for the bank without the browser cache', async () => {
     const fetch = respond(200, payload)
     await expect(fetchBank()).resolves.toEqual(payload)
-    expect(fetch).toHaveBeenCalledWith('https://api.test/api/bank', expect.objectContaining({ cache: 'no-store', headers: {} }))
+    expect(fetch).toHaveBeenCalledWith(
+      'https://api.test/api/bank',
+      expect.objectContaining({ cache: 'no-store', headers: {} }),
+    )
   })
 
   it('sends the cached version and returns null when it is still current', async () => {
     const fetch = respond(304)
     await expect(fetchBank('abc123')).resolves.toBeNull()
-    expect(fetch.mock.calls[0]).toEqual([expect.any(String), expect.objectContaining({ headers: { 'If-None-Match': '"abc123"' } })])
+    expect(fetch.mock.calls[0]).toEqual([
+      expect.any(String),
+      expect.objectContaining({ headers: { 'If-None-Match': '"abc123"' } }),
+    ])
   })
 
   it('throws on a server error', async () => {

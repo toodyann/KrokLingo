@@ -12,7 +12,15 @@ const POSES = {
 export type MascotPose = keyof typeof POSES
 
 /** Decorative: the surrounding text carries the meaning, so the image has no alt text. */
-export function Mascot({ pose = 'thumb', size = 160, className = '' }: { pose?: MascotPose; size?: number; className?: string }) {
+export function Mascot({
+  pose = 'thumb',
+  size = 160,
+  className = '',
+}: {
+  pose?: MascotPose
+  size?: number
+  className?: string
+}) {
   const p = POSES[pose]
   return (
     <img

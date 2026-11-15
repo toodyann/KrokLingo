@@ -32,9 +32,9 @@ services:
         sync: false
       # Free plan has no pre-deploy step, so migrations run when the service starts
       - key: MIGRATE_ON_START
-        value: "true"
+        value: 'true'
       - key: CORS_ORIGINS
         # the live site and the local dev server (npm run dev)
         value: https://toodyann.github.io,http://localhost:5173
       - key: DB_POOL_MAX
-        value: "5"
+        value: '5'

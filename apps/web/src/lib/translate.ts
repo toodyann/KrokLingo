@@ -96,7 +96,11 @@ interface Span {
 }
 
 /** Longest phrase (by word count) whose tokens cover `index` within one sentence. */
-function matchPhrase<T extends { words: string[] }>(a: AnalyzedText, index: number, pool: Iterable<T>): (Span & { item: T }) | null {
+function matchPhrase<T extends { words: string[] }>(
+  a: AnalyzedText,
+  index: number,
+  pool: Iterable<T>,
+): (Span & { item: T }) | null {
   let best: (Span & { item: T }) | null = null
   const sentence = a.tokens[index].sentence
   for (const item of pool) {
@@ -133,7 +137,8 @@ interface SenseChoice {
   alternatives: string[]
 }
 
-const has = (list: string[] | undefined, raw: string | undefined) => !!raw && !!list && [...candidates(raw)].some((c) => list.includes(c))
+const has = (list: string[] | undefined, raw: string | undefined) =>
+  !!raw && !!list && [...candidates(raw)].some((c) => list.includes(c))
 
 /** Scores each sense against the sentence. Commits only when one sense is clearly ahead. */
 export function chooseSense(senses: Sense[], a: AnalyzedText, index: number, related: string[] = []): SenseChoice {
@@ -167,8 +172,14 @@ export function chooseSense(senses: Sense[], a: AnalyzedText, index: number, rel
 
 /** Ukrainian infinitive: "спричиняти", "відкривати(ся)", "рости". */
 const UK_VERB = /(?:ти|тися|тись|ть|ться)(?:\s*\([^)]*\))?$/
-const DETERMINERS = new Set('the a an this these those his her its their our my your any no some each every whose one two several many much'.split(' '))
-const VERB_BEFORE = new Set('to can may will would should must might could does did do not cannot often usually also'.split(' '))
+const DETERMINERS = new Set(
+  'the a an this these those his her its their our my your any no some each every whose one two several many much'.split(
+    ' ',
+  ),
+)
+const VERB_BEFORE = new Set(
+  'to can may will would should must might could does did do not cannot often usually also'.split(' '),
+)
 const BE = new Set('is are was were be been being'.split(' '))
 
 /** A rough guess from the neighbours; undefined when the sentence does not tell. */
@@ -235,11 +246,27 @@ function resolveBuiltin(ctx: ClickContext): Resolution {
         .map((k) => ({ words: k.split(' '), key: k }))
       const m = matchPhrase(a, ctx.index, multi)
       if (m) {
-        return { ...base, key: m.item.key, kind: 'phrase', unitText: spanText(a, m), translation: terms[m.item.key], source: 'question', certainty: 'verified' }
+        return {
+          ...base,
+          key: m.item.key,
+          kind: 'phrase',
+          unitText: spanText(a, m),
+          translation: terms[m.item.key],
+          source: 'question',
+          certainty: 'verified',
+        }
       }
       const single = [...candidates(token.text)].find((c) => c in terms)
       if (single) {
-        return { ...base, key: single, kind: 'word', unitText: token.text, translation: terms[single], source: 'question', certainty: 'verified' }
+        return {
+          ...base,
+          key: single,
+          kind: 'word',
+          unitText: token.text,
+          translation: terms[single],
+          source: 'question',
+          certainty: 'verified',
+        }
       }
     }
 
@@ -247,10 +274,27 @@ function resolveBuiltin(ctx: ClickContext): Resolution {
     if (token.kind === 'abbr' || /^[A-Z]{2,}$/.test(token.text)) {
       const abbr = lookupAbbreviation(token.text) ?? lookupAbbreviation(token.text.replace(/s$/, ''))
       if (abbr) {
-        return { ...base, key: token.text, kind: 'abbr', unitText: token.text, translation: abbr, source: 'abbr', certainty: 'verified' }
+        return {
+          ...base,
+          key: token.text,
+          kind: 'abbr',
+          unitText: token.text,
+          translation: abbr,
+          source: 'abbr',
+          certainty: 'verified',
+        }
       }
       if (token.kind === 'abbr' && !known(token.text.toLowerCase())) {
-        return { ...base, key: token.text, kind: 'abbr', unitText: token.text, translation: '', source: 'none', certainty: 'unknown', hint: 'Абревіатура — розшифровки немає у вбудованому довіднику.' }
+        return {
+          ...base,
+          key: token.text,
+          kind: 'abbr',
+          unitText: token.text,
+          translation: '',
+          source: 'none',
+          certainty: 'unknown',
+          hint: 'Абревіатура — розшифровки немає у вбудованому довіднику.',
+        }
       }
     }
 
@@ -262,7 +306,16 @@ function resolveBuiltin(ctx: ClickContext): Resolution {
       const head = LATIN_HEADS[latin.head.toLowerCase()]
       const clickedLatin = latinWord(token.text)
       if (full) {
-        return { ...base, key, kind: 'latin', unitText: spanText(a, latin), translation: full, wordMeaning: clickedLatin, source: 'latin', certainty: 'verified' }
+        return {
+          ...base,
+          key,
+          kind: 'latin',
+          unitText: spanText(a, latin),
+          translation: full,
+          wordMeaning: clickedLatin,
+          source: 'latin',
+          certainty: 'verified',
+        }
       }
       return {
         ...base,
@@ -310,14 +363,19 @@ function resolveBuiltin(ctx: ClickContext): Resolution {
         source: choice.confident ? 'context' : 'dictionary',
         certainty: choice.confident ? 'likely' : 'uncertain',
         alternatives: choice.confident ? [] : choice.alternatives,
-        hint: choice.confident ? undefined : 'Значення залежить від контексту, а речення не вказує на нього однозначно.',
+        hint: choice.confident
+          ? undefined
+          : 'Значення залежить від контексту, а речення не вказує на нього однозначно.',
       }
     }
 
     // 6. general dictionary meaning
     const word = [...candidates(token.text)].find((c) => GLOSSARY.has(c))
     if (word) {
-      let senses = GLOSSARY.get(word)!.split(';').map((s) => s.trim()).filter(Boolean)
+      let senses = GLOSSARY.get(word)!
+        .split(';')
+        .map((s) => s.trim())
+        .filter(Boolean)
       // noun and verb senses side by side ("причина; спричиняти"): let the neighbours pick one
       const verbs = senses.filter((s) => UK_VERB.test(s))
       const nouns = senses.filter((s) => !UK_VERB.test(s))
@@ -377,7 +435,15 @@ function resolveBuiltin(ctx: ClickContext): Resolution {
     }
 
     // 7. unknown: say so
-    return { ...base, key: lemma, kind: 'word', unitText: token.text, translation: '', source: 'none', certainty: 'unknown' }
+    return {
+      ...base,
+      key: lemma,
+      kind: 'word',
+      unitText: token.text,
+      translation: '',
+      source: 'none',
+      certainty: 'unknown',
+    }
   })()
 
   if (resolutionCache.size > 1000) resolutionCache.clear()
@@ -397,12 +463,27 @@ export function resolveTranslation(ctx: ClickContext, user: UserLexicon = () => 
     const own = id ? entry?.contextual?.[id] : undefined
     if (own) {
       const unit = entry === unitEntry ? {} : { key: entry!.word, kind: 'word' as const, unitText: builtin.clicked }
-      return { ...builtin, ...unit, translation: own, source: 'user-context', certainty: 'verified', alternatives: [], hint: undefined }
+      return {
+        ...builtin,
+        ...unit,
+        translation: own,
+        source: 'user-context',
+        certainty: 'verified',
+        alternatives: [],
+        hint: undefined,
+      }
     }
   }
   // 2. user's translation everywhere
   if (unitEntry?.source === 'manual' && unitEntry.translation) {
-    return { ...builtin, translation: unitEntry.translation, source: 'user', certainty: 'verified', alternatives: [], hint: undefined }
+    return {
+      ...builtin,
+      translation: unitEntry.translation,
+      source: 'user',
+      certainty: 'verified',
+      alternatives: [],
+      hint: undefined,
+    }
   }
   return builtin
 }
@@ -413,11 +494,19 @@ export function resolveTranslation(ctx: ClickContext, user: UserLexicon = () => 
  */
 export function storedText(r: Pick<Resolution, 'translation' | 'certainty' | 'alternatives'>): string {
   if (!r.translation) return ''
-  return r.certainty === 'uncertain' && r.alternatives.length ? [r.translation, ...r.alternatives].join('; ') : r.translation
+  return r.certainty === 'uncertain' && r.alternatives.length
+    ? [r.translation, ...r.alternatives].join('; ')
+    : r.translation
 }
 
 /** Resolve a click given the raw text and the clicked token index. */
-export function translateClick(text: string, index: number, contextId?: string, user?: UserLexicon, related?: string): Resolution {
+export function translateClick(
+  text: string,
+  index: number,
+  contextId?: string,
+  user?: UserLexicon,
+  related?: string,
+): Resolution {
   return resolveTranslation({ text, index, contextId, related }, user)
 }
 
@@ -425,19 +514,23 @@ export function translateClick(text: string, index: number, contextId?: string, 
  * Re-resolves a stored, non-manual entry against the current built-in data, so updates to the
  * dictionary reach it. Returns null when the entry must be left alone (the user's own text).
  */
-export function refreshedTranslation(entry: DictEntry): { translation: string; certainty: Certainty; origin: ResolutionSource } | null {
+export function refreshedTranslation(
+  entry: DictEntry,
+): { translation: string; certainty: Certainty; origin: ResolutionSource } | null {
   if (entry.source === 'manual') return null
   if (entry.context && entry.surface) {
     const a = analyzeText(entry.context)
     const index = a.tokens.findIndex((t) => t.text.toLowerCase() === entry.surface!.toLowerCase())
     if (index >= 0) {
       const r = resolveBuiltin({ text: entry.context, index, contextId: entry.contextId })
-      if (r.key === entry.word && r.translation) return { translation: storedText(r), certainty: r.certainty, origin: r.source }
+      if (r.key === entry.word && r.translation)
+        return { translation: storedText(r), certainty: r.certainty, origin: r.source }
     }
   }
   // no stored context (older entries): the word on its own
   const r = resolveBuiltin({ text: entry.word, index: 0 })
-  if (r.key === entry.word && r.translation) return { translation: storedText(r), certainty: r.certainty, origin: r.source }
+  if (r.key === entry.word && r.translation)
+    return { translation: storedText(r), certainty: r.certainty, origin: r.source }
   return null
 }
 

@@ -47,10 +47,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>{options.cancelLabel ?? 'Скасувати'}</AlertDialogCancel>
-              <AlertDialogAction
-                variant={options.destructive ? 'destructive' : 'default'}
-                onClick={() => settle(true)}
-              >
+              <AlertDialogAction variant={options.destructive ? 'destructive' : 'default'} onClick={() => settle(true)}>
                 {options.confirmLabel ?? 'Продовжити'}
               </AlertDialogAction>
             </AlertDialogFooter>

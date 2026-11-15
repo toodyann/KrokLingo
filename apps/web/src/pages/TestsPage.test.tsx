@@ -19,7 +19,15 @@ const b = bank(qs)
 afterEach(() => window.history.replaceState(null, '', '/'))
 
 const running = (): ActiveSession => ({
-  ...createSession({ mode: 'exam', title: 'Іспит', questions: qs.slice(0, 10), timeLimitMin: 150, instantFeedback: false, threshold: 60, topics: [] }),
+  ...createSession({
+    mode: 'exam',
+    title: 'Іспит',
+    questions: qs.slice(0, 10),
+    timeLimitMin: 150,
+    instantFeedback: false,
+    threshold: 60,
+    topics: [],
+  }),
   answers: [0, 1, ...Array(8).fill(null)],
 })
 

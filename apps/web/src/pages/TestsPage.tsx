@@ -52,7 +52,11 @@ export function TestsPage() {
 
   return (
     <div className="page">
-      <PageHeader title="Тести" subtitle={`${bank.questions.length} питань · ${topics.length} тем`} actions={<LangSwitch />} />
+      <PageHeader
+        title="Тести"
+        subtitle={`${bank.questions.length} питань · ${topics.length} тем`}
+        actions={<LangSwitch />}
+      />
 
       {session && (
         <Alert className="mb-6 has-data-[slot=alert-action]:pr-32">
@@ -99,11 +103,16 @@ export function TestsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">Вільне тренування</CardTitle>
-            <CardDescription>Обирайте збірники й теми, кількість питань і повторюйте помилки — без обмеження часу.</CardDescription>
+            <CardDescription>
+              Обирайте збірники й теми, кількість питань і повторюйте помилки — без обмеження часу.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mode-facts m-0">
-              <Fact value={bank.collections.length} label={pluralUk(bank.collections.length, 'збірник', 'збірники', 'збірників')} />
+              <Fact
+                value={bank.collections.length}
+                label={pluralUk(bank.collections.length, 'збірник', 'збірники', 'збірників')}
+              />
               <Fact value={topics.length} label="тем" />
               <Fact value={mistakes} label="з помилками" />
             </div>

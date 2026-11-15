@@ -25,7 +25,12 @@ export interface Range {
   days: number
 }
 
-export function periodRange(period: Period, history: AttemptRecord[], dictionary: DictEntry[], now = Date.now()): Range {
+export function periodRange(
+  period: Period,
+  history: AttemptRecord[],
+  dictionary: DictEntry[],
+  now = Date.now(),
+): Range {
   const to = addDays(startOfDay(now), 1)
   if (period !== 'all') return { from: addDays(to, -period), to, days: period }
   const firsts = [...history.map((r) => r.finishedAt), ...dictionary.map((e) => e.addedAt)]
@@ -80,7 +85,11 @@ export interface ActivityPoint {
 }
 
 /** Daily buckets up to 90 days; weekly beyond that, so columns stay readable. */
-export function activitySeries(history: AttemptRecord[], dictionary: DictEntry[], range: Range): {
+export function activitySeries(
+  history: AttemptRecord[],
+  dictionary: DictEntry[],
+  range: Range,
+): {
   points: ActivityPoint[]
   bucket: 'day' | 'week'
 } {

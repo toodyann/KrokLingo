@@ -23,7 +23,11 @@ export const UK_COLLECTION: Collection = { id: 'uk-col', name: 'Крок 2020', 
 /** A bank with English and Ukrainian collections; questions go to 'en-col' unless they say otherwise. */
 export function bank(
   questions: Question[],
-  { lang = 'en', passages = [] as Passage[], custom = EMPTY_CUSTOM }: { lang?: Lang; passages?: Passage[]; custom?: CustomBank } = {},
+  {
+    lang = 'en',
+    passages = [] as Passage[],
+    custom = EMPTY_CUSTOM,
+  }: { lang?: Lang; passages?: Passage[]; custom?: CustomBank } = {},
 ): Bank {
   return buildBank({ collections: [EN_COLLECTION, UK_COLLECTION], questions, passages }, custom, lang)
 }

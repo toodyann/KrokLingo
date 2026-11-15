@@ -17,8 +17,17 @@ const report = []
 
 /* ---------- similarity ---------- */
 
-const norm = (s) => s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim()
-const words = (s) => new Set(norm(s).split(' ').filter((w) => w.length >= 3))
+const norm = (s) =>
+  s
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim()
+const words = (s) =>
+  new Set(
+    norm(s)
+      .split(' ')
+      .filter((w) => w.length >= 3),
+  )
 function jaccard(a, b) {
   let inter = 0
   for (const w of a) if (b.has(w)) inter++
@@ -140,7 +149,9 @@ if (fs.existsSync(bsmuFile)) {
       ids.add(id)
       added++
     })
-    report.push(`bsmu ${year}: parsed ${parsed.items.length}/${parsed.found} (problems ${parsed.problems.length}), new ${added}`)
+    report.push(
+      `bsmu ${year}: parsed ${parsed.items.length}/${parsed.found} (problems ${parsed.problems.length}), new ${added}`,
+    )
   }
 }
 
@@ -189,14 +200,23 @@ function parsePercentBooklet(raw) {
   }
   return items
     .filter((it) => it.correct >= 0 && it.options.length >= 4)
-    .map((it) => ({ n: it.n, text: it.text, options: [it.options[it.correct], ...it.options.filter((_, i) => i !== it.correct)] }))
+    .map((it) => ({
+      n: it.n,
+      text: it.text,
+      options: [it.options[it.correct], ...it.options.filter((_, i) => i !== it.correct)],
+    }))
 }
 
 function ukCollection(year) {
   const id = `uk-${year}`
   if (!files.has(id)) {
     files.set(id, {
-      collection: { id, name: `Буклет ${year} (укр.)`, description: `Крок 1. Стоматологія, україномовний буклет ${year} року`, lang: 'uk' },
+      collection: {
+        id,
+        name: `Буклет ${year} (укр.)`,
+        description: `Крок 1. Стоматологія, україномовний буклет ${year} року`,
+        lang: 'uk',
+      },
       passages: [],
       questions: [],
     })
@@ -218,7 +238,11 @@ function addUk(year, idPrefix, items, label) {
   const clean = items
     .filter((it) => cyrRatio(it.text + it.options.join(' ')) > 0.6) // English subtests stay out
     .filter((it) => !lostGlyphUk.test(it.text) && !it.options.some((o) => lostGlyphUk.test(o)))
-    .map((it) => ({ ...it, text: tidy(it.text), options: it.options.map(tidy).filter((o) => o && o !== '-' && o !== '–') }))
+    .map((it) => ({
+      ...it,
+      text: tidy(it.text),
+      options: it.options.map(tidy).filter((o) => o && o !== '-' && o !== '–'),
+    }))
     .filter((it) => it.text.length > 10 && it.options.length >= 4)
   if (!clean.length) {
     report.push(`${label}: nothing usable of ${items.length}`)

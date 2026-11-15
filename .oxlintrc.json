@@ -1,11 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "ignorePatterns": ["**/dist/**", "**/drizzle/**"],
-  "plugins": [
-    "react",
-    "typescript",
-    "oxc"
-  ],
+  "plugins": ["react", "typescript", "oxc"],
   "rules": {
     "react/rules-of-hooks": "error",
     "react/only-export-components": [
@@ -17,9 +13,7 @@
   },
   "overrides": [
     {
-      "files": [
-        "apps/web/src/components/ui/**"
-      ],
+      "files": ["apps/web/src/components/ui/**"],
       "rules": {
         "react/only-export-components": "off"
       }

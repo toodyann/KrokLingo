@@ -124,14 +124,23 @@ export function DashboardPage() {
             <span className="hero-eyebrow">Ласкаво просимо до KrokLingo</span>
             <h2 id="onboarding-title">Ваш шлях до Кроку</h2>
             <p>
-              Складіть пробний іспит або потренуйтеся за темами. Незнайомі слова з питань потраплять у словник, а
-              тут з’явиться ваш прогрес.
+              Складіть пробний іспит або потренуйтеся за темами. Незнайомі слова з питань потраплять у словник, а тут
+              з’явиться ваш прогрес.
             </p>
             <div className="hero-actions">
-              <Button asChild size="lg" className="hero-cta rounded-xl bg-white px-5 font-semibold text-[var(--ink)] shadow-lg hover:bg-white/90">
+              <Button
+                asChild
+                size="lg"
+                className="hero-cta rounded-xl bg-white px-5 font-semibold text-[var(--ink)] shadow-lg hover:bg-white/90"
+              >
                 <a href={link('exam')}>Почати іспит</a>
               </Button>
-              <Button asChild size="lg" variant="outline" className="hero-ghost rounded-xl border-white/35 bg-white/10 px-5 text-white hover:bg-white/20 hover:text-white dark:border-white/35 dark:bg-white/10 dark:hover:bg-white/20">
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="hero-ghost rounded-xl border-white/35 bg-white/10 px-5 text-white hover:bg-white/20 hover:text-white dark:border-white/35 dark:bg-white/10 dark:hover:bg-white/20"
+              >
                 <a href={link('training')}>Тренування</a>
               </Button>
             </div>
@@ -175,7 +184,11 @@ export function DashboardPage() {
 
         <StatCard tone="purple" icon={MessageSquareText} label="Відповіді" value={num(now.answered)}>
           {prev ? (
-            <Delta value={now.answered - prev.answered} text={signed(now.answered - prev.answered)} context={prevWord} />
+            <Delta
+              value={now.answered - prev.answered}
+              text={signed(now.answered - prev.answered)}
+              context={prevWord}
+            />
           ) : (
             <span className="stat-card-note">{periodWord}</span>
           )}
@@ -204,7 +217,11 @@ export function DashboardPage() {
 
         <StatCard tone="coral" icon={Languages} label="Нових слів" value={num(now.newWords)}>
           {prev ? (
-            <Delta value={now.newWords - prev.newWords} text={signed(now.newWords - prev.newWords)} context={prevWord} />
+            <Delta
+              value={now.newWords - prev.newWords}
+              text={signed(now.newWords - prev.newWords)}
+              context={prevWord}
+            />
           ) : (
             <span className="stat-card-note">{periodWord}</span>
           )}
@@ -246,7 +263,13 @@ export function DashboardPage() {
                 sub={`${settings.examQuestions} завдань · ${settings.examMinutes} хв`}
               />
             )}
-            <QuickAction tone="purple" href={link('training')} icon={LayoutGrid} title="Тренування за темами" sub="Без таймера" />
+            <QuickAction
+              tone="purple"
+              href={link('training')}
+              icon={LayoutGrid}
+              title="Тренування за темами"
+              sub="Без таймера"
+            />
             <QuickAction
               tone="sky"
               href={link('flashcards')}
@@ -335,7 +358,12 @@ export function DashboardPage() {
           )}
         </ChartCard>
 
-        <ChartCard className="span-12" tone="sky" title="Точність за темами" value={<span>поріг {settings.threshold}%</span>}>
+        <ChartCard
+          className="span-12"
+          tone="sky"
+          title="Точність за темами"
+          value={<span>поріг {settings.threshold}%</span>}
+        >
           {topics.length === 0 ? (
             <ChartEmpty>Немає відповідей {periodWord}</ChartEmpty>
           ) : (
@@ -446,7 +474,11 @@ function ProgressHero({
           </li>
         </ul>
         <div className="hero-actions">
-          <Button asChild size="lg" className="hero-cta rounded-xl bg-white px-5 font-semibold text-[var(--ink)] shadow-lg hover:bg-white/90">
+          <Button
+            asChild
+            size="lg"
+            className="hero-cta rounded-xl bg-white px-5 font-semibold text-[var(--ink)] shadow-lg hover:bg-white/90"
+          >
             <a href={link(resume ? 'test' : 'exam')}>{resume ? 'Продовжити тест' : 'Почати іспит'}</a>
           </Button>
         </div>
@@ -548,7 +580,12 @@ interface SeriesProps {
 
 /* ---------- activity: answers per day (single series, columns) ---------- */
 
-function ActivityChart({ points, bucket, theme, color }: SeriesProps & { points: ActivityPoint[]; bucket: 'day' | 'week' }) {
+function ActivityChart({
+  points,
+  bucket,
+  theme,
+  color,
+}: SeriesProps & { points: ActivityPoint[]; bucket: 'day' | 'week' }) {
   const Content = ({ active, payload }: TipProps) => {
     if (!active || !payload?.length) return null
     const p = payload[0].payload as ActivityPoint
@@ -594,7 +631,9 @@ function ActivityChart({ points, bucket, theme, color }: SeriesProps & { points:
       <DataTable
         caption="Відповіді за періодами"
         head={['Період', 'Відповідей', 'Правильних', 'Хвилин']}
-        rows={points.filter((p) => p.answered).map((p) => [bucketTitle(p.start, bucket), p.answered, p.correct, p.minutes])}
+        rows={points
+          .filter((p) => p.answered)
+          .map((p) => [bucketTitle(p.start, bucket), p.answered, p.correct, p.minutes])}
       />
     </>
   )
@@ -602,7 +641,12 @@ function ActivityChart({ points, bucket, theme, color }: SeriesProps & { points:
 
 /* ---------- dictionary growth (single series, area) ---------- */
 
-function WordsChart({ points, bucket, theme, color }: SeriesProps & { points: ActivityPoint[]; bucket: 'day' | 'week' }) {
+function WordsChart({
+  points,
+  bucket,
+  theme,
+  color,
+}: SeriesProps & { points: ActivityPoint[]; bucket: 'day' | 'week' }) {
   const Content = ({ active, payload }: TipProps) => {
     if (!active || !payload?.length) return null
     const p = payload[0].payload as ActivityPoint
@@ -650,7 +694,12 @@ function WordsChart({ points, bucket, theme, color }: SeriesProps & { points: Ac
 
 /* ---------- attempt scores against the pass threshold (single series, line) ---------- */
 
-function AttemptsChart({ points, threshold, theme, color }: SeriesProps & { points: AttemptPoint[]; threshold: number }) {
+function AttemptsChart({
+  points,
+  threshold,
+  theme,
+  color,
+}: SeriesProps & { points: AttemptPoint[]; threshold: number }) {
   const Content = ({ active, payload }: TipProps) => {
     if (!active || !payload?.length) return null
     const p = payload[0].payload as AttemptPoint
@@ -675,7 +724,14 @@ function AttemptsChart({ points, threshold, theme, color }: SeriesProps & { poin
             axisLine={{ stroke: theme.grid }}
             minTickGap={16}
           />
-          <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickFormatter={(v: number) => `${v}%`} tickLine={false} axisLine={false} width={44} />
+          <YAxis
+            domain={[0, 100]}
+            ticks={[0, 25, 50, 75, 100]}
+            tickFormatter={(v: number) => `${v}%`}
+            tickLine={false}
+            axisLine={false}
+            width={44}
+          />
           <ReferenceLine
             y={threshold}
             stroke={theme.label2}

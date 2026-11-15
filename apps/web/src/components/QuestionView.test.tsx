@@ -21,21 +21,27 @@ const options = () => screen.getAllByRole('radio')
 
 describe('QuestionView', () => {
   it('shows the options in the session’s order, lettered from A', () => {
-    renderWithApp(<QuestionView question={q} order={[2, 0, 1]} chosen={null} reveal={false} onChoose={() => {}} />, { bank: b })
+    renderWithApp(<QuestionView question={q} order={[2, 0, 1]} chosen={null} reveal={false} onChoose={() => {}} />, {
+      bank: b,
+    })
     expect(options().map((o) => o.textContent)).toEqual(['AVagus nerve', 'BMandibular nerve', 'CFacial nerve'])
     expect(screen.getByText('Текст для читання: Muscles')).toBeTruthy()
   })
 
   it('reports the original index of the chosen option, by row or by letter', async () => {
     const onChoose = vi.fn()
-    renderWithApp(<QuestionView question={q} order={[2, 0, 1]} chosen={null} reveal={false} onChoose={onChoose} />, { bank: b })
+    renderWithApp(<QuestionView question={q} order={[2, 0, 1]} chosen={null} reveal={false} onChoose={onChoose} />, {
+      bank: b,
+    })
     await userEvent.click(options()[0])
     await userEvent.click(screen.getByRole('button', { name: 'Варіант C' }))
     expect(onChoose.mock.calls).toEqual([[2], [1]])
   })
 
   it('marks the chosen option before the answer is revealed', () => {
-    renderWithApp(<QuestionView question={q} order={[0, 1, 2]} chosen={1} reveal={false} onChoose={() => {}} />, { bank: b })
+    renderWithApp(<QuestionView question={q} order={[0, 1, 2]} chosen={1} reveal={false} onChoose={() => {}} />, {
+      bank: b,
+    })
     expect(options()[1].getAttribute('aria-checked')).toBe('true')
     expect(options()[1].className).toContain('selected')
     expect(screen.queryByText(/Пояснення/)).toBeNull()

@@ -12,7 +12,11 @@ const rows = WORKSPACES.map((dir) => {
 })
 
 console.log(
-  ['### Coverage', '', `| Workspace | ${METRICS.join(' | ')} |`, `|---|${METRICS.map(() => '---:').join('|')}|`, ...rows].join(
-    '\n',
-  ),
+  [
+    '### Coverage',
+    '',
+    `| Workspace | ${METRICS.join(' | ')} |`,
+    `|---|${METRICS.map(() => '---:').join('|')}|`,
+    ...rows,
+  ].join('\n'),
 )

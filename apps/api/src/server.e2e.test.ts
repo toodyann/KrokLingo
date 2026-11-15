@@ -93,7 +93,9 @@ describe('server.ts over the postgres.js driver', () => {
     expect(output).toContain('migrations applied')
     expect(await (await fetch(`${base}/health`)).json()).toEqual({ ok: true })
     expect(await (await fetch(`${base}/ready`)).json()).toEqual({ ok: true, db: true })
-    const tables = await pg.query<{ tablename: string }>("select tablename from pg_tables where schemaname = 'public' order by 1")
+    const tables = await pg.query<{ tablename: string }>(
+      "select tablename from pg_tables where schemaname = 'public' order by 1",
+    )
     expect(tables.rows.map((r) => r.tablename)).toEqual([
       'active_sessions',
       'attempts',
@@ -113,13 +115,30 @@ describe('server.ts over the postgres.js driver', () => {
 
   it('stores and reads user data end to end', async () => {
     const auth = { Authorization: `Bearer ${await token()}`, 'Content-Type': 'application/json' }
-    const entry = { id: 'w1', word: 'tooth', translation: 'зуб', note: '', source: 'builtin', addedAt: 1, updatedAt: 1, lookups: 1, learned: false, box: 0 }
-    const put = await fetch(`${base}/api/dictionary/w1`, { method: 'PUT', headers: auth, body: JSON.stringify({ entry }) })
+    const entry = {
+      id: 'w1',
+      word: 'tooth',
+      translation: 'зуб',
+      note: '',
+      source: 'builtin',
+      addedAt: 1,
+      updatedAt: 1,
+      lookups: 1,
+      learned: false,
+      box: 0,
+    }
+    const put = await fetch(`${base}/api/dictionary/w1`, {
+      method: 'PUT',
+      headers: auth,
+      body: JSON.stringify({ entry }),
+    })
     expect(put.status).toBe(200)
     const replaced = await fetch(`${base}/api/state`, {
       method: 'PUT',
       headers: auth,
-      body: JSON.stringify({ state: { settings: { threshold: 55 }, dictionary: [entry], history: [], session: null, customBank: null } }),
+      body: JSON.stringify({
+        state: { settings: { threshold: 55 }, dictionary: [entry], history: [], session: null, customBank: null },
+      }),
     })
     expect(replaced.status).toBe(200)
     expect(((await replaced.json()) as UserState).settings).toEqual({ threshold: 55 })

@@ -93,7 +93,11 @@ describe('question bank', () => {
       ['u22-1', 'uk-2022', 'anatomy', 'Який нерв?', ['Язиковий', 'Блукаючий'], 0],
     ])
 
-    const again = await app.inject({ method: 'GET', url: '/api/bank', headers: { 'if-none-match': `"${src.version}"` } })
+    const again = await app.inject({
+      method: 'GET',
+      url: '/api/bank',
+      headers: { 'if-none-match': `"${src.version}"` },
+    })
     expect(again.statusCode).toBe(304)
 
     const gz = await app.inject({ method: 'GET', url: '/api/bank', headers: { 'accept-encoding': 'gzip' } })

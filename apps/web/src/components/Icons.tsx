@@ -70,7 +70,14 @@ export function IconClose(p: IconProps) {
 export function IconChevronLeft(p: IconProps) {
   return (
     <Svg {...p}>
-      <path d="M14.5 5.5 8 12l6.5 6.5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <path
+        d="M14.5 5.5 8 12l6.5 6.5"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
     </Svg>
   )
 }
@@ -78,7 +85,14 @@ export function IconChevronLeft(p: IconProps) {
 export function IconChevronRight(p: IconProps) {
   return (
     <Svg {...p}>
-      <path d="M9.5 5.5 16 12l-6.5 6.5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <path
+        d="M9.5 5.5 16 12l-6.5 6.5"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
     </Svg>
   )
 }
@@ -97,7 +111,14 @@ export function IconGrid(p: IconProps) {
 export function IconCheck(p: IconProps) {
   return (
     <Svg {...p}>
-      <path d="M5 12.5 10 17.5 19 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <path
+        d="M5 12.5 10 17.5 19 7"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
     </Svg>
   )
 }

@@ -31,7 +31,14 @@ export default function ScoreTrend({ points, threshold }: { points: ScorePoint[]
       <LineChart data={points} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
         <CartesianGrid vertical={false} stroke={theme.grid} />
         <XAxis dataKey="index" hide />
-        <YAxis domain={[0, 100]} ticks={[0, 50, 100]} tickFormatter={(v: number) => `${v}%`} tickLine={false} axisLine={false} width={40} />
+        <YAxis
+          domain={[0, 100]}
+          ticks={[0, 50, 100]}
+          tickFormatter={(v: number) => `${v}%`}
+          tickLine={false}
+          axisLine={false}
+          width={40}
+        />
         <ReferenceLine y={threshold} stroke={theme.label2} strokeWidth={1} />
         <Tooltip content={Content} cursor={{ stroke: theme.label2, strokeWidth: 1 }} isAnimationActive={false} />
         <Line

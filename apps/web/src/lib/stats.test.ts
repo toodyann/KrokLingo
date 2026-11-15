@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { at, attempt, bank, entry, question } from '../test/fixtures'
-import { activitySeries, attemptSeries, periodRange, previousRange, startOfDay, streakDays, summarize, topicSeries } from './stats'
+import {
+  activitySeries,
+  attemptSeries,
+  periodRange,
+  previousRange,
+  startOfDay,
+  streakDays,
+  summarize,
+  topicSeries,
+} from './stats'
 
 const NOW = at(2026, 3, 15, 18)
 
