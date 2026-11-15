@@ -245,6 +245,23 @@ body:has(.main-test) {
   margin: 0;
 }
 
+/* ---------- navigation behaves like buttons ---------- */
+
+/* sections are links (keyboard, back button), but they can't be selected, dragged out or long-pressed for "copy link" */
+.sidebar,
+.tab-bar {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.sidebar a,
+.sidebar img,
+.tab-bar a,
+.tab-bar img {
+  -webkit-user-drag: none;
+}
+
 /* ---------- sidebar (regular widths) ---------- */
 
 .sidebar {

@@ -79,6 +79,10 @@ function Sidebar({ route }: { route: Route }) {
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setPeek(false)
       }}
+      // a press in the panel never starts a text selection that runs on into the page (clicks still work)
+      onMouseDown={(e) => {
+        if (e.button === 0) e.preventDefault()
+      }}
       onClick={(e) => {
         // choosing a section closes the peeked panel right away
         if ((e.target as HTMLElement).closest('a')) {
@@ -87,7 +91,7 @@ function Sidebar({ route }: { route: Route }) {
         }
       }}
     >
-      <a className="brand" href={link('')} aria-label="KrokLingo — на головну">
+      <a className="brand" href={link('')} draggable={false} aria-label="KrokLingo — на головну">
         <BrandMark size={32} />
         <span className="brand-text fade">
           <span className="brand-name">KrokLingo</span>
@@ -98,6 +102,7 @@ function Sidebar({ route }: { route: Route }) {
           <a
             key={path}
             className="side-item"
+            draggable={false}
             href={link(path)}
             aria-current={routes.includes(route.name) ? 'page' : undefined}
           >
@@ -126,6 +131,7 @@ function TabBar({ route }: { route: Route }) {
           <a
             key={path}
             className="tab"
+            draggable={false}
             href={link(path)}
             aria-current={routes.includes(route.name) ? 'page' : undefined}
           >
