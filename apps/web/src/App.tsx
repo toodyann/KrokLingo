@@ -1,13 +1,11 @@
-import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type ComponentType } from 'react'
+import { lazy, Suspense, useRef, useState, type ComponentType } from 'react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { BrandMark } from './components/BrandMark'
-import { IconBook, IconChevronLeft, IconGear, IconHistory, IconHome, IconTests } from './components/Icons'
+import { IconBook, IconGear, IconHistory, IconHome, IconTests } from './components/Icons'
 import { ConfirmProvider } from './components/ConfirmDialog'
 import { ToastProvider } from './components/Toast'
 import { WordLookupProvider } from './components/WordLookup'
-import { useMediaQuery, WIDE_QUERY } from './lib/hooks'
 import { useRoute, type Route, link } from './lib/router'
 import { AppProvider } from './store/AppStore'
 import { useApp } from './store/context'
@@ -46,52 +44,19 @@ function DictionaryBadge() {
   return toLearn > 0 ? <span className="tab-badge">{toLearn > 99 ? '99+' : toLearn}</span> : null
 }
 
-const COLLAPSE_KEY = 'kroklingo:sidebar-collapsed'
-
-function readCollapsed(): boolean {
-  try {
-    return localStorage.getItem(COLLAPSE_KEY) === '1'
-  } catch {
-    return false
-  }
-}
-
 /**
- * Wide screens: the tab bar becomes a sidebar. It can be collapsed to an icon rail, which
- * peeks open over the content (no layout shift) on mouse hover or keyboard focus.
+ * Wide screens: the tab bar becomes an icon rail. It peeks open over the content (no layout shift)
+ * on mouse hover or keyboard focus, and closes again when the pointer leaves or a section is chosen.
  */
 function Sidebar({ route }: { route: Route }) {
-  const wide = useMediaQuery(WIDE_QUERY)
-  const [collapsed, setCollapsed] = useState(readCollapsed)
   const [peek, setPeek] = useState(false)
-  // Right after "collapse" the pointer is still over the panel; it must not peek straight back
+  // After choosing a section the pointer is still over the panel; it must not peek straight back
   // open. Hover-peek re-arms once the pointer leaves.
   const suppressPeek = useRef(false)
-  const rail = !wide || collapsed
-
-  const toggle = () => {
-    const next = !collapsed
-    setCollapsed(next)
-    setPeek(false)
-    suppressPeek.current = next
-  }
-
-  // Layout effect: the content margin (driven by this class) changes in the same frame as the panel.
-  useLayoutEffect(() => {
-    document.documentElement.classList.toggle('sidebar-collapsed', collapsed)
-  }, [collapsed])
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(COLLAPSE_KEY, collapsed ? '1' : '0')
-    } catch {
-      // per-viewer convenience only
-    }
-  }, [collapsed])
 
   return (
     <aside
-      className={`sidebar${rail ? ' rail' : ''}${rail && peek ? ' peek' : ''}`}
+      className={`sidebar rail${peek ? ' peek' : ''}`}
       aria-label="Розділи"
       onPointerEnter={(e) => {
         // touch taps navigate directly; only a mouse or pen hover peeks
@@ -108,8 +73,8 @@ function Sidebar({ route }: { route: Route }) {
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setPeek(false)
       }}
       onClick={(e) => {
-        // choosing a section from a peeked rail closes it right away
-        if (rail && (e.target as HTMLElement).closest('a')) {
+        // choosing a section closes the peeked panel right away
+        if ((e.target as HTMLElement).closest('a')) {
           suppressPeek.current = true
           setPeek(false)
         }
@@ -135,25 +100,6 @@ function Sidebar({ route }: { route: Route }) {
           </a>
         ))}
       </nav>
-      <div className="sidebar-footer">
-        {wide && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="sidebar-toggle text-muted-foreground"
-                onClick={toggle}
-                aria-label={collapsed ? 'Закріпити бічну панель розгорнутою' : 'Згорнути бічну панель'}
-                aria-expanded={!collapsed}
-              >
-                <IconChevronLeft />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right">{collapsed ? 'Закріпити розгорнутою' : 'Згорнути'}</TooltipContent>
-          </Tooltip>
-        )}
-      </div>
     </aside>
   )
 }
