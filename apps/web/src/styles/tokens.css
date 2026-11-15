@@ -1,65 +1,78 @@
 /*
  * KrokLingo design tokens — the single source for colour, type, space, radius and elevation.
- * Every text/background pair below is WCAG AA (>= 4.5:1); ratios are noted next to the value.
- * Dark is the primary theme: a blue-tinted near-black with layered surfaces and hairline borders,
- * never flat black with identical grey boxes.
+ * One appearance: dark navy with layered translucent cards and a set of bright accents
+ * (lime, purple, sky, coral, yellow, pink) for the stat cards, actions and chart series.
+ * Text/background pairs are WCAG AA (>= 4.5:1); ratios are noted next to the value.
  */
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
 
-  /* surfaces — light */
-  --bg: #f6f7f9;
-  --surface-1: #ffffff; /* cards, panels */
-  --surface-2: #f3f4f7; /* inputs, hover rows, nested blocks */
-  --surface-3: #eaecf1; /* pressed / selected on surface-2 */
-  --sidebar-bg: #eff1f5;
-  --border: #e4e6ec;
-  --border-strong: #d3d7df;
+  /* surfaces */
+  --bg: #080f2b;
+  --bg-2: #101b40; /* secondary background: wells, tracks */
+  --surface-1: #14234a; /* cards, panels */
+  --surface-2: #1b2c58; /* inputs, hover rows, nested blocks */
+  --surface-3: #243868; /* pressed / selected */
+  --card-glass: rgb(20 35 74 / 0.72); /* chart cards over the glow */
+  --sidebar-bg: #0b1535;
+  --border: rgb(255 255 255 / 0.08);
+  --border-strong: rgb(255 255 255 / 0.14);
 
-  /* text — light */
-  --text: #14161c; /* 16.9:1 on bg */
-  --text-2: #5b6170; /* 6.2:1 on surface-1 */
-  --text-3: #6b7180; /* 4.9:1 on surface-1 — captions, meta */
+  /* text */
+  --text: #f1f4ff; /* 14.0:1 on surface-1 */
+  --text-2: #b4bedb; /* 8.3:1 */
+  --text-3: #8f9bc2; /* 5.6:1 */
+  --ink: #0b1535; /* text on the bright accent cards (>= 6.5:1 on all six) */
 
-  /* accent (logo blue) */
-  --brand: #0066cc; /* 5.57:1 as text on surface-1 */
-  --brand-strong: #0058b6;
-  --brand-bg: #0066cc; /* primary buttons, white text 5.57:1 */
-  --brand-bg-hover: #0058b6;
+  /* accents */
+  --lime: #b7f36b;
+  --purple: #a58bfa;
+  --sky: #78d9f5;
+  --coral: #ffad87;
+  --yellow: #ffd36d;
+  --pink: #f4a8ce;
+
+  /* brand blue */
+  --brand: #7fa8ff; /* 6.5:1 as text on surface-1 */
+  --brand-strong: #a3c0ff;
+  --brand-bg: #3461e8; /* primary buttons, white text 5.2:1 */
+  --brand-bg-hover: #4170f2;
+  --brand-gradient: linear-gradient(135deg, #2f5cf0 0%, #6a4ff0 100%);
   --on-brand: #ffffff;
-  --brand-soft: rgb(0 102 204 / 0.1);
-  --brand-ring: rgb(0 102 204 / 0.45);
+  --brand-soft: rgb(127 168 255 / 0.14);
+  --brand-ring: rgb(127 168 255 / 0.55);
 
   /* status */
-  --success: #1a7f37; /* 5.1:1 */
-  --success-soft: rgb(26 127 55 / 0.1);
-  --danger: #c4161c; /* 6.0:1 */
-  --danger-soft: rgb(196 22 28 / 0.08);
-  --warning: #8a5a00; /* 5.9:1 */
-  --warning-soft: rgb(229 160 0 / 0.14);
+  --success: #8fe36b; /* 9.8:1 */
+  --success-soft: rgb(143 227 107 / 0.14);
+  --danger: #ff8f8f; /* 7.0:1 */
+  --danger-soft: rgb(255 143 143 / 0.14);
+  --warning: #ffd36d; /* 10.8:1 */
+  --warning-soft: rgb(255 211 109 / 0.14);
 
   /* highlighter marker — the product signature (words already in the dictionary) */
-  --marker: #ffe98a; /* text on marker 13.8:1 */
-  --marker-strong: #ffd84d;
+  --marker: #5c4d12; /* text on marker 7.6:1 */
+  --marker-strong: #7a6618;
 
-  /* charts (validated with dataviz validate_palette) */
-  --chart-series: #0066cc;
-  --chart-track: #d9e6f5;
-  --chart-grid: #e8eaef;
+  /* charts */
+  --chart-series: #78d9f5;
+  --chart-track: #0f1c42;
+  --chart-grid: rgb(255 255 255 / 0.07);
 
   /* elevation */
-  --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.05);
-  --shadow-md: 0 4px 16px rgb(16 24 40 / 0.08), 0 1px 2px rgb(16 24 40 / 0.06);
-  --shadow-lg: 0 16px 48px rgb(16 24 40 / 0.16), 0 2px 6px rgb(16 24 40 / 0.08);
-  --overlay-bg: rgb(255 255 255 / 0.86);
-  --scrim: rgb(15 18 25 / 0.35);
+  --shadow-sm: 0 1px 2px rgb(2 6 23 / 0.45);
+  --shadow-md: 0 10px 30px rgb(2 6 23 / 0.45), 0 1px 2px rgb(2 6 23 / 0.4);
+  --shadow-lg: 0 24px 64px rgb(2 6 23 / 0.6), 0 2px 8px rgb(2 6 23 / 0.5);
+  --glow-brand: 0 8px 28px rgb(61 107 255 / 0.35);
+  --overlay-bg: rgb(20 35 74 / 0.9);
+  --scrim: rgb(2 6 23 / 0.6);
 
   /* radius */
   --r-xs: 4px;
   --r-sm: 6px;
   --r-md: 8px;
-  --r-lg: 14px; /* = shadcn rounded-xl */
-  --r-xl: 18px;
+  --r-lg: 16px; /* = shadcn rounded-xl */
+  --r-xl: 24px;
   /* hairline ring that matches shadcn Card (ring-1 ring-foreground/10) */
   --ring-surface: 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent);
   --r-full: 999px;
@@ -77,6 +90,7 @@
 
   /* type scale */
   --font-ui: 'Geist Variable', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Unbounded Variable', var(--font-ui);
   --font-read: ui-serif, 'New York', 'Iowan Old Style', 'Palatino Linotype', Charter, Georgia, serif;
   --fs-xs: 0.75rem; /* 12 */
   --fs-sm: 0.8125rem; /* 13 */
@@ -104,50 +118,6 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 
   --ease: cubic-bezier(0.25, 0.9, 0.3, 1);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b0c10;
-    --surface-1: #13151c; /* +1 step: cards */
-    --surface-2: #1a1d26; /* +2: inputs, hover rows, nested */
-    --surface-3: #232735; /* +3: selected */
-    --sidebar-bg: #0e1015;
-    --border: rgb(255 255 255 / 0.07);
-    --border-strong: rgb(255 255 255 / 0.12);
-
-    --text: #ecedf1; /* 15.6:1 on surface-1 */
-    --text-2: #a3a8b6; /* 7.7:1 */
-    --text-3: #8a8f9e; /* 5.7:1 */
-
-    --brand: #6aa8ff; /* 7.5:1 as text */
-    --brand-strong: #8dbcff;
-    --brand-bg: #2563d0; /* white text 5.56:1 */
-    --brand-bg-hover: #2f6fe0;
-    --on-brand: #ffffff;
-    --brand-soft: rgb(106 168 255 / 0.12);
-    --brand-ring: rgb(106 168 255 / 0.5);
-
-    --success: #4ccf7a; /* 9.1:1 */
-    --success-soft: rgb(76 207 122 / 0.12);
-    --danger: #ff7a7a; /* 7.2:1 */
-    --danger-soft: rgb(255 122 122 / 0.12);
-    --warning: #e8b64c; /* 9.8:1 */
-    --warning-soft: rgb(232 182 76 / 0.12);
-
-    --marker: #5c4d12; /* text on marker 7.6:1 */
-    --marker-strong: #7a6618;
-
-    --chart-series: #3987e5;
-    --chart-track: #1d2a3e;
-    --chart-grid: #232735;
-
-    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-    --shadow-md: 0 8px 24px rgb(0 0 0 / 0.45), 0 1px 2px rgb(0 0 0 / 0.4);
-    --shadow-lg: 0 24px 64px rgb(0 0 0 / 0.6), 0 2px 8px rgb(0 0 0 / 0.5);
-    --overlay-bg: rgb(26 29 38 / 0.88);
-    --scrim: rgb(0 0 0 / 0.55);
-  }
 }
 
 @media (prefers-contrast: more) {
