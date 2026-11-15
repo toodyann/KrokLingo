@@ -14,10 +14,12 @@
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present"
+    "test": "npm run test --workspaces --if-present",
+    "test:coverage": "npm run test --workspaces --if-present -- --coverage --coverage.reporter=text-summary --coverage.reporter=html --coverage.reporter=json-summary"
   },
   "devDependencies": {
     "@types/node": "^24.19.2",
+    "@vitest/coverage-v8": "^5.1.0",
     "oxlint": "^1.90.0",
     "typescript": "~7.0.2",
     "vitest": "^5.1.0"
