@@ -166,4 +166,32 @@ function segment(items) {
   return best.out
 }
 
-module.exports = { scores, argmax, segment, ORDER }
+/** Topics for a booklet: subject-ordered head (segmented) + mixed tail (per-question). */
+function bookletTopics(items) {
+  const raw = items.map((i) => argmax(scores(i)))
+  // the ordered head ends after the first pharmacology run (>=3 in a window of 5) in the first 130 items
+  let headEnd = items.length
+  for (let i = 10; i < Math.min(items.length, 130); i++) {
+    const win = raw.slice(i, i + 5).filter((t) => t === 'pharmacology').length
+    if (raw[i] === 'pharmacology' && win >= 3) {
+      let j = i
+      while (j < items.length && raw.slice(j, j + 4).includes('pharmacology')) j++
+      headEnd = j
+      break
+    }
+  }
+  // block position decides, unless the question's own evidence clearly points elsewhere
+  const head = segment(items.slice(0, headEnd)).map((t, k) => {
+    const s = scores(items[k])
+    const own = argmax(s)
+    return s[own] - s[t] >= 5 ? own : t
+  })
+  const tail = items.slice(headEnd).map((it, k) => {
+    const s = scores(it)
+    const best = argmax(s)
+    return s[best] > 0 ? best : raw[headEnd + k]
+  })
+  return { topics: [...head, ...tail], headEnd }
+}
+
+module.exports = { scores, argmax, segment, bookletTopics, ORDER }
