@@ -55,7 +55,7 @@ export function TestsPage() {
       <PageHeader title="Тести" subtitle={`${bank.questions.length} питань · ${topics.length} тем`} actions={<LangSwitch />} />
 
       {session && (
-        <Alert className="mb-6">
+        <Alert className="mb-6 has-data-[slot=alert-action]:pr-32">
           <IconTests />
           <AlertTitle>{session.title}</AlertTitle>
           <AlertDescription>
