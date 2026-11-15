@@ -33,6 +33,7 @@ services:
       - key: MIGRATE_ON_START
         value: "true"
       - key: CORS_ORIGINS
-        value: https://toodyann.github.io
+        # the live site and the local dev server (npm run dev)
+        value: https://toodyann.github.io,http://localhost:5173
       - key: DB_POOL_MAX
         value: "5"
