@@ -2,17 +2,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { useApp } from '../store/context'
-import type { SyncStatus } from '../store/useCloudSync'
-
-const STATUS: Record<SyncStatus, { label: string; variant: 'success' | 'secondary' | 'warning' | 'destructive' }> = {
-  off: { label: 'Вимкнено', variant: 'secondary' },
-  'signed-out': { label: 'Не виконано вхід', variant: 'secondary' },
-  connecting: { label: 'Підключення…', variant: 'secondary' },
-  synced: { label: 'Синхронізовано', variant: 'success' },
-  saving: { label: 'Збереження…', variant: 'secondary' },
-  offline: { label: 'Офлайн — зміни збережуться пізніше', variant: 'warning' },
-  error: { label: 'Помилка синхронізації', variant: 'destructive' },
-}
+import { SYNC_STATUS as STATUS } from '../lib/cloud/status'
+import { Avatar } from './Avatar'
 
 function GoogleMark() {
   return (
@@ -70,13 +61,7 @@ export function AccountCard() {
         <CardDescription>Дані зберігаються в обліковому записі та синхронізуються між пристроями.</CardDescription>
       </CardHeader>
       <CardContent className="flex items-center gap-3">
-        {user.avatarUrl ? (
-          <img src={user.avatarUrl} alt="" width={40} height={40} className="size-10 rounded-full" referrerPolicy="no-referrer" />
-        ) : (
-          <span className="grid size-10 place-items-center rounded-full bg-muted font-semibold" aria-hidden="true">
-            {(user.name ?? user.email ?? '?').slice(0, 1).toUpperCase()}
-          </span>
-        )}
+        <Avatar user={user} />
         <div className="min-w-0 flex-1">
           {user.name && <div className="truncate font-medium">{user.name}</div>}
           <div className="truncate text-sm text-muted-foreground">{user.email}</div>
