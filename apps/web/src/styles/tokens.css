@@ -33,14 +33,14 @@
   --pink: #f4a8ce;
 
   /* brand blue */
-  --brand: #7fa8ff; /* 6.5:1 as text on surface-1 */
-  --brand-strong: #a3c0ff;
+  --brand: #f1f4ff; /* white accent: 14.0:1 as text on surface-1 */
+  --brand-strong: #ffffff;
   --brand-bg: #3461e8; /* primary buttons, white text 5.2:1 */
   --brand-bg-hover: #4170f2;
   --brand-gradient: linear-gradient(135deg, #2f5cf0 0%, #6a4ff0 100%);
   --on-brand: #ffffff;
-  --brand-soft: rgb(127 168 255 / 0.14);
-  --brand-ring: rgb(127 168 255 / 0.55);
+  --brand-soft: rgb(241 244 255 / 0.1);
+  --brand-ring: rgb(241 244 255 / 0.6);
 
   /* status */
   --success: #8fe36b; /* 9.8:1 */

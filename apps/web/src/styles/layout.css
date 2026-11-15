@@ -532,7 +532,7 @@ body:has(.main-test) {
 }
 
 .tab[aria-current='page'] svg {
-  filter: drop-shadow(0 2px 8px rgb(61 107 255 / 0.55));
+  filter: drop-shadow(0 2px 8px rgb(255 255 255 / 0.35));
 }
 
 .tab .tab-badge {
