@@ -38,9 +38,13 @@ const SPLITS: Record<string, Split> = {
       /\b(?:head|neck|face|facial|skull|cran\w*|orbit\w*|nasal|nose|zygomatic|sphenoid|ethmoid|occipital|frontal|parietal|hyoid)\b/g,
       /\b(?:tongue|lingual|palat\w*|lips?|cheeks?|buccal|oral|pharyn\w*|laryn\w*|tonsil\w*|salivary|parotid|submandibular|sublingual)\b/g,
       /\b(?:trigemin\w*|hypoglossal|glossopharyngeal|chorda tympani|infraorbital|mental|carotid|jugular|thyroid|sternocleidomastoid|cervical)\b/g,
+      // Ukrainian (stems: \b and \w do not cover Cyrillic)
+      /зуб|щелеп|жувальн|порожнин[а-яіїєґ']* рота|ротов|голов|ши[яїю]|облич|череп|очниц|носов|вилиц|клиноподібн|решітчаст|потиличн|лобов|тім'ян/g,
+      /язик|піднебін|губ|щок|глотк|гортан|мигдалик|слинн|привушн|піднижньощелепн|під'язиков|трійчаст|лицьов[а-яіїєґ']* нерв|язикоглотков|барабанн[а-яіїєґ']* струн|підочноямков|підборідн|сонн|яремн|щитоподібн|груднинно-ключично|шийн/g,
     ],
     stay: [
       /\b(?:arm|forearm|hand|leg|thigh|knee|foot|feet|shoulder|hip|pelvi\w*|femor\w*|humer\w*|spinal|vertebr\w*|rib|thora\w*|abdom\w*|heart|lungs?|liver|stomach|intestin\w*|kidney|uter\w*|bladder|urethra|prostat\w*|ovar\w*|testi\w*|peritone\w*|diaphragm|brachial|lumbar|sacral)\b/g,
+      /плеч|передпліч|кист[ьі]|стегн|гомілк|колін|стоп|таз|хреб|ребр|грудн[а-яіїєґ']* клітк|живот|черевн|серц|леген|печінк|шлунк|кишк|нирк|матк|сечов|простат|яєчник|яєчк|очеревин|діафрагм|поперек|крижов/g,
     ],
   },
   histology: {
@@ -50,8 +54,14 @@ const SPLITS: Record<string, Split> = {
       /\b(?:germ layers?|ectoderm\w*|mesoderm\w*|endoderm\w*|mesenchym\w*|neural (?:tube|crest)|notochord|somites?|myotome|sclerotome|dermatome)\b/g,
       /\b(?:placent\w*|chorion\w*|amnion|amniotic|yolk sac|allantois|provisory|umbilical)\b/g,
       /\b(?:branchial|pharyngeal (?:arch|pouch|cleft)\w*|cleft (?:lip|palate)|malformation\w*|tooth (?:germ|development|bud)|enamel organ|dental (?:papilla|lamina|sac|follicle)|hertwig\w*|odontogenesis|stellate reticulum|inner enamel epithelium|outer enamel epithelium)\b/g,
+      // Ukrainian
+      /ембріон|плід|плода|зародк|зигот|бластоцист|бластул|гаструл|дроблен|імплантац|онтогенез|ектодерм|мезодерм|ендодерм|мезенхім|нервов[а-яіїєґ']* (?:трубк|гребін)|хорд|соміт|міотом|склеротом|дерматом/g,
+      /плацент|хоріон|амніон|жовтков|алантоїс|провізорн|пупков|зябров|глотков[а-яіїєґ']* (?:дуг|кишен)|вовч[а-яіїєґ']* паща|заяч[а-яіїєґ']* губ|незрощен|вад[а-яіїєґ']* розвитку|зачат[а-яіїєґ']* зуба|розвит[а-яіїєґ']* зуба|емалев[а-яіїєґ']* орган|зубн[а-яіїєґ']* (?:сосоч|пластинк|мішеч)|гертвіг|одонтогенез/g,
     ],
-    stay: [/\b(?:specimen|microslide|stain\w*|electron micro\w*|tissue|epitheli\w*|cells?)\b/g],
+    stay: [
+      /\b(?:specimen|microslide|stain\w*|electron micro\w*|tissue|epitheli\w*|cells?)\b/g,
+      /препарат|забарвл|електронн[а-яіїєґ']* мікроскоп|тканин|епітелі|клітин/g,
+    ],
   },
   microbiology: {
     to: 'immunology',
@@ -60,9 +70,13 @@ const SPLITS: Record<string, Split> = {
       /\b(?:phagocyt\w*|complement|interferon\w*|cytokine\w*|interleukin\w*|histocompatib\w*|hla)\b/g,
       /\b(?:allerg\w*|anaphyla\w*|hypersensitiv\w*|tuberculin|mantoux|transplant\w*|graft\w*|rejection|autoimmun\w*|immunodeficien\w*|serum sickness|arthus)\b/g,
       /\b(?:vaccin\w*|toxoid|immunization|immunisation|prophylaxis)\b/g,
+      // Ukrainian
+      /імун|антитіл|антиген|імуноглобулін|ig[agmde]|[тв]-лімфоцит|т-хелпер|т-кілер|лімфоцит|фагоцит|комплемент|інтерферон|цитокін|інтерлейкін|гістосумісн/gi,
+      /алерг|анафілак|гіперчутлив|туберкулін|манту|трансплант|відторгнен|аутоімун|імунодефіцит|сироватков[а-яіїєґ']* хвороб|артюс|вакцин|анатоксин|щеплен/g,
     ],
     stay: [
       /\b(?:bacteri\w*|virus\w*|viral|fung\w*|cocci|bacill\w*|spore\w*|culture\w*|colon(?:y|ies)|medium|agar|gram|stain\w*|smear|causative agent|microscopy|incubat\w*|isolat\w*|phage\w*|toxin)\b/g,
+      /бактері|вірус|гриб|кок[иі]|бацил|спор|культур|колоні|середовищ|агар|грам|забарвл|мазок|мазку|збудник|мікроскоп|інкубац|виділен|фаг|токсин/g,
     ],
   },
   pathology: {
@@ -72,11 +86,18 @@ const SPLITS: Record<string, Split> = {
       /\b(?:fever|pyrogen\w*|hypoxi\w*|anoxi\w*|shock|acidosis|alkalosis|dehydrat\w*|hyperhydrat\w*|edema|oedema|osmotic|oncotic)\b/g,
       /\b(?:leukocytosis|leukopenia|anemi\w*|anaemi\w*|erythrocytosis|thrombocytopeni\w*|coagul\w*|hemostasis|blood count|reticulocyt\w*|hemoglobin|haemoglobin|hematocrit)\b/g,
       /\b(?:experiment\w*|test animal|rabbit|rat|dog|insufficiency|failure|hyperfunction|hypofunction|hormone\w*|secretion|arterial pressure|blood pressure|heart rate|breathing|respiration)\b/g,
+      // Ukrainian
+      /патогенез|механізм|провідн[а-яіїєґ']* ланк|внаслідок|спричин|розвит|гарячк|пірогенн|гіпокс|аноксі|шок|ацидоз|алкалоз|зневоднен|гіпергідрат|набряк|осмотичн|онкотичн/g,
+      /лейкоцитоз|лейкопені|анемі|еритроцитоз|тромбоцитопені|згортан|гемостаз|аналіз[а-яіїєґ']* крові|ретикулоцит|гемоглобін|гематокрит|експеримент|тварин|кролик|щур|собак|недостатн|гіперфункц|гіпофункц|гормон|секреці|артеріальн[а-яіїєґ']* тиск|частот[а-яіїєґ']* серц|дихан/g,
     ],
     stay: [
       /\b(?:autops\w*|post-?mortem|biopsy|bioptate|macroscop\w*|microscop\w*|histolog\w*|section|cut surface|on palpation|morpholog\w*|specimen|deceased|died)\b/g,
       /\b(?:necro\w*|dystroph\w*|amyloid\w*|hyalin\w*|calcif\w*|petrifi\w*|atroph\w*|metaplas\w*|dysplas\w*|granulom\w*|giant cells|infiltrat\w*|fibrin\w*|purulent|abscess|phlegmon)\b/g,
       /\b(?:tumou?r\w*|carcinom\w*|sarcom\w*|adenom\w*|papillom\w*|ameloblastom\w*|odontom\w*|lymphom\w*|metasta\w*|atypi\w*|cyst\w*)\b/g,
+      // Ukrainian
+      /розтин|автопсі|аутопсі|біопсі|біоптат|макроскопічн|мікроскопічн|гістологічн|на розрізі|пальпац|морфолог|препарат|помер/g,
+      /некроз|дистрофі|амілоїд|гіалін|звапнен|петрифік|атрофі|метаплаз|дисплаз|гранульом|гігантськ[а-яіїєґ']* клітин|інфільтр|фібрин|гнійн|абсцес|флегмон/g,
+      /пухлин|карцином|саркома|аденом|папілом|амелобластом|одонтом|лімфом|метастаз|атипі|кіст/g,
     ],
   },
 }

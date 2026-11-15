@@ -144,6 +144,159 @@ if (fs.existsSync(bsmuFile)) {
   }
 }
 
+/* ---------- Ukrainian booklets (emu.dp.ua) ---------- */
+
+const { normalizeUk, scoresUk } = require('./classify-uk.cjs')
+
+const cyrRatio = (s) => {
+  const letters = s.match(/\p{L}/gu) || []
+  return letters.length ? letters.filter((c) => /[Ѐ-ӿ]/.test(c)).length / letters.length : 0
+}
+// ABO groups in Ukrainian booklets keep their Cyrillic letters ("А(II)"): only a bare "(II)" is damage
+const lostGlyphUk = /(^|[^\p{L}\p{N}])\((I{1,3}|IV)\)/u
+
+/** Text from columns.mjs: drop running heads and sheet codes, Latin option letters, Cyrillic «і». */
+function prepUk(raw) {
+  return normalizeUk(raw.replace(/\r/g, ''))
+    .split('\n')
+    .filter((l) => !/Крок\s*1.*Стоматолог/i.test(l) && !/^\s*\d{5,}\s*$/.test(l))
+    .join('\n')
+    .replace(/^(\s*)([АВСЕ])\.(?=\s)/gm, (m, s, c) => s + { А: 'A', В: 'B', С: 'C', Е: 'E' }[c] + '.')
+}
+
+/** The 2019 booklet marks answers with percentages: "100% Автоліз" is correct, "0% …" are not. */
+function parsePercentBooklet(raw) {
+  const items = []
+  let cur = null
+  let inOptions = false
+  for (const line of raw.replace(/\r/g, '').replace(/\f/g, '\n').split('\n')) {
+    const l = line.trim()
+    if (!l || /^(Завантажено|HTTP\/|ТЕСТУВАННЯ|Буклет українською)/.test(l)) continue
+    const q = l.match(/^(\d{1,3})\.\s+(.*)$/)
+    const o = l.match(/^(\d{1,3})%\s+(.*)$/)
+    if (q && (!cur || inOptions)) {
+      cur = { n: Number(q[1]), text: q[2], options: [], correct: -1 }
+      items.push(cur)
+      inOptions = false
+    } else if (o && cur) {
+      if (o[1] === '100') cur.correct = cur.options.length
+      cur.options.push(o[2])
+      inOptions = true
+    } else if (cur) {
+      if (inOptions) cur.options[cur.options.length - 1] += ' ' + l
+      else cur.text += ' ' + l
+    }
+  }
+  return items
+    .filter((it) => it.correct >= 0 && it.options.length >= 4)
+    .map((it) => ({ n: it.n, text: it.text, options: [it.options[it.correct], ...it.options.filter((_, i) => i !== it.correct)] }))
+}
+
+function ukCollection(year) {
+  const id = `uk-${year}`
+  if (!files.has(id)) {
+    files.set(id, {
+      collection: { id, name: `Буклет ${year} (укр.)`, description: `Крок 1. Стоматологія, україномовний буклет ${year} року`, lang: 'uk' },
+      passages: [],
+      questions: [],
+    })
+  }
+  return files.get(id)
+}
+
+const knownUk = new Known()
+for (const f of files.values()) {
+  if (f.collection.lang !== 'uk') continue
+  for (const q of f.questions) {
+    knownUk.add(q[2], q[3][0])
+    ids.add(q[0])
+  }
+}
+
+/** Adds one Ukrainian booklet: items with the correct option first, numbered as in the booklet. */
+function addUk(year, idPrefix, items, label) {
+  const clean = items
+    .filter((it) => cyrRatio(it.text + it.options.join(' ')) > 0.6) // English subtests stay out
+    .filter((it) => !lostGlyphUk.test(it.text) && !it.options.some((o) => lostGlyphUk.test(o)))
+    .map((it) => ({ ...it, text: tidy(it.text), options: it.options.map(tidy).filter((o) => o && o !== '-' && o !== '–') }))
+    .filter((it) => it.text.length > 10 && it.options.length >= 4)
+  if (!clean.length) {
+    report.push(`${label}: nothing usable of ${items.length}`)
+    return
+  }
+  const { topics } = bookletTopics(clean, scoresUk)
+  const file = ukCollection(year)
+  let added = 0
+  clean.forEach((it, k) => {
+    const id = `${idPrefix}-${it.n}`
+    if (ids.has(id) || knownUk.has(it.text, it.options[0])) return
+    file.questions.push([id, topics[k], it.text, it.options])
+    knownUk.add(it.text, it.options[0])
+    ids.add(id)
+    dirty.add(file.collection.id)
+    added++
+  })
+  report.push(`${label}: usable ${clean.length} of ${items.length}, new ${added}`)
+}
+
+// All Ukrainian sources go through one list, newest year first, so a question repeated across
+// years stays in its newest booklet.
+const ukSources = []
+
+// emu.dp.ua PDFs (text via columns.mjs) in <sources>/txt/emu-uk
+const emuDir = path.join(dir, 'txt/emu-uk')
+if (fs.existsSync(emuDir)) {
+  for (const name of fs.readdirSync(emuDir)) {
+    if (/Англ|removed/i.test(name)) continue // English exams and the answer-stripped scans
+    const variant = name.match(/Стоматологія-(20\d\d)(?:-(\d))?\.txt$/) // "Відповідь А" booklets: answer A
+    const yearly = name.match(/\((?:Буклет )?(20\d\d)\)\.txt$/)
+    const m = variant ?? yearly
+    if (!m) continue
+    const year = Number(m[1])
+    ukSources.push({
+      year,
+      prefix: `u${year}${variant?.[2] ? 'v' + variant[2] : ''}`,
+      label: `emu ${name}`,
+      load() {
+        const raw = readText(path.join(emuDir, name))
+        // the 2019 booklet marks answers with percentages ("100% Автоліз")
+        if ((raw.match(/^\s*100%\s/gm)?.length ?? 0) > 20) return parsePercentBooklet(normalizeUk(raw))
+        return parseBookletText(prepUk(raw)).items.map((it) => ({ n: it.n, text: it.text, options: it.options }))
+      },
+    })
+  }
+}
+
+// medical-club.net pages with H5P tests (correct answers marked) in <sources>/html/mc-uk-<year>[suffix].html
+const htmlDir = path.join(dir, 'html')
+if (fs.existsSync(htmlDir)) {
+  const { parseMedicalClub } = require('./parse.cjs')
+  for (const name of fs.readdirSync(htmlDir)) {
+    const m = name.match(/^mc-uk-(20\d\d)(\w*)\.html$/)
+    if (!m) continue
+    const year = Number(m[1])
+    ukSources.push({
+      year,
+      prefix: `mu${year}${m[2]}`,
+      label: `medical-club ${name}`,
+      load() {
+        const sets = parseMedicalClub(readText(path.join(htmlDir, name)))
+        return sets
+          .flatMap((s) => s.items)
+          .filter((it) => it.correct >= 0 && it.correct < it.options.length)
+          .map((it, k) => ({
+            n: k + 1,
+            text: normalizeUk(it.text),
+            options: [it.options[it.correct], ...it.options.filter((_, i) => i !== it.correct)].map(normalizeUk),
+          }))
+      },
+    })
+  }
+}
+
+ukSources.sort((a, b) => b.year - a.year || a.prefix.localeCompare(b.prefix))
+for (const s of ukSources) addUk(s.year, s.prefix, s.load(), s.label)
+
 /* ---------- write ---------- */
 
 let total = 0

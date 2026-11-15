@@ -156,8 +156,8 @@ function segmentWith(order, S) {
 // Booklets of different years put microbiology before or after pathology; try both orders.
 const ORDERS = [ORDER, ['biology', 'anatomy', 'histology', 'physiology', 'biochemistry', 'pathology', 'microbiology', 'pharmacology']]
 
-function segment(items) {
-  const S = items.map(scores)
+function segment(items, score = scores) {
+  const S = items.map(score)
   let best = null
   for (const order of ORDERS) {
     const r = segmentWith(order, S)
@@ -167,8 +167,8 @@ function segment(items) {
 }
 
 /** Topics for a booklet: subject-ordered head (segmented) + mixed tail (per-question). */
-function bookletTopics(items) {
-  const raw = items.map((i) => argmax(scores(i)))
+function bookletTopics(items, score = scores) {
+  const raw = items.map((i) => argmax(score(i)))
   // the ordered head ends after the first pharmacology run (>=3 in a window of 5) in the first 130 items
   let headEnd = items.length
   for (let i = 10; i < Math.min(items.length, 130); i++) {
@@ -181,13 +181,13 @@ function bookletTopics(items) {
     }
   }
   // block position decides, unless the question's own evidence clearly points elsewhere
-  const head = segment(items.slice(0, headEnd)).map((t, k) => {
-    const s = scores(items[k])
+  const head = segment(items.slice(0, headEnd), score).map((t, k) => {
+    const s = score(items[k])
     const own = argmax(s)
     return s[own] - s[t] >= 5 ? own : t
   })
   const tail = items.slice(headEnd).map((it, k) => {
-    const s = scores(it)
+    const s = score(it)
     const best = argmax(s)
     return s[best] > 0 ? best : raw[headEnd + k]
   })
